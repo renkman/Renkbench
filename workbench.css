@@ -1,0 +1,267 @@
+body
+{
+	background-color: #000099;
+	font-family: monospace;
+	font-size: 10pt;
+	color: #ffffff;
+	/*cursor: url(images/window/cursor.png), url(images/window/cursor.cur), default*/
+}
+
+/* The workbench element */
+#workbench
+{
+	position: absolute;
+	height: 100%;
+	width: 95%;
+	background-color: #000099;
+	z-index: 1;
+}
+
+#mainBar
+{
+	width: 100%;
+	background-color: #ffffff;
+	float: left;
+}
+
+#mainTitle
+{
+	background-image: url(images/window/main_title.png);
+	float: left;
+	width: 175px;
+	height: 20px;
+}
+
+/* The charset element */
+div.char
+{
+	position: absolute;
+	background-image: url(images/fonts/topaz.png);
+	background-repeat: no-repeat;
+	width: 8px;
+	height: 16px;
+}
+
+/* The icon element */
+div.icon
+{
+	position: absolute;
+	z-index: 1;
+}
+
+div.icon > div
+{
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* The window elements */
+div.window
+{
+	position: absolute;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-color: #ffffff;
+	border-width: 2px;
+	background-color: #000099;
+	overflow: hidden;
+	z-index: -1;
+}
+
+span.titleBar
+{
+	width: 100%;
+	float: left;
+	background-image: url(images/window/titlebar_background.png);
+}
+
+div.buttonClose
+{
+	float: left;
+	background-image: url(images/window/button_close.png);
+	width: 20px;
+	height: 20px;
+}
+
+div.title
+{
+	float: left;
+}
+
+div.buttonUp
+{
+	float: right;
+	background-image: url(images/window/button_up.png);
+	width: 24px;
+	height: 20px;
+}
+
+div.buttonDown
+{
+	float: right;
+	background-image: url(images/window/button_down.png);
+	width: 24px;
+	height: 20px;
+}
+
+div.fillerWhiteLeft
+{
+	float: left;
+	background-color: #ffffff;
+	width: 1px;
+	height: 20px;
+}
+
+div.fillerBlueLeft
+{
+	float: left;
+	background-color: #000099;
+	width: 2px;
+	height: 20px;
+}
+
+div.fillerWhiteRight
+{
+	float: right;
+	background-color: #ffffff;
+	width: 3px;
+	height: 20px;
+}
+
+div.fillerBlueRight
+{
+	float: right;
+	background-color: #000099;
+	width: 2px;
+	height: 20px;
+}
+
+div.fillerWhiteRight_1
+{
+	float: right;
+	background-color: #ffffff;
+	width: 1px;
+	height: 20px;
+}
+
+/* Window content */
+h1
+{
+	font-weight: bold;
+	font-size: 12pt;
+	margin: 5px;
+	margin-top: 10px;
+}
+
+h2
+{
+	font-weight: bold;
+	font-size: 10pt;
+	margin-left: 5px;
+	clear: right;
+}
+
+div.content
+{
+	width: 100%;
+	height: 100%;
+	background-color: #000099;
+}
+
+div.text
+{
+	margin: 5px;
+}
+
+div.text > img
+{
+	float: right;
+	margin: 2px;
+}
+
+a
+{
+	color: #ffffff;
+}
+
+table
+{
+	border-color: #ffffff;
+	border-style: solid;
+	border-width: 1px;
+	border-collapse: collapse;
+	width: 50%;
+	margin-top: 5px;
+}
+
+th
+{
+	background-color: #ffffff;
+	color: #000099;
+	text-align: left;
+}
+
+td
+{
+	border-width: 1px;
+	border-style: solid;
+	border-color: #ffffff;
+}
+
+/* Ok and Cancel buttons */
+div.buttonOk
+{
+	 height: 22px;
+	 width: 62px;
+	 background-image: url(images/window/button_ok.png);
+}
+
+div.buttonCancel
+{
+	 height: 22px;
+	 width: 62px;
+	 background-image: url(images/window/button_cancel.png);
+}
+
+/* form elements */
+form
+{
+	background-color: #000022;
+	color: #ffffff;
+	position: absolute;
+	left: 25px;
+	top: 25px;
+}
+
+label
+{
+	margin: 2px;
+}
+
+input
+{
+	background-color: #000099;
+	color: #ffffff;
+	border-color: #ffffff;
+	border-style: solid;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-top-width: 2px;
+	border-bottom-width: 2px;
+	font-family: monospace;
+	margin: 2px;
+}
+
+textarea
+{
+	background-color: #000099;
+	color: #ffffff;
+	border-color: #ffffff;
+	border-style: solid;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-top-width: 2px;
+	border-bottom-width: 2px;
+	margin: 2px;
+}

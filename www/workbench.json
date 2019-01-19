@@ -1,0 +1,37 @@
+var data = [
+	{
+		"id" : 1,
+		"pid" : 0,
+		"icons" : {
+			"image" : { 
+				"file" : "workbench.png",
+				"width" : 35,
+				"height" : 30
+			},
+			"imageText" : {
+				"file": "lachsfilet_icontext.png",
+				"height": 14,
+				"width": 79
+			},
+			"imageSelected" : {
+				"file" : "workbench_selected.png",
+				"width" : 35,
+				"height" : 30
+			}
+		},
+		"window" : {
+			"file": "lachsfilet_title.png",
+			"width": 84,
+			"height": 20		
+		},
+		"content" : {
+			"title": "Test",
+			"articles" : [
+				{
+					"title": "Client test",
+					"text": "Just for Javascript testing purpose!"
+				}
+			]
+		}
+	}
+]
