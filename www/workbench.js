@@ -9,6 +9,8 @@
 *	Amiga for life...
 */
 
+"use strict";
+
 //The workbench main object
 var Workbench = (() => {
 	//The DOM-element of the workbench (<div>)
@@ -480,7 +482,7 @@ var Workbench = (() => {
 				{
 					var article=content.articles[i];
 					var lastText={};
-					for(contentType in article)
+					for(var contentType in article)
 					{
 						var temp={};
 						//Create elements
@@ -980,7 +982,7 @@ var Workbench = (() => {
 	{
 		for(var i=1;i<registry.length;i++)
 		{
-			titlebar=registry[i].window.element.firstChild;
+			var titlebar=registry[i].window.element.firstChild;
 			changeImage(titlebar,"window",WINDOW+"titlebar_background_deselected.png");
 		}
 		

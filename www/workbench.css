@@ -77,7 +77,7 @@ div.window
 	z-index: -1;
 }
 
-span.titleBar
+div.titleBar
 {
 	width: 100%;
 	float: left;
