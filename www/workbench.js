@@ -199,10 +199,10 @@ var Workbench = (() => {
 				}).getNode();
 				
 				//Create div element and set background source files
-				this.element = createNode("div").class("icon").id("icon_").append(image).append(text)
-					.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
+				this.element = createNode("div").class("icon").id("icon_").append(image).append(text).getNode();
+					//.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
 
-				Workbench.registry[pid]["window"].element().appendChild(this.element);
+				registry[pid]["window"].element().appendChild(this.element);
 				
 				this.element.style.top=Workbench.registry[pid]["window"].iconStartPos().y;
 				
@@ -239,7 +239,6 @@ var Workbench = (() => {
 					return;
 				}
 				//Setup window containing icon
-				var registry=Workbench.registry;
 				var window=registry[pid]["window"];
 				window.addIcon(this);
 			}
@@ -286,7 +285,7 @@ var Workbench = (() => {
 			init : function()
 			{
 				// Create div element and set background source file
-				this.element = createNode("div").class("window").id("window_").style({visibility:"hidden"}).getNode();
+				this.element = createNode("div").class("window").id("window_").style({visibility:"hidden"}).appendTo(element.parentNode).getNode();
 				
 				// Create title bar
 				/*
@@ -445,7 +444,7 @@ var Workbench = (() => {
 				this.resizeScrollbars();
 			},
 			
-			//Sets the content elements of a window
+			// Sets the content elements of a window
 			setContent : function(content)
 			{
 //console.dir(content);
@@ -456,36 +455,24 @@ var Workbench = (() => {
 				
 				this.hasContent=true;
 				var maxWidth=Math.ceil(element.offsetWidth/1.5);
+												
+				// Set the content element
+				var contentElement=createNode("div").class("content").appendTo(this.element).style(content.css).getNode();
 				
-				//Set the content element
-				var contentElement=document.createElement("div");
-				contentElement.className="content";
-				this.element.appendChild(contentElement);
-				//Set css properties if there are any.
-				if(content.css)
-				{
-					for(var key in content.css)
-					{
-						contentElement.style[key]=content.css[key];
-					}
-				}
+				// Set the content title
+				var title=createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
+				var stopper=createNode("div").class("stop").appendTo(contentElement);
 				
-				//Set the content title
-				var title = document.createElement("div");
-				title.className="text";
-				title.innerHTML=convertText(content.title, fontColor["whiteOnBlue"]);
-				contentElement.appendChild(title);
-				var stopper=document.createElement("div");
-				stopper.className="stop";
-				contentElement.appendChild(stopper);
-				
-				//Set form if there is any
+				// Set form if there is any
 				if(content.form)
 				{
+					var formNode=createNode("div").innerHtml(content.form).getNode().firstChild;
+					/*
 					var tempNode=document.createElement("div");
 					tempNode.innerHTML=content.form;
 					var formNode=tempNode.firstChild;
-					//Append form
+					*/
+					// Append form
 					this.element.appendChild(formNode);
 				}
 				
@@ -514,7 +501,7 @@ var Workbench = (() => {
 									img.alt=CONTENT+images[j];
 									if(lastText.insertBefore)
 									{
-										//Insert image before the first elemet, 
+										//Insert image before the first element, 
 										//but behind the last image.
 										for(var k=0;k<lastText.childNodes.length;k++)
 										{
@@ -543,8 +530,10 @@ var Workbench = (() => {
 						stopper.className="stop";
 						contentElement.appendChild(stopper);
 					}
+					
 					//Reset window size
-					this.element.style.width=maxWidth+"px";
+					this.element.style.width=contentElement.offsetWidth+"px";
+					//this.element.style.width=maxWidth+"px";
 					//Reset scrollbar size
 					this.resizeScrollbars();
 					this.setPosition();
@@ -1365,16 +1354,12 @@ var Workbench = (() => {
 	{
 		var xCoord=getCharIndex(character);
 //console.debug("Char: %s, Mapping: %i", character, xCoord);
-		if(typeof xCoord!="number")
+		if(typeof xCoord!=="number")
 			return null;
-		if(typeof color!="number")
+		if(typeof color!=="number")
 			return null;
-		if(mode=="text")
+		if(mode==="text")
 			return '<div class="char" style="background-position: -'+xCoord+'px -'+color+'px"></div>';
-		var element=document.createElement("div");
-		element.className="char";
-		element.style="background-position: -"+xCoord+"px -"+color+"px";
-		return element;
 	};
 	
 	//Charset mapping for topaz font
@@ -1413,6 +1398,7 @@ var Workbench = (() => {
 					node.id = id;
 					return instance;
 				},
+				
 				class : className => {
 					node.className=className;
 					return instance;
@@ -1434,8 +1420,13 @@ var Workbench = (() => {
 					return instance;
 				},
 				
+				innerHtml : content => {
+					node.innerHTML=content;
+					return instance;
+				},
+				
 				clone : (deep) => {
-					node = node.cloneNode(deep);
+					node=node.cloneNode(deep);
 					return instance;
 				},
 				
