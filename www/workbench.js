@@ -262,6 +262,9 @@ var Workbench = (() => {
 			//The DOM-element of this window
 			element : {},
 			
+			// Viewport
+			viewport : {},
+			
 			//The creation coordinates of the next icon.
 			iconStartPos : {x:"10px",y:"25px"},
 			
@@ -360,6 +363,9 @@ var Workbench = (() => {
 				buttonResize.className="buttonResize";
 				this.element.appendChild(buttonResize);
 
+								
+				//Add viewport
+				this.viewport = createNode("div").class("viewport").appendTo(this.element).getNode();
 				//Setup element
 				//element.appendChild(this.element);
 				//element.parentNode.appendChild(this.element);
@@ -438,7 +444,7 @@ var Workbench = (() => {
 				var maxWidth=Math.ceil(element.offsetWidth/1.5);
 												
 				// Set the content element
-				var contentElement=createNode("div").class("content").appendTo(this.element).style(content.css).getNode();
+				var contentElement=createNode("div").class("content").appendTo(this.viewport).style(content.css).getNode();
 				
 				// Set the content title
 				var title=createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
