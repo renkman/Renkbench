@@ -334,47 +334,21 @@ var Workbench = (() => {
 				}
 				
 				// Create vertical scrollbar
-				var scrollbarVertical=document.createElement("div");
-				var buttonArrowUp=document.createElement("div");
-				var scrollSpaceVertical=document.createElement("div");
-				var scrollButtonVertical=document.createElement("div");
-				var buttonArrowDown=document.createElement("div");
+				var scrollbarVertical=createNode("div").class("scrollbarVertical").appendTo(this.element).getNode();
+				var buttonArrowUp=createNode("div").class("scrollButtonUp").appendTo(scrollbarVertical).getNode();
+				var scrollSpaceVertical=createNode("div").class("scrollSpaceVertical").appendTo(scrollbarVertical).getNode();
+				var scrollButtonVertical=createNode("div").class("scrollButtonVertical").appendTo(scrollSpaceVertical).getNode();
+				var buttonArrowDown=createNode("div").class("scrollButtonDown").appendTo(scrollbarVertical).getNode();
 				
-				scrollbarVertical.className="scrollbarVertical";
-				buttonArrowUp.className="scrollButtonUp";
-				scrollSpaceVertical.className="scrollSpaceVertical";
-				scrollButtonVertical.className="scrollButtonVertical";
-				buttonArrowDown.className="scrollButtonDown";
-				
-				scrollbarVertical.appendChild(buttonArrowUp);
-				scrollbarVertical.appendChild(scrollSpaceVertical);
-				scrollbarVertical.appendChild(buttonArrowDown);
-				scrollSpaceVertical.appendChild(scrollButtonVertical);
-				
-				//Add scrollbar to the window
-				this.element.appendChild(scrollbarVertical);
 				this.scrollbar.vertical=scrollbarVertical;
 
 				//Create horizontal scrollbar
-				var scrollbarHorizontal=document.createElement("div");
-				var buttonArrowLeft=document.createElement("div");
-				var scrollSpaceHorizontal=document.createElement("div");
-				var scrollButtonHorizontal=document.createElement("div");
-				var buttonArrowRight=document.createElement("div");
+				var scrollbarHorizontal=createNode("div").class("scrollbarHorizontal").appendTo(this.element).getNode();
+				var buttonArrowLeft=createNode("div").class("scrollButtonLeft").appendTo(scrollbarHorizontal).getNode();
+				var scrollSpaceHorizontal=createNode("div").class("scrollSpaceHorizontal").appendTo(scrollbarHorizontal).getNode();
+				var scrollButtonHorizontal=createNode("div").class("scrollButtonHorizontal").appendTo(scrollSpaceHorizontal).getNode();
+				var buttonArrowRight=createNode("div").class("scrollButtonRight").appendTo(scrollbarHorizontal).getNode();
 				
-				scrollbarHorizontal.className="scrollbarHorizontal";
-				buttonArrowLeft.className="scrollButtonLeft";
-				scrollSpaceHorizontal.className="scrollSpaceHorizontal";
-				scrollButtonHorizontal.className="scrollButtonHorizontal";
-				buttonArrowRight.className="scrollButtonRight";
-				
-				scrollbarHorizontal.appendChild(buttonArrowLeft);
-				scrollbarHorizontal.appendChild(scrollSpaceHorizontal);
-				scrollbarHorizontal.appendChild(buttonArrowRight);
-				scrollSpaceHorizontal.appendChild(scrollButtonHorizontal);
-
-				//Add scrollbar to the window
-				this.element.appendChild(scrollbarHorizontal);
 				this.scrollbar.horizontal=scrollbarHorizontal;
 
 				var buttonResize=document.createElement("div");
