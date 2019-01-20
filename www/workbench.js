@@ -2,7 +2,7 @@
 *	Just an Amiga Workbench look and feel clone, written in Javascript.
 *	Copyright 2008, 2019 by Jan Renken, Hamburg
 *	
-*	This software is licensed under the GNU General Public License Version 2.0.
+*	This software is licensed under the GNU General Public License Version 3.0.
 *
 *	So feel free to use, modify and distribute it.
 *
@@ -578,7 +578,11 @@ var Workbench = (() => {
 					
 				scrollButtonVertical.style.height=height+"px";
 				scrollButtonHorizontal.style.width=width+"px";
-			}
+			},
+			
+			resize : function() {
+console.debug(this);
+			}			
 		};
 	};
 	
@@ -672,9 +676,10 @@ var Workbench = (() => {
 				case "buttonDown":
 					changeImage(selection,"window",WINDOW+"button_down_selected.png");
 					break
+				case "buttonResize":
+					changeImage(selection,"window",WINDOW+"button_resize_selected.png");
 				case "title":
 				case "titleBar":
-				case "buttonResize":
 					var window=getWindowElement(selection);
 					oldSelectedElement=window;
 					selection=createWindowFrame(window);
@@ -695,11 +700,12 @@ var Workbench = (() => {
 	var deselect = workbenchElement => {
 		return event =>	{
 			var curSelection=getSelection(event);
-			
+//console.debug(curSelection);			
 			//Check if there is any item to deselect
 			var selection=selectedElement;
 			if(!selection.id && !selection.className)
 				return false;
+//console.debug(selection);
 				
 			//If the stored element is a window button, change button image
 			switch(selection.className)
@@ -719,6 +725,7 @@ var Workbench = (() => {
 				case "buttonCancel":
 					changeImage(selection,"window",WINDOW+"button_cancel.png");
 					break;
+				
 				//Move the icon to the current dummy position and delete the dummy
 				case "image":
 					var icon=oldSelectedElement;
@@ -768,6 +775,9 @@ var Workbench = (() => {
 			//Switch simple button functionality
 			switch(curSelection.className)
 			{
+				case "buttonResize":
+					changeImage(curSelection,"window",WINDOW+"button_resize.png");
+					break;
 				//If the currently selected element is a close button, close the
 				//belonging window.
 				case "buttonClose":
@@ -808,7 +818,7 @@ var Workbench = (() => {
 				var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
 				var order=openOrder;
 				var window=registry[id]["window"].element;
-//console.debug(curSelection.className);
+console.debug(curSelection.className);
 			var change=false;
 //console.dir(order);
 				if(curSelection.className=="buttonUp")
@@ -869,7 +879,10 @@ var Workbench = (() => {
 			event=window.event;
 		
 		if(event.target.className==="buttonResize")
-			return resize(event, selection);
+		{
+			var curSelection=getSelection(event);
+			return resize(event, curSelection); // resize(event, selection);
+		}
 		else
 			return move(event, selection);
 	};
@@ -907,6 +920,9 @@ var Workbench = (() => {
 	};
 	
 	var resize = (event, selection) => {
+		var id=/^window_([0-9]+)$/.exec(selection.parentNode.id)[1];
+		var window=registry[id]["window"];
+		window.resize();
 		return false;
 	};
 		
