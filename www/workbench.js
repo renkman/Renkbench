@@ -571,27 +571,12 @@ var Workbench = (() => {
 					return;
 				}
 				
-				//Get content element
-				var content={};
-				var nodes=this.element.childNodes
-				for(var i in nodes)
-				{
-					 if(nodes[i].className=="content")
-					 {
-						content=nodes[i];
-						break;
-					 }
-				}
-				
-				if(!content.className)
-					return;
-				
 				//Get factor of actual height
-				var contentHeight=content.offsetHeight;
-				var contentWidth=content.offsetWidth;
+				var viewportHeight=this.viewport.offsetHeight;
+				var viewportWidth=this.viewport.offsetWidth;
 				
-				height=(height-36)/contentHeight*maxHeight;
-				width=(width-8)/contentWidth*maxWidth;
+				height=(height-36)/viewportHeight*maxHeight;
+				width=(width-8)/viewportWidth*maxWidth;
 					
 				scrollButtonVertical.style.height=height+"px";
 				scrollButtonHorizontal.style.width=width+"px";
