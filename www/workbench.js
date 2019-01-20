@@ -62,7 +62,11 @@ var Workbench = (() => {
 		changeCursor(true);
 		
 		element=document.getElementById("workbench");
-		registry.push({icon:null,pid:-1,window:Workbench});
+		registry.push({icon:null,pid:-1,window:{
+			element: element,
+			iconStartPos: iconStartPos,
+			arrangeIcons: arrangeIcons
+		}});
 		
 		element.style.zIndex=1;
 				
@@ -85,6 +89,7 @@ var Workbench = (() => {
 		changeCursor(false);
 		// var request=createHTTPRequest(URL,getWindowsTree);
 		// request.send(null);
+//console.debug(registry);
 	};
 	
 	//Recursive addition to the window registry of a windows object
@@ -204,9 +209,9 @@ var Workbench = (() => {
 				this.element = createNode("div").class("icon").id("icon_").append(image).append(text).getNode();
 					//.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
 
-				registry[pid]["window"].element().appendChild(this.element);
+				registry[pid]["window"].element.appendChild(this.element);
 				
-				this.element.style.top=Workbench.registry[pid]["window"].iconStartPos().y;
+				this.element.style.top=registry[pid]["window"].iconStartPos.y;
 				
 				//Coordinates of the next icon are top and right, if it is
 				//a direct child of the workbench
@@ -218,8 +223,8 @@ var Workbench = (() => {
 				if(pid==0)
 				{
 					//Set workbench icon with highest width
-					if(x>Workbench.iconWidth)
-						Workbench.iconWidth=x;
+					if(x>iconWidth)
+						iconWidth=x;
 					
 					this.disk=true;
 					this.element.style.right=iconStartPos.x;
@@ -588,7 +593,7 @@ var Workbench = (() => {
 		};
 	};
 	
-	//Event listener functions
+	// Event listener functions
 	var select = element => {
 		return event => {
 //console.debug(element);
@@ -861,14 +866,14 @@ var Workbench = (() => {
 	//Moves the icon and window elements
 	var drag = event =>
 	{
-		var element=selectedElement;
+		var selection=selectedElement;
 		
 		//Look if there is an item to drag
-		if(element.className!="image"
-		&& element.className!="frame")
+		if(selection.className!="image"
+		&& selection.className!="frame")
 			return false;
-//console.debug("Class: %s, id: %s, left: %s, top: %s",element.className,element.id,element.style.left,element.style.top);
-//console.dir(element);
+//console.debug("Class: %s, id: %s, left: %s, top: %s",selection.className,selection.id,selection.style.left,selection.style.top);
+//console.dir(selection);
 		
 		if(!event)
 			event=window.event;
@@ -879,17 +884,17 @@ var Workbench = (() => {
 //console.debug("x: %i, y: %i",newPosX,newPosY);
 			
 		//Set drag element to foreground
-		element.style.zIndex=openOrder.length+2;
+		selection.style.zIndex=openOrder.length+2;
 		
-//console.debug(element.style.zIndex);
+//console.debug(selection.style.zIndex);
 		
 		//Check if the item will only be dragged in the workbench div
-		var sizeX=element.offsetWidth;
-		var sizeY=element.offsetHeight;
-		var borderLeft=Workbench.element.offsetLeft;
-		var borderRight=Workbench.element.offsetLeft+element.offsetWidth;
-		var borderTop=Workbench.element.offsetTop;
-		var borderBottom=Workbench.element.offsetTop+element.offsetHeight;
+		var sizeX=selection.offsetWidth;
+		var sizeY=selection.offsetHeight;
+		var borderLeft=element.offsetLeft;
+		var borderRight=element.offsetLeft+element.offsetWidth;
+		var borderTop=element.offsetTop;
+		var borderBottom=element.offsetTop+element.offsetHeight;
 //console.debug("borderLeft: %i, borderRight: %i, borderTop: %i, borderBottom: %i",borderLeft,borderRight,borderTop,borderBottom);
 //console.debug("newPosX: %i, newPosX+sizeX: %i, newPosY: %i, newPosY+sizeY: %i",newPosX,newPosX+sizeX,newPosY,newPosY+sizeY);
 		if(borderLeft >= newPosX || borderRight <= newPosX+sizeX
@@ -897,12 +902,12 @@ var Workbench = (() => {
 			return false;
 		
 		//Move item
-		element.style.top=newPosY+"px";
-		element.style.left=newPosX+"px";
-//console.debug("x: %s, y: %s",element.style.top,element.style.left);
+		selection.style.top=newPosY+"px";
+		selection.style.left=newPosX+"px";
+//console.debug("x: %s, y: %s",selection.style.top,selection.style.left);
 		return false;
 	};
-	
+		
 	var openWindow = event =>
 	{
 		var selection=getSelection(event);
@@ -931,7 +936,8 @@ var Workbench = (() => {
 		}
 //console.dir(openOrder);
 	};
-	
+
+		
 	var closeWindow = window =>
 	{
 		element.parentNode.appendChild(window);
@@ -1414,14 +1420,6 @@ var Workbench = (() => {
 		return instance;
 	};
 	
-	return {
-		CONTENT : IMAGES+"content/",
-		registry: registry,
-		element : () => element,
-		iconStartPos : () => iconStartPos,
-		iconWidth : iconWidth,
-		init: init,
-		arrangeIcons: arrangeIcons
-	};
+	// Initialize workbench
+	init();	
 })();
-Workbench.init();
