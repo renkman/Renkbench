@@ -262,7 +262,7 @@ var Workbench = (() => {
 			//The DOM-element of this window
 			element : {},
 			
-			// Viewport
+			// The viewport of this window
 			viewport : {},
 			
 			//The creation coordinates of the next icon.
@@ -358,13 +358,11 @@ var Workbench = (() => {
 				var buttonArrowRight=createNode("div").class("scrollButtonRight").appendTo(scrollbarHorizontal).getNode();
 				
 				this.scrollbar.horizontal=scrollbarHorizontal;
-
-				var buttonResize=document.createElement("div");
-				buttonResize.className="buttonResize";
-				this.element.appendChild(buttonResize);
-
+				
+				// Add resize button the window
+				var buttonResize=createNode("div").class("buttonResize").appendTo(this.element);
 								
-				//Add viewport
+				// Add viewport
 				this.viewport = createNode("div").class("viewport").appendTo(this.element).getNode();
 				//Setup element
 				//element.appendChild(this.element);
@@ -676,6 +674,7 @@ var Workbench = (() => {
 					break
 				case "title":
 				case "titleBar":
+				case "buttonResize":
 					var window=getWindowElement(selection);
 					oldSelectedElement=window;
 					selection=createWindowFrame(window);
@@ -865,9 +864,17 @@ var Workbench = (() => {
 			return false;
 //console.debug("Class: %s, id: %s, left: %s, top: %s",selection.className,selection.id,selection.style.left,selection.style.top);
 //console.dir(selection);
-		
+//console.dir(event.target);		
 		if(!event)
 			event=window.event;
+		
+		if(event.target.className==="buttonResize")
+			return resize(event, selection);
+		else
+			return move(event, selection);
+	};
+	
+	var move = (event, selection) => {
 		
 		//Calculate new icon position
 		var newPosX=event.clientX-offset.x;
@@ -898,9 +905,12 @@ var Workbench = (() => {
 //console.debug("x: %s, y: %s",selection.style.top,selection.style.left);
 		return false;
 	};
+	
+	var resize = (event, selection) => {
+		return false;
+	};
 		
-	var openWindow = event =>
-	{
+	var openWindow = event => {
 		var selection=getSelection(event);
 		
 //console.debug(selection.id);
@@ -1056,19 +1066,19 @@ var Workbench = (() => {
 	
 	//Creates red frame for window dragging.
 	var createWindowFrame = window =>
-	{
-		var frame=document.createElement("div");
-		frame.style.width=window.style.width;
-		frame.style.height=window.offsetHeight+"px";
-		frame.style.top=window.offsetTop+"px";
-		frame.style.left=window.offsetLeft+"px";
-		frame.style.borderColor="#ff8800";
-		frame.style.borderWidth="2px";
-		frame.style.borderStyle="solid";
-		frame.style.zIndex=-1;
-		frame.style.position="absolute";
-		frame.className="frame";
-		element.appendChild(frame);
+	{		
+		var frame=createNode("div").class("frame").
+		style({
+			width:window.style.width,
+			height:window.offsetHeight+"px",
+			top:window.offsetTop+"px",
+			left:window.offsetLeft+"px",
+			borderColor:"#ff8800",
+			borderWidth:"2px",
+			borderStyle:"solid",
+			zIndex:-1,
+			position:"absolute"
+		}).appendTo(element).getNode();
 		return frame;
 	};
 	
