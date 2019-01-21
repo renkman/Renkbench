@@ -44,6 +44,9 @@ var Workbench = (() => {
 	//Last element clicked for coubleclick detection
 	var lastClickedElement = {};
 	
+	// The height in of the window title bar in pixels
+	const TITLE_BAR_HEIGHT = 21;
+	
 	//The image path structure
 	const IMAGES = "images/";
 	
@@ -292,6 +295,9 @@ var Workbench = (() => {
 				horizontal: {}
 			},
 			
+			// The resize button node of the this window
+			buttonResize : {},
+			
 			init : function()
 			{
 				// Create div element and set background source file
@@ -360,7 +366,7 @@ var Workbench = (() => {
 				this.scrollbar.horizontal=scrollbarHorizontal;
 				
 				// Add resize button the window
-				var buttonResize=createNode("div").class("buttonResize").appendTo(this.element);
+				this.buttonResize=createNode("div").class("buttonResize").appendTo(this.element).getNode();
 								
 				// Add viewport
 				this.viewport = createNode("div").class("viewport").appendTo(this.element).getNode();
@@ -544,7 +550,7 @@ var Workbench = (() => {
 				var styleHeight=parseInt(this.element.style.height);			
 				//Check if the window's height is set by style or get it via
 				//offset height otherwise
-				var height=styleHeight>0?styleHeight-20:this.element.offsetHeight-20;
+				var height=styleHeight>0?styleHeight-21:this.element.offsetHeight-21;
 				var width=this.element.offsetWidth-18;
 				
 				//Set vertical scrollbar...
@@ -580,9 +586,17 @@ var Workbench = (() => {
 				scrollButtonHorizontal.style.width=width+"px";
 			},
 			
-			resize : function() {
-console.debug(this);
-			}			
+			resize : function(width, height) {
+				this.element.style.width=width;
+				this.element.style.height=height;
+				changeImage(this.buttonResize,"window",WINDOW+"button_resize.png");
+				this.resizeScrollbars();
+			},
+			
+			move : function(left, top) {
+				this.element.style.left=left;
+				this.element.style.top=top;
+			}
 		};
 	};
 	
@@ -655,6 +669,7 @@ console.debug(this);
 			selectWindow(selection);
 			
 //console.debug("Class: %s",selection.className);
+			var frameMode="move";
 			switch(selection.className)
 			{
 				//If the element is an icon, change its background image
@@ -678,11 +693,12 @@ console.debug(this);
 					break
 				case "buttonResize":
 					changeImage(selection,"window",WINDOW+"button_resize_selected.png");
+					frameMode="resize";
 				case "title":
 				case "titleBar":
 					var window=getWindowElement(selection);
 					oldSelectedElement=window;
-					selection=createWindowFrame(window);
+					selection=createWindowFrame(window, frameMode);
 					break;
 				case "buttonOk":
 					changeImage(selection,"window",WINDOW+"button_ok_selected.png");
@@ -760,24 +776,29 @@ console.debug(this);
 					selection=icon;
 					break;
 				case "frame":
-					var window=oldSelectedElement;
-					window.style.left=selection.style.left;
-					window.style.top=selection.style.top;
+					var windowElement=oldSelectedElement;
+					var id=/^window_([0-9]+)$/.exec(windowElement.id)[1];
+					var window=registry[id]["window"];
+					if(selection.dataset.mode==="resize")
+						window.resize(selection.style.width, selection.style.height, curSelection);
+					else
+						window.move(selection.style.left, selection.style.top);
+					
+					// var window=oldSelectedElement;
+					// window.style.left=selection.style.left;
+					// window.style.top=selection.style.top;
 //console.debug(selection);
 //console.debug(workbenchElement);
 					workbenchElement.removeChild(selection);
 					//Set window content selectable again
-					deactivateSelection(window,true);
-					selection=window;
+					deactivateSelection(windowElement,true);
+					selection=windowElement;
 					break;
 			}
 			
 			//Switch simple button functionality
 			switch(curSelection.className)
-			{
-				case "buttonResize":
-					changeImage(curSelection,"window",WINDOW+"button_resize.png");
-					break;
+			{				
 				//If the currently selected element is a close button, close the
 				//belonging window.
 				case "buttonClose":
@@ -878,18 +899,14 @@ console.debug(curSelection.className);
 		if(!event)
 			event=window.event;
 		
-		if(event.target.className==="buttonResize")
-		{
-			var curSelection=getSelection(event);
-			return resize(event, curSelection); // resize(event, selection);
-		}
+		if(selection.dataset.mode==="resize")
+			return resize(event, selection); // resize(event, selection);
 		else
 			return move(event, selection);
 	};
 	
-	var move = (event, selection) => {
-		
-		//Calculate new icon position
+	var move = (event, selection) => {		
+		//Calculate new window position
 		var newPosX=event.clientX-offset.x;
 		var newPosY=event.clientY-offset.y;
 //console.debug("x: %i, y: %i",newPosX,newPosY);
@@ -909,7 +926,7 @@ console.debug(curSelection.className);
 //console.debug("borderLeft: %i, borderRight: %i, borderTop: %i, borderBottom: %i",borderLeft,borderRight,borderTop,borderBottom);
 //console.debug("newPosX: %i, newPosX+sizeX: %i, newPosY: %i, newPosY+sizeY: %i",newPosX,newPosX+sizeX,newPosY,newPosY+sizeY);
 		if(borderLeft >= newPosX || borderRight <= newPosX+sizeX
-		|| borderTop >= newPosY-21)// || borderBottom <= newPosY+sizeY)
+		|| borderTop >= newPosY-TITLE_BAR_HEIGHT)// || borderBottom <= newPosY+sizeY)
 			return false;
 		
 		//Move item
@@ -920,9 +937,22 @@ console.debug(curSelection.className);
 	};
 	
 	var resize = (event, selection) => {
-		var id=/^window_([0-9]+)$/.exec(selection.parentNode.id)[1];
-		var window=registry[id]["window"];
-		window.resize();
+		//Calculate new window size
+		var newPosX=event.clientX;
+		var newPosY=event.clientY;
+		
+		var borderRight=element.offsetLeft+element.offsetWidth;
+		var borderBottom=element.offsetTop+element.offsetHeight;
+
+		if(newPosX>=borderRight || newPosY>=borderBottom
+		|| newPosX<=selection.offsetLeft || newPosY<=selection.offsetTop)		
+			return false;
+		//Set drag element to foreground
+		selection.style.zIndex=openOrder.length+2;
+				
+		selection.style.width=(newPosX-selection.offsetLeft)+"px";
+		selection.style.height=(newPosY-selection.offsetTop)+"px";
+
 		return false;
 	};
 		
@@ -1081,7 +1111,7 @@ console.debug(curSelection.className);
 	};
 	
 	//Creates red frame for window dragging.
-	var createWindowFrame = window =>
+	var createWindowFrame = (window, frameMode) =>
 	{		
 		var frame=createNode("div").class("frame").
 		style({
@@ -1094,7 +1124,9 @@ console.debug(curSelection.className);
 			borderStyle:"solid",
 			zIndex:-1,
 			position:"absolute"
-		}).appendTo(element).getNode();
+		}).
+		data({mode:frameMode}).
+		appendTo(element).getNode();
 		return frame;
 	};
 	
@@ -1232,7 +1264,7 @@ console.debug(curSelection.className);
 	};
 	
 	//Returns the style property value of the element.
-	var getStyle = (element,styleProperty) =>
+	var getStyle = (element, styleProperty) =>
 	{
 		if (window.getComputedStyle)
 		{
@@ -1426,6 +1458,12 @@ console.debug(curSelection.className);
 				
 				clone : (deep) => {
 					node=node.cloneNode(deep);
+					return instance;
+				},
+				
+				data : (dataset) => {
+					for(var record in dataset)
+						node.dataset[record]=dataset[record];
 					return instance;
 				},
 				
