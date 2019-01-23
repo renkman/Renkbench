@@ -277,8 +277,11 @@ var Workbench = (() => {
 			//A content window does not show any icons.
 			hasContent : false,
 			
-			//The minimum width of this window
-			minWidth : 100,
+			// The minimum width of this window
+			minWidth : 400,
+			
+			// The minimum height of this window
+			minHeight : 200,
 			
 			//The distance between the icons in this window
 			iconDistance : 15,
@@ -370,6 +373,10 @@ var Workbench = (() => {
 								
 				// Add viewport
 				this.viewport = createNode("div").class("viewport").appendTo(this.element).getNode();
+				/*
+				this.element.style.height="200px";
+				this.element.style.width="400px";
+*/
 				//Setup element
 				//element.appendChild(this.element);
 				//element.parentNode.appendChild(this.element);
@@ -445,7 +452,8 @@ var Workbench = (() => {
 					return false;
 				
 				this.hasContent=true;
-				var maxWidth=Math.ceil(element.offsetWidth/1.5);
+				var maxWidth=Math.ceil(element.offsetWidth/4);
+//console.debug(maxWidth);
 												
 				// Set the content element
 				var contentElement=createNode("div").class("content").appendTo(this.viewport).style(content.css).getNode();
@@ -522,8 +530,12 @@ var Workbench = (() => {
 						contentElement.appendChild(stopper);
 					}
 					
+//console.debug(contentElement.offsetWidth);
+//console.debug(contentElement.offsetHeight);
+					
 					//Reset window size
-					this.element.style.width=contentElement.offsetWidth+"px";
+					this.element.style.width=Math.max(contentElement.offsetWidth,this.minWidth)+"px";
+					this.element.style.height=Math.max(contentElement.offsetHeight,this.minHeight)+"px";
 					//this.element.style.width=maxWidth+"px";
 					//Reset scrollbar size
 					this.resizeScrollbars();
@@ -550,13 +562,17 @@ var Workbench = (() => {
 				var styleHeight=parseInt(this.element.style.height);			
 				//Check if the window's height is set by style or get it via
 				//offset height otherwise
-				var height=styleHeight>0?styleHeight-21:this.element.offsetHeight-21;
-				var width=this.element.offsetWidth-18;
-				
+				//var height=styleHeight>0?styleHeight-21:this.element.offsetHeight-21;
+				// var height=this.element.offsetHeight-22;
+				var height = this.viewport.offsetHeight;
+				// var width=this.element.offsetWidth-18;
+				var width= this.viewport.offsetWidth;
+//console.debug(this.viewport.offsetWidth);
+												
 				//Set vertical scrollbar...
 				scrollbarVertical.style.height=height+"px"
 				//...and scroll space height
-				var scrollSpaceHeight=scrollbarVertical.offsetHeight-48;
+				var scrollSpaceHeight=height-32;
 				scrollSpaceVertical.style.height=scrollSpaceHeight+"px";
 				
 				//Set horizontal scrollbar width
@@ -575,15 +591,13 @@ var Workbench = (() => {
 					return;
 				}
 				
-				//Get factor of actual height
-				var viewportHeight=this.viewport.offsetHeight;
-				var viewportWidth=this.viewport.offsetWidth;
+				var content = this.viewport.childNodes[0];
 				
-				height=(height-36)/viewportHeight*maxHeight;
-				width=(width-8)/viewportWidth*maxWidth;
-					
-				scrollButtonVertical.style.height=height+"px";
-				scrollButtonHorizontal.style.width=width+"px";
+				var factorHeight = Math.min(1, height/content.offsetHeight);
+				var factorWidth = Math.min(1, width/content.offsetWidth);
+
+				scrollButtonVertical.style.height=(scrollSpaceHeight * factorHeight)+"px";
+				scrollButtonHorizontal.style.width=((scrollSpaceHorizontal.offsetWidth - 4) * factorWidth)+"px";
 			},
 			
 			resize : function(width, height) {

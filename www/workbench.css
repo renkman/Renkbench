@@ -156,18 +156,21 @@ div.fillerWhiteRight_1
 /* Viewport */
 div.viewport
 {
-	position: relative;
-	margin: 20px 16px 16px 8px;
+	position: absolute;
 	background-color: #000099;
+	top: 21px;
+	bottom: 15px;
+	right: 15px;
+	left: 0;
+		overflow: hidden;
 }
 
 /* Scrollbars */
 div.scrollbarVertical
 {
-
-	/*top: 20px;
+	top: 20px;
 	position: absolute;
-	right: 0;*/
+	right: 0;
 	float: right;
 	width: 15px;
 	margin-left: 2px;
@@ -188,7 +191,7 @@ div.scrollButtonUp
 div.scrollButtonDown
 {
 	position: absolute;
-	bottom: 16px;
+	bottom: 0;
 	right: 0px;
 	height: 12px;
 	width: 14px;
@@ -213,13 +216,12 @@ div.scrollButtonVertical
 
 div.scrollbarHorizontal
 {
+	/*position: absolute;*/
 	position: absolute;
 	bottom: 0;
 	float: right;
 	height: 16px;
-	margin-top: 2px;
 	background-color: #ffffff;
-	z-index: 1;
 }
 
 div.scrollButtonLeft
@@ -271,15 +273,14 @@ div.buttonResize
 	z-index: 2;	
 }
 
-div.dopArea
+div.dropArea
 {
 	position: relative;
 }
 
 div.content
 {
-  	position: relative;
-	margin-top: 16px;
+  	/* position: relative; */
 	padding: 16px 8px 16px 8px;
 	background-color: #000099;
 }
