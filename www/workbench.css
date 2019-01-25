@@ -162,7 +162,7 @@ div.viewport
 	bottom: 15px;
 	right: 15px;
 	left: 0;
-		overflow: hidden;
+	overflow: hidden;
 }
 
 /* Scrollbars */
@@ -280,7 +280,7 @@ div.dropArea
 
 div.content
 {
-  	/* position: relative; */
+  	position: relative;
 	padding: 16px 8px 16px 8px;
 	background-color: #000099;
 }

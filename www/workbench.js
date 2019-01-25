@@ -604,12 +604,33 @@ var Workbench = (() => {
 				this.element.style.width=width;
 				this.element.style.height=height;
 				changeImage(this.buttonResize,"window",WINDOW+"button_resize.png");
+				
+				var content = this.viewport.children[0];
+				if(this.viewport.offsetWidth > content.offsetWidth)
+					content.style.left=0;
+				if(this.viewport.offsetHeight > content.offsetHeight)
+					content.style.top=0;
+				
 				this.resizeScrollbars();
 			},
 			
 			move : function(left, top) {
 				this.element.style.left=left;
 				this.element.style.top=top;
+			},
+			
+			moveContent : function(direction) {
+				var content = this.viewport.children[0];
+				var step = direction === "scrollButtonLeft" || direction ===  "scrollButtonUp" ?  10 : -10;
+				var axisX = direction === "scrollButtonLeft" || direction ===  "scrollButtonRight";
+
+				var offsetLeft = this.viewport.offsetWidth-content.offsetWidth;
+				var offsetTop = this.viewport.offsetHeight-content.offsetHeight;
+
+				if(axisX && offsetLeft < 0)
+					content.style.left = Math.max(Math.min(0,content.offsetLeft + step), offsetLeft) + "px";
+				else if(offsetTop < 0)
+					content.style.top = Math.max(Math.min(0,content.offsetTop + step), offsetTop) + "px";
 			}
 		};
 	};
@@ -628,13 +649,14 @@ var Workbench = (() => {
 			mouseDownTime=new Date();
 			var span=mouseDownTime.getTime() - lastClicked.getTime();
 
-			//Assess the last two mousedown events as doubleclick, whether the
-			//timespan between them was smaller equal 500 ms
+			// Determine the last two mousedown events as doubleclick, whether the
+			// timespan between them was smaller equal 500 ms
 //console.debug("Letzter Klick: %i, Jetzt: %i, Abstand: %i", lastClicked.getTime(), mouseDownTime.getTime(), span);
 //console.debug("Current selection: %s", selection.parentNode.id);
 //console.debug("Last selection: %s", lastClickedElement.id);
-			if(selection.parentNode == lastClickedElement && span<=500)
+			if(selection.parentNode === lastClickedElement && span<=500 && !selection.className.includes("Button"))
 			{
+console.debug(selection.className);
 				deselect(element)(event);
 				return openWindow(event);
 			}
@@ -720,6 +742,18 @@ var Workbench = (() => {
 				case "buttonCancel":
 					changeImage(selection,"window",WINDOW+"button_cancel_selected.png");
 					break;
+				case "scrollButtonLeft":
+					changeImage(selection,"window",WINDOW+"button_arrow_left_selected.png");
+					break;
+				case "scrollButtonUp":
+					changeImage(selection,"window",WINDOW+"button_arrow_up_selected.png");
+					break;
+				case "scrollButtonRight":
+					changeImage(selection,"window",WINDOW+"button_arrow_right_selected.png");
+					break;
+				case "scrollButtonDown":
+					changeImage(selection,"window",WINDOW+"button_arrow_down_selected.png");
+					break;
 			}
 			selectedElement=selection;
 //console.dir(selectedElement);
@@ -754,6 +788,18 @@ var Workbench = (() => {
 					break;
 				case "buttonCancel":
 					changeImage(selection,"window",WINDOW+"button_cancel.png");
+					break;
+				case "scrollButtonLeft":
+					changeImage(selection,"window",WINDOW+"button_arrow_left.png");
+					break;
+				case "scrollButtonUp":
+					changeImage(selection,"window",WINDOW+"button_arrow_up.png");
+					break;
+				case "scrollButtonRight":
+					changeImage(selection,"window",WINDOW+"button_arrow_right.png");
+					break;
+				case "scrollButtonDown":
+					changeImage(selection,"window",WINDOW+"button_arrow_down.png");
 					break;
 				
 				//Move the icon to the current dummy position and delete the dummy
@@ -820,6 +866,15 @@ var Workbench = (() => {
 					var window=registry[id]["window"];
 					closeWindow(window.element);
 					break;
+				case "scrollButtonLeft":
+				case "scrollButtonUp":
+				case "scrollButtonRight":
+				case "scrollButtonDown":
+					var windowElement = getWindowElement(curSelection);
+					var id=/^window_([0-9]+)$/.exec(windowElement.id)[1];
+					var window=registry[id]["window"];
+					window.moveContent(curSelection.className);
+					break;
 				case "buttonOk":
 					var form=getFormElement(curSelection);
 
@@ -853,7 +908,7 @@ var Workbench = (() => {
 				var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
 				var order=openOrder;
 				var window=registry[id]["window"].element;
-console.debug(curSelection.className);
+//console.debug(curSelection.className);
 			var change=false;
 //console.dir(order);
 				if(curSelection.className=="buttonUp")
@@ -926,8 +981,7 @@ console.debug(curSelection.className);
 //console.debug("x: %i, y: %i",newPosX,newPosY);
 			
 		//Set drag element to foreground
-		selection.style.zIndex=openOrder.length+2;
-		
+		selection.style.zIndex=openOrder.length+2;		
 //console.debug(selection.style.zIndex);
 		
 		//Check if the item will only be dragged in the workbench div
@@ -969,7 +1023,7 @@ console.debug(curSelection.className);
 
 		return false;
 	};
-		
+	
 	var openWindow = event => {
 		var selection=getSelection(event);
 		
@@ -997,8 +1051,7 @@ console.debug(curSelection.className);
 		}
 //console.dir(openOrder);
 	};
-
-		
+	
 	var closeWindow = window =>
 	{
 		element.parentNode.appendChild(window);

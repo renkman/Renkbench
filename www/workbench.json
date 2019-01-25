@@ -29,7 +29,7 @@ var data = [
 			"articles" : [
 				{
 					"title": "Client test",
-					"text": "Just for Javascript testing purpose!"
+					"text": "Just for Javascript testing purpose! And now also for window resize and scroll feature tests!"
 				}
 			]
 		}
