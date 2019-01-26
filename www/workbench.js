@@ -188,9 +188,9 @@ var Workbench = (() => {
 			//The images of this icon
 			image : ICONS+properties.image.file,
 			imageSelected : ICONS+properties.imageSelected.file,
-			imageText : ICONS+properties.imageText.file,
 			initX : 0,
 			disk : false,
+			title  : properties.title,
 			
 			//The DOM-element of this icon
 			element : {},
@@ -201,18 +201,19 @@ var Workbench = (() => {
 					backgroundImage:"url("+this.image+")",
 					width:properties.image.width+"px",
 					height:properties.image.height+"px"
-				}).getNode();
+				}).
+				data({mode:"move"}).
+				getNode();
 				
-				// Text
-				var text = createNode("div").style({
-						backgroundImage:"url("+this.imageText+")",
-						marginTop:"2px",
-						width:properties.imageText.width+"px",
-						height:properties.imageText.height+"px"
-				}).getNode();
+				// Icon title 
+				var text = convertText(this.title, fontColor["whiteOnBlue"]);
+				var textImage = createNode("div").style({
+					marginTop:"2px",
+				}).innerHtml(text)
+				.getNode();
 				
 				//Create div element and set background source files
-				this.element = createNode("div").class("icon").id("icon_").append(image).append(text).getNode();
+				this.element = createNode("div").class("icon").id("icon_").append(image).append(textImage).getNode();
 					//.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
 
 				registry[pid]["window"].element.appendChild(this.element);
@@ -263,7 +264,7 @@ var Workbench = (() => {
 	{
 		return {
 			id : 0,
-			name : iconPath+properties.file,
+			name : properties.title,
 			
 			//The DOM-element of this window
 			element : {},
@@ -327,12 +328,14 @@ var Workbench = (() => {
 				*		<div class="fillerWhiteRight" />
 				*	</div>
 				*/
+				var title = convertText(this.name, fontColor["blueOnWhite"]);
+				
 				var titleBar = createNode("div").class("titleBar").appendTo(this.element).getNode();
 				createNode("div").class("fillerWhiteLeft").appendTo(titleBar);
 				createNode("div").class("fillerBlueLeft").appendTo(titleBar);
 				createNode("div").class("buttonClose").appendTo(titleBar);
 				createNode("div").class("fillerBlueLeft").appendTo(titleBar);
-				createNode("div").class("title").appendTo(titleBar).style({backgroundImage:"url("+this.name+")", width:properties.width+"px", height:properties.height+"px"});
+				createNode("div").class("title").appendTo(titleBar).innerHtml(title);
 				createNode("div").class("fillerWhiteRight_1").appendTo(titleBar);
 				createNode("div").class("fillerBlueRight").appendTo(titleBar);
 				createNode("div").class("buttonUp").appendTo(titleBar);

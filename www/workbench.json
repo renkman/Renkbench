@@ -3,15 +3,11 @@ var data = [
 		"id" : 1,
 		"pid" : 0,
 		"icons" : {
+			"title": "Lachsfilet",
 			"image" : { 
 				"file" : "workbench.png",
 				"width" : 35,
 				"height" : 30
-			},
-			"imageText" : {
-				"file": "lachsfilet_icontext.png",
-				"height": 14,
-				"width": 79
 			},
 			"imageSelected" : {
 				"file" : "workbench_selected.png",
@@ -20,9 +16,7 @@ var data = [
 			}
 		},
 		"window" : {
-			"file": "lachsfilet_title.png",
-			"width": 84,
-			"height": 20		
+			"title": "Lachsfilet"
 		},
 		"content" : {
 			"title": "Test",
