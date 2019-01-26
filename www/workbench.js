@@ -68,11 +68,15 @@ var Workbench = (() => {
 		changeCursor(true);
 		
 		element=document.getElementById("workbench");
-		registry.push({icon:null,pid:-1,window:{
-			element: element,
-			iconStartPos: iconStartPos,
-			arrangeIcons: arrangeIcons
-		}});
+		registry.push({
+			icon:null,
+			pid:-1,
+			window: {
+				element: element,
+				iconStartPos: iconStartPos,
+				arrangeIcons: arrangeIcons
+			}
+		});
 		
 		element.style.zIndex=1;
 				
@@ -151,13 +155,14 @@ var Workbench = (() => {
 				window.setContent(content);
 		}
 		//Set window id and add items to registry
-		window.id=registry.length;
-		icon.element.id+=window.id;
-		window.element.id+=window.id;
+		var id = registry.length;
+		window.setId(id);
+		icon.element.id+=id;
 		registry.push({
 				icon : icon,
 				window : window,
-				pid : pid});
+				pid : pid
+		});
 //console.dir(this.registry);
 //console.debug("Id: %i",window.id);
 		//this.arrangeIcons();
@@ -252,6 +257,7 @@ var Workbench = (() => {
 					iconStartPos.y="40px";
 					return;
 				}
+				
 				//Setup window containing icon
 				var window=registry[pid]["window"];
 				window.addIcon(this);
@@ -271,6 +277,10 @@ var Workbench = (() => {
 			
 			// The viewport of this window
 			viewport : {},
+			
+			title : {},
+			
+			titleInactive : {},
 			
 			//The creation coordinates of the next icon.
 			iconStartPos : {x:"10px",y:"25px"},
@@ -308,7 +318,12 @@ var Workbench = (() => {
 			init : function()
 			{
 				// Create div element and set background source file
-				this.element = createNode("div").class("window").id("window_").style({visibility:"hidden"}).appendTo(element.parentNode).getNode();
+				this.element = createNode("div").class("window").
+				id("window_").
+				style({visibility:"hidden"}).
+				// Set custom css properties if there are any.								
+				style(properties.css).
+				appendTo(element.parentNode).getNode();
 				
 				// Create title bar
 				/*
@@ -329,13 +344,15 @@ var Workbench = (() => {
 				*	</div>
 				*/
 				var title = convertText(this.name, fontColor["blueOnWhite"]);
+				var titleInactive = convertText(this.name, fontColor["blueOnWhiteInactive"]);
 				
 				var titleBar = createNode("div").class("titleBar").appendTo(this.element).getNode();
 				createNode("div").class("fillerWhiteLeft").appendTo(titleBar);
 				createNode("div").class("fillerBlueLeft").appendTo(titleBar);
 				createNode("div").class("buttonClose").appendTo(titleBar);
 				createNode("div").class("fillerBlueLeft").appendTo(titleBar);
-				createNode("div").class("title").appendTo(titleBar).innerHtml(title);
+				this.title = createNode("div").class("title").appendTo(titleBar).innerHtml(title).getNode();
+				this.titleInactive = createNode("div").class("titleInactive").appendTo(titleBar).innerHtml(titleInactive).getNode();
 				createNode("div").class("fillerWhiteRight_1").appendTo(titleBar);
 				createNode("div").class("fillerBlueRight").appendTo(titleBar);
 				createNode("div").class("buttonUp").appendTo(titleBar);
@@ -346,16 +363,7 @@ var Workbench = (() => {
 				
 				// Foreach titlebar child node: this.minWidth+=parseInt(element.style.width?element.style.width:0);
 				// this.element.style.width=this.minWidth+"px";
-								
-				// Set css properties if there are any.
-				if(properties.css)
-				{
-					for(var key in properties.css)
-					{
-						this.element.style[key]=properties.css[key];
-					}
-				}
-				
+							
 				// Create vertical scrollbar
 				var scrollbarVertical=createNode("div").class("scrollbarVertical").appendTo(this.element).getNode();
 				var buttonArrowUp=createNode("div").class("scrollButtonUp").appendTo(scrollbarVertical).getNode();
@@ -388,6 +396,13 @@ var Workbench = (() => {
 				//element.parentNode.appendChild(this.element);
 //console.debug("Id: %i, minWidth: %i",this.id,this.minWidth);
 			},
+			
+			// Sets the registry id of the current window
+			setId : function(id) {
+				this.id=id;				
+				this.element.id+=id;
+				this.element.dataset["id"]=id;
+			},			
 			
 			//Sets the start position of the window
 			setPosition : function()
@@ -673,6 +688,20 @@ var Workbench = (() => {
 				var content = this.viewport.children[0];
 				content.style.left = -left + "px";
 				content.style.top = -top + "px";
+			},
+			
+			deselect : function() {
+				var titlebar = this.element.firstChild;
+				changeImage(titlebar,"window",WINDOW+"titlebar_background_deselected.png");
+				this.titleInactive.style.display = "block";
+				this.title.style.display = "none";
+			},
+			
+			select : function() {
+				var titlebar = this.element.firstChild;
+				changeImage(titlebar,"window",WINDOW+"titlebar_background.png");
+				this.titleInactive.style.display = "none";
+				this.title.style.display = "block";
 			}
 		};
 	};
@@ -724,7 +753,9 @@ var Workbench = (() => {
 				offset.y=event.clientY-posY;
 			}
 			//...windows...
-			if(selection.className=="titleBar" || selection.className=="title")
+			if(selection.className=="titleBar" || 
+				isChildOfClass(selection, "title") || 
+				isChildOfClass(selection, "titleInactive"))
 			{
 				var window=getWindowElement(selection);
 				offset.x=event.clientX-window.offsetLeft;
@@ -732,7 +763,6 @@ var Workbench = (() => {
 				
 				//Set window content unselectable
 				deactivateSelection(window);
-//console.dir(offset);
 			}
 			
 			//If the old element was an icon, also change its background image
@@ -741,13 +771,16 @@ var Workbench = (() => {
 				var icon=changeImage(oldSelection,"icon","image");
 				icon.element.style.zIndex=1;
 			}
+		//console.debug("Class: %s",selection.className);
+			var frameMode="move";
+			var className = (isChildOfClass(selection, "title") || isChildOfClass(selection, "titleInactive")) 
+				? "title" 
+				: selection.className;
 			
 			//Select and deselect the windows (if any is selected)
-			selectWindow(selection);
-			
-//console.debug("Class: %s",selection.className);
-			var frameMode="move";
-			switch(selection.className)
+			selectWindow(selection);			
+
+			switch(className)
 			{
 				//If the element is an icon, change its background image
 				case "iconElements":
@@ -1140,26 +1173,29 @@ var Workbench = (() => {
 	var selectWindow = element =>
 	{
 		for(var i=1;i<registry.length;i++)
-		{
-			var titlebar=registry[i].window.element.firstChild;
-			changeImage(titlebar,"window",WINDOW+"titlebar_background_deselected.png");
-		}
+			registry[i].window.deselect();			
 		
 		//If the worbench is clicked, only deleselect the windows
 		//and then return
-		if(element.id=="workbench")
+		if(element.id==="workbench")
 			return;
 		
 		//Get the window titlebar
 		element=getWindowElement(element);
-		if(element.id!="workbench")
-			changeImage(element.firstChild,"window",WINDOW+"titlebar_background.png");
+		var id = element.dataset["id"];
+		if(!id)
+			return;
+		
+		var window = registry[id].window;
+		window.select();
+		//if(element.id!=="workbench")
+		//	changeImage(element.firstChild,"window",WINDOW+"titlebar_background.png");
 	};
 	
 	//Get the window element of the current element.
 	var getWindowElement = element =>
 	{
-		if(element.className=="window" || element.id=="workbench")
+		if(element.className==="window" || element.id==="workbench")
 			return element;
 		return getWindowElement(element.parentNode);
 	};
@@ -1180,6 +1216,16 @@ var Workbench = (() => {
 		return getFormElement(element.parentNode);
 	};
 	
+	// Determines whether an element is a child node 
+	// of a node with the passed class name
+	var isChildOfClass = (element, className) => {
+		if(!element.parentNode)
+			return false;
+		if(element.className === className)
+			return true;
+		return isChildOfClass(element.parentNode, className);
+	};	
+	
 	//Changes/switches the background image of an icon or a window/workbench
 	//button.
 	var changeImage = (element, type, image) =>
@@ -1195,7 +1241,7 @@ var Workbench = (() => {
 		{
 			case "window":
 				id=getWindowElement(element).id;
-				if(id=="workbench")
+				if(id==="workbench")
 					item=Workbench;
 				else
 				{

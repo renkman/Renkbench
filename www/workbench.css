@@ -94,8 +94,17 @@ div.buttonClose
 
 div.title
 {
-	padding-top: 3px;
+	padding: 2px 3px 0 4px;
 	float: left;
+	background-color: #ffffff;
+}
+
+div.titleInactive
+{
+	display: none;
+	padding: 2px 3px 0 4px;
+	float: left;
+	background-color: #ffffff;
 }
 
 div.buttonUp
