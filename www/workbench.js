@@ -32,6 +32,9 @@ var Workbench = (() => {
 	//The highest icon width for rearrangement
 	var iconWidth = 0;
 	
+	// The minimum window size
+	var windowMinSize = {x:84,y:78};
+	
 	//The order of the opened windows
 	var openOrder = [];
 	
@@ -598,6 +601,14 @@ var Workbench = (() => {
 
 				scrollButtonVertical.style.height=(scrollSpaceHeight * factorHeight)+"px";
 				scrollButtonHorizontal.style.width=((scrollSpaceHorizontal.offsetWidth - 4) * factorWidth)+"px";
+				
+				/*
+				var posX = content.offsetLeft * factorWidth + 2;
+				var posY = content.offsetTop * factorHeight + 2;
+				
+				scrollButtonHorizontal.style.left=posX+"px";
+				scrollButtonVertical.style.top=posY+"px";
+				*/
 			},
 			
 			resize : function(width, height) {
@@ -619,7 +630,7 @@ var Workbench = (() => {
 				this.element.style.top=top;
 			},
 			
-			moveContent : function(direction) {
+			moveContentByButton : function(direction) {
 				var content = this.viewport.children[0];
 				var step = direction === "scrollButtonLeft" || direction ===  "scrollButtonUp" ?  10 : -10;
 				var axisX = direction === "scrollButtonLeft" || direction ===  "scrollButtonRight";
@@ -631,6 +642,34 @@ var Workbench = (() => {
 					content.style.left = Math.max(Math.min(0,content.offsetLeft + step), offsetLeft) + "px";
 				else if(offsetTop < 0)
 					content.style.top = Math.max(Math.min(0,content.offsetTop + step), offsetTop) + "px";
+			},
+			
+			moveScrollButton : function(event, selection) {
+				var axisX = selection.className === "scrollButtonHorizontalSelected";
+				
+				var borderX = selection.parentNode.offsetWidth-selection.offsetWidth-2;
+				var borderY = selection.parentNode.offsetHeight-selection.offsetHeight-2;
+				
+				if(axisX)
+					selection.style.left=Math.max(2,Math.min(selection.offsetLeft+event.movementX, borderX))+"px";
+				else
+					selection.style.top=Math.max(2,Math.min(selection.offsetTop+event.movementY, borderY))+"px";
+			},
+			
+			moveContentByScrollbar : function() {
+				var scrollButtonX = this.scrollbar.horizontal.children[1].children[0];
+				var scrollButtonY = this.scrollbar.vertical.children[1].children[0];
+				
+				var factorX = this.viewport.offsetWidth / scrollButtonX.offsetWidth;
+				var factorY = this.viewport.offsetHeight / scrollButtonY.offsetHeight;
+				
+				var left = (scrollButtonX.offsetLeft * factorX);
+				var top = (scrollButtonY.offsetTop * factorY);
+//console.debug("factorY: %f * scrollButtonY.offsetTop: %f = top: %f", factorY, scrollButtonY.offsetTop, top);
+				
+				var content = this.viewport.children[0];
+				content.style.left = -left + "px";
+				content.style.top = -top + "px";
 			}
 		};
 	};
@@ -656,7 +695,6 @@ var Workbench = (() => {
 //console.debug("Last selection: %s", lastClickedElement.id);
 			if(selection.parentNode === lastClickedElement && span<=500 && !selection.className.includes("Button"))
 			{
-console.debug(selection.className);
 				deselect(element)(event);
 				return openWindow(event);
 			}
@@ -754,6 +792,12 @@ console.debug(selection.className);
 				case "scrollButtonDown":
 					changeImage(selection,"window",WINDOW+"button_arrow_down_selected.png");
 					break;
+				case "scrollButtonVertical":
+					selection.className="scrollButtonVerticalSelected";
+					break;	
+				case "scrollButtonHorizontal":
+					selection.className="scrollButtonHorizontalSelected";
+					break;						
 			}
 			selectedElement=selection;
 //console.dir(selectedElement);
@@ -801,7 +845,14 @@ console.debug(selection.className);
 				case "scrollButtonDown":
 					changeImage(selection,"window",WINDOW+"button_arrow_down.png");
 					break;
-				
+				case "scrollButtonVerticalSelected":
+				case "scrollButtonHorizontalSelected":
+					selection.className=selection.className.replace("Selected","");
+					var windowElement = getWindowElement(curSelection);
+					var id=/^window_([0-9]+)$/.exec(windowElement.id)[1];
+					var window=registry[id]["window"];
+					window.moveContentByScrollbar();
+					break;	
 				//Move the icon to the current dummy position and delete the dummy
 				case "image":
 					var icon=oldSelectedElement;
@@ -873,7 +924,7 @@ console.debug(selection.className);
 					var windowElement = getWindowElement(curSelection);
 					var id=/^window_([0-9]+)$/.exec(windowElement.id)[1];
 					var window=registry[id]["window"];
-					window.moveContent(curSelection.className);
+					window.moveContentByButton(curSelection.className);
 					break;
 				case "buttonOk":
 					var form=getFormElement(curSelection);
@@ -959,8 +1010,10 @@ console.debug(selection.className);
 		var selection=selectedElement;
 		
 		//Look if there is an item to drag
-		if(selection.className!="image"
-		&& selection.className!="frame")
+		if(selection.className!=="image"
+		&& selection.className!=="frame"
+		&& selection.className!=="scrollButtonHorizontalSelected"
+		&& selection.className!=="scrollButtonVerticalSelected")
 			return false;
 //console.debug("Class: %s, id: %s, left: %s, top: %s",selection.className,selection.id,selection.style.left,selection.style.top);
 //console.dir(selection);
@@ -970,8 +1023,15 @@ console.debug(selection.className);
 		
 		if(selection.dataset.mode==="resize")
 			return resize(event, selection); // resize(event, selection);
-		else
+		else if(selection.dataset.mode==="move")
 			return move(event, selection);
+
+		// Scroll button moving
+		var windowElement = getWindowElement(selection);
+		var id = /^window_([0-9]+)$/.exec(windowElement.id)[1];
+		var window=registry[id]["window"];
+		
+		window.moveScrollButton(event, selection);	
 	};
 	
 	var move = (event, selection) => {		
@@ -1015,11 +1075,13 @@ console.debug(selection.className);
 		if(newPosX>=borderRight || newPosY>=borderBottom
 		|| newPosX<=selection.offsetLeft || newPosY<=selection.offsetTop)		
 			return false;
+			
 		//Set drag element to foreground
 		selection.style.zIndex=openOrder.length+2;
-				
-		selection.style.width=(newPosX-selection.offsetLeft)+"px";
-		selection.style.height=(newPosY-selection.offsetTop)+"px";
+		
+		// Resize frame
+		selection.style.width=Math.max(windowMinSize.x,newPosX-selection.offsetLeft)+"px";
+		selection.style.height=Math.max(windowMinSize.y,newPosY-selection.offsetTop)+"px";
 
 		return false;
 	};

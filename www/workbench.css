@@ -214,6 +214,13 @@ div.scrollButtonVertical
 	background-color: #ffffff;
 }
 
+div.scrollButtonVerticalSelected
+{
+	position: absolute;
+	width: 8px;
+	background-color: #000000;
+}
+
 div.scrollbarHorizontal
 {
 	/*position: absolute;*/
@@ -260,6 +267,13 @@ div.scrollButtonHorizontal
 	position: absolute;
 	height: 10px;
 	background-color: #ffffff;
+}
+
+div.scrollButtonHorizontalSelected
+{
+	position: absolute;
+	height: 10px;
+	background-color: #000000;
 }
 
 div.buttonResize
