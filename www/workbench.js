@@ -61,7 +61,8 @@ var Workbench = (() => {
 	//const URL = "workbench.php",
 	const URL = "workbench.json";
 	
-	const MAIN_TITLE = "ÁLachsfilet.de release.";
+	// The workbench main title text
+	const MAIN_TITLE = "Lachsfilet.de release.";
 	
 	//The initialization method.
 	var init = () =>
@@ -74,10 +75,10 @@ var Workbench = (() => {
 		createNode("div").style({
 				marginTop:"2px",
 			}).innerHtml(title)
-			.appendTo(mainTitle)
-			.getNode();
+			.appendTo(mainTitle);
 		
 		element=document.getElementById("workbench");
+		element.dataset["id"]=-1;
 		registry.push({
 			icon:null,
 			pid:-1,
@@ -589,16 +590,9 @@ var Workbench = (() => {
 				var scrollSpaceVertical=scrollbarVertical.childNodes[1];
 				var scrollSpaceHorizontal=scrollbarHorizontal.childNodes[1];
 
-				//Determine the window height and width
-				var styleHeight=parseInt(this.element.style.height);			
-				//Check if the window's height is set by style or get it via
-				//offset height otherwise
-				//var height=styleHeight>0?styleHeight-21:this.element.offsetHeight-21;
-				// var height=this.element.offsetHeight-22;
+				//Determine the window height and width	
 				var height = this.viewport.offsetHeight;
-				// var width=this.element.offsetWidth-18;
 				var width= this.viewport.offsetWidth;
-//console.debug(this.viewport.offsetWidth);
 												
 				//Set vertical scrollbar...
 				scrollbarVertical.style.height=height+"px"
@@ -627,16 +621,21 @@ var Workbench = (() => {
 				var factorHeight = Math.min(1, height/content.offsetHeight);
 				var factorWidth = Math.min(1, width/content.offsetWidth);
 
-				scrollButtonVertical.style.height=(scrollSpaceHeight * factorHeight)+"px";
-				scrollButtonHorizontal.style.width=((scrollSpaceHorizontal.offsetWidth - 4) * factorWidth)+"px";
+				var scrollHeight = scrollSpaceHeight * factorHeight;
+				var scrollWidth = scrollSpaceHorizontal.offsetWidth * factorWidth - 4;
 				
-				/*
-				var posX = content.offsetLeft * factorWidth + 2;
-				var posY = content.offsetTop * factorHeight + 2;
+				scrollButtonVertical.style.height=scrollHeight+"px";
+				scrollButtonHorizontal.style.width=scrollWidth+"px";
 				
-				scrollButtonHorizontal.style.left=posX+"px";
-				scrollButtonVertical.style.top=posY+"px";
-				*/
+				// Set scroll button positions
+				var left = -content.offsetLeft * factorWidth;
+				var top = -content.offsetTop * factorHeight;
+				
+				var borderX = scrollSpaceVertical.offsetWidth-scrollButtonVertical.offsetWidth-2;
+				var borderY = scrollSpaceHorizontal.offsetHeight-scrollButtonHorizontal.offsetHeight-2;
+				
+				scrollButtonHorizontal.style.left = Math.max(2,Math.min(left, borderX)) + "px";
+				scrollButtonVertical.style.top = Math.max(2,Math.min(top, borderX)) + "px";
 			},
 			
 			resize : function(width, height) {
@@ -666,14 +665,26 @@ var Workbench = (() => {
 				var offsetLeft = this.viewport.offsetWidth-content.offsetWidth;
 				var offsetTop = this.viewport.offsetHeight-content.offsetHeight;
 
+				var scrollButtonX = this.scrollbar.horizontal.children[1].children[0];
+				var scrollButtonY = this.scrollbar.vertical.children[1].children[0];
+				
+				var factorX = scrollButtonX.offsetWidth / this.viewport.offsetWidth ;
+				var factorY =  scrollButtonY.offsetHeight / this.viewport.offsetHeight;
+				
 				if(axisX && offsetLeft < 0)
+				{
 					content.style.left = Math.max(Math.min(0,content.offsetLeft + step), offsetLeft) + "px";
+					this.moveScrollButton({movementX:-step * factorX}, scrollButtonX);
+				}
 				else if(offsetTop < 0)
+				{
 					content.style.top = Math.max(Math.min(0,content.offsetTop + step), offsetTop) + "px";
+					this.moveScrollButton({movementY:-step * factorY}, scrollButtonY);
+				}
 			},
 			
 			moveScrollButton : function(event, selection) {
-				var axisX = selection.className === "scrollButtonHorizontalSelected";
+				var axisX = selection.className.includes("scrollButtonHorizontal");
 				
 				var borderX = selection.parentNode.offsetWidth-selection.offsetWidth-2;
 				var borderY = selection.parentNode.offsetHeight-selection.offsetHeight-2;
@@ -691,8 +702,8 @@ var Workbench = (() => {
 				var factorX = this.viewport.offsetWidth / scrollButtonX.offsetWidth;
 				var factorY = this.viewport.offsetHeight / scrollButtonY.offsetHeight;
 				
-				var left = (scrollButtonX.offsetLeft * factorX);
-				var top = (scrollButtonY.offsetTop * factorY);
+				var left = scrollButtonX.offsetLeft * factorX;
+				var top = scrollButtonY.offsetTop * factorY;
 //console.debug("factorY: %f * scrollButtonY.offsetTop: %f = top: %f", factorY, scrollButtonY.offsetTop, top);
 				
 				var content = this.viewport.children[0];
@@ -895,7 +906,7 @@ var Workbench = (() => {
 				case "scrollButtonHorizontalSelected":
 					selection.className=selection.className.replace("Selected","");
 					var windowElement = getWindowElement(curSelection);
-					var id=/^window_([0-9]+)$/.exec(windowElement.id)[1];
+					var id = windowElement.dataset["id"];
 					var window=registry[id]["window"];
 					window.moveContentByScrollbar();
 					break;	
@@ -968,7 +979,7 @@ var Workbench = (() => {
 				case "scrollButtonRight":
 				case "scrollButtonDown":
 					var windowElement = getWindowElement(curSelection);
-					var id=/^window_([0-9]+)$/.exec(windowElement.id)[1];
+					var id = windowElement.dataset["id"];
 					var window=registry[id]["window"];
 					window.moveContentByButton(curSelection.className);
 					break;
@@ -1002,7 +1013,8 @@ var Workbench = (() => {
 			&& (curSelection.className=="buttonUp"
 			|| curSelection.className=="buttonDown"))
 			{
-				var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
+				var id = windowElement.dataset["id"];
+				var id=selection.parentNode.parentNode.dataset["id"];
 				var order=openOrder;
 				var window=registry[id]["window"].element;
 //console.debug(curSelection.className);
@@ -1074,7 +1086,7 @@ var Workbench = (() => {
 
 		// Scroll button moving
 		var windowElement = getWindowElement(selection);
-		var id = /^window_([0-9]+)$/.exec(windowElement.id)[1];
+		var id = windowElement.dataset["id"];
 		var window=registry[id]["window"];
 		
 		window.moveScrollButton(event, selection);	
@@ -1193,7 +1205,8 @@ var Workbench = (() => {
 		//Get the window titlebar
 		element=getWindowElement(element);
 		var id = element.dataset["id"];
-		if(!id)
+
+		if(id < 0)
 			return;
 		
 		var window = registry[id].window;
@@ -1250,14 +1263,11 @@ var Workbench = (() => {
 		switch(type)
 		{
 			case "window":
-				id=getWindowElement(element).id;
-				if(id==="workbench")
+				id = getWindowElement(element).dataset["id"];
+				if(id < 0)
 					item=Workbench;
 				else
-				{
-					id=/^window_([0-9]+)$/.exec(id)[1];
 					item=registry[id][type];
-				}
 				file=image;
 				break;
 			case "icon":

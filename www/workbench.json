@@ -3,7 +3,7 @@ var data = [
 		"id" : 1,
 		"pid" : 0,
 		"icons" : {
-			"title": "Lachsfilet",
+			"title": "Note!",
 			"image" : { 
 				"file" : "workbench.png",
 				"width" : 35,
@@ -16,14 +16,14 @@ var data = [
 			}
 		},
 		"window" : {
-			"title": "Lachsfilet"
+			"title": "Note!"
 		},
 		"content" : {
-			"title": "Test",
+			"title": "Hello again!",
 			"articles" : [
 				{
-					"title": "Client test",
-					"text": "Just for Javascript testing purpose! And now also for window resize and scroll feature tests!"
+					"title": "Lachfilet relaunch",
+					"text": "Currently lachsfilet.de is just running with static content, since my webhost has updated the PHP version.<br/>I took advantage of the resulting downtime to refactor my Workbench Javascript code and added some missing features like window resizing and scrolling by arrow buttons and scrollbar.<br/>A reworked backend and new content will follow soon.<br/><br/>Well, to be seroius, as soon as possible. Whenever that is..."
 				}
 			]
 		}
