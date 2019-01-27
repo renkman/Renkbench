@@ -676,7 +676,7 @@ var Workbench = (() => {
 					content.style.left = Math.max(Math.min(0,content.offsetLeft + step), offsetLeft) + "px";
 					this.moveScrollButton({movementX:-step * factorX}, scrollButtonX);
 				}
-				else if(offsetTop < 0)
+				else if(!axisX && offsetTop < 0)
 				{
 					content.style.top = Math.max(Math.min(0,content.offsetTop + step), offsetTop) + "px";
 					this.moveScrollButton({movementY:-step * factorY}, scrollButtonY);
@@ -1013,7 +1013,6 @@ var Workbench = (() => {
 			&& (curSelection.className=="buttonUp"
 			|| curSelection.className=="buttonDown"))
 			{
-				var id = windowElement.dataset["id"];
 				var id=selection.parentNode.parentNode.dataset["id"];
 				var order=openOrder;
 				var window=registry[id]["window"].element;
