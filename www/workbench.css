@@ -26,9 +26,8 @@ body
 
 #mainTitle
 {
-	background-image: url(images/window/main_title.png);
+	padding: 1px 0 0 1px;
 	float: left;
-	width: 175px;
 	height: 20px;
 }
 

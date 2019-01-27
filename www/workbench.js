@@ -61,11 +61,21 @@ var Workbench = (() => {
 	//const URL = "workbench.php",
 	const URL = "workbench.json";
 	
+	const MAIN_TITLE = "ÁLachsfilet.de release.";
+	
 	//The initialization method.
 	var init = () =>
 	{		
 		//Set cursor to wait mode
 		changeCursor(true);
+		
+		var title = convertText(MAIN_TITLE, fontColor["blueOnWhite"]);
+		var mainTitle = document.getElementById("mainTitle");
+		createNode("div").style({
+				marginTop:"2px",
+			}).innerHtml(title)
+			.appendTo(mainTitle)
+			.getNode();
 		
 		element=document.getElementById("workbench");
 		registry.push({
@@ -1293,9 +1303,9 @@ var Workbench = (() => {
 	{		
 		var frame=createNode("div").class("frame").
 		style({
-			width:window.style.width,
-			height:window.offsetHeight+"px",
-			top:window.offsetTop+"px",
+			width:(window.offsetWidth-4)+"px",
+			height:(window.offsetHeight-4)+"px",
+			top:(window.offsetTop)+"px",
 			left:window.offsetLeft+"px",
 			borderColor:"#ff8800",
 			borderWidth:"2px",
