@@ -12,7 +12,7 @@
 "use strict";
 
 //The workbench main object
-var Workbench = (() => {
+var Renkbench = (() => {
 	//The DOM-element of the workbench (<div>)
 	var element = {};
 	
@@ -62,7 +62,7 @@ var Workbench = (() => {
 	const URL = "workbench.json";
 	
 	// The workbench main title text
-	const MAIN_TITLE = "Lachsfilet.de release.";
+	const MAIN_TITLE = "Renkbench release.";
 	
 	//The initialization method.
 	var init = () =>

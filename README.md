@@ -1,4 +1,4 @@
-# Workbench
+# Renkbench
 A Javascript Amiga Workbench 1.3.3 look and feel clone.
 
 ## Goal
