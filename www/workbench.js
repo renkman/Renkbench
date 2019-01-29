@@ -58,8 +58,8 @@ var Renkbench = (() => {
 	const ICONS = IMAGES+"icons/";
 	
 	//The AJAX URL
-	//const URL = "workbench.php",
-	const URL = "workbench.json";
+	const URL = "https://renkbench.azurewebsites.net/";
+	//const URL = "workbench.json";
 	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
@@ -106,10 +106,10 @@ var Renkbench = (() => {
 		}
 		
 		//Get data via AJAX request
-		addWindows(data,0);
-		changeCursor(false);
-		// var request=createHTTPRequest(URL,getWindowsTree);
-		// request.send(null);
+		//addWindows(data,0);
+		//changeCursor(false);
+		var request=createHTTPRequest(URL, getWindowsTree);
+		request.send(null);
 //console.debug(registry);
 	};
 	
@@ -1413,18 +1413,17 @@ var Renkbench = (() => {
 	};
 	
 	//Callback function for AJAX response
-	var getWindowsTree = () =>
+	var getWindowsTree = (event) =>
 	{
-		if(this.readyState != 4)
+		if(event.target.readyState != 4)
 			return;
-//console.log("Huhu!" + request.responseText);
-		var windows=JSON.parse(this.responseText);
-//console.dir(windows);
+
 		//Register the windows, icons and the content
-		addWindows(windows,0);
+		var data = JSON.parse(event.target.response)
+		addWindows(data,0);
+
 		//Change cursor to normal mode
 		changeCursor();
-//console.dir(registry);
 	};
 	
 	//Sends an AJAX POST request.

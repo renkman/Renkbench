@@ -1,2 +1,5 @@
 # Ignore text editor backup files
 *~
+
+# Ignore node modules
+service/node_modules
