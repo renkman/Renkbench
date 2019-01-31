@@ -18,7 +18,6 @@ steps:
 - script: |
     cd service
     npm install
-    npm run build
   displayName: 'npm install and build'
 
 - task: PublishBuildArtifacts@1
