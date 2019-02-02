@@ -36,7 +36,7 @@ const data = [
 ];
 
 app.get('/', (request, response) => {
-	//response.set('Access-Control-Allow-Origin', '*');
+	response.set('Access-Control-Allow-Origin', '*');
 	response.json(data);
 });
 
