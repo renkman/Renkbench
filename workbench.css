@@ -24,11 +24,67 @@ body
 	float: left;
 }
 
+#main-bar-default
+{
+	width: 100%;
+	background-color: #ffffff;
+	float: left;
+}
+
 #mainTitle
 {
-	padding: 1px 0 0 1px;
+	padding: 0 0 0 5px;
 	float: left;
-	height: 20px;
+	height: 19px;
+}
+
+/* The Workbench context menu */
+#main-menu
+{
+	width: 100%;
+	display: none;
+}
+
+.dropdown
+{
+	float: left;
+	overflow: hidden;
+}
+
+.dropdown .dropdown-title
+{	
+	height: 19px;
+	border: none;
+	outline: none;
+	background-color: #ffffff;
+}
+
+.dropdown:hover .dropdown-title {
+	background-color: #000000;
+}
+
+.dropdown-content
+{
+	display: none;
+	position: absolute;
+	background-color: #ffffff;
+	min-width: 160px;
+	border: 2px solid #000099;
+}
+
+.dropdown-entry
+{
+	height: 19px;
+	float: none;
+	text-align: left;
+}
+
+.dropdown-entry:hover {
+  background-color: #000000;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 /* The charset element */

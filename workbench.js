@@ -47,6 +47,9 @@ var Renkbench = (() => {
 	//Last element clicked for coubleclick detection
 	var lastClickedElement = {};
 	
+	// The context menu of the currently selected window
+	var contextMenu = {};
+	
 	// The height in of the window title bar in pixels
 	const TITLE_BAR_HEIGHT = 21;
 	
@@ -69,7 +72,7 @@ var Renkbench = (() => {
 	{		
 		//Set cursor to wait mode
 		changeCursor(true);
-		
+
 		var title = convertText(MAIN_TITLE, fontColor["blueOnWhite"]);
 		var mainTitle = document.getElementById("mainTitle");
 		createNode("div").style({
@@ -78,7 +81,7 @@ var Renkbench = (() => {
 			.appendTo(mainTitle);
 		
 		element=document.getElementById("workbench");
-		element.dataset["id"]=-1;
+		element.dataset["id"]=0;
 		registry.push({
 			icon:null,
 			pid:-1,
@@ -90,12 +93,17 @@ var Renkbench = (() => {
 		});
 		
 		element.style.zIndex=1;
+
+		// Disable browser context menu
+		element.oncontextmenu = () => false;
 				
 		if(document.addEventListener)
 		{
-			element.addEventListener("mousedown",select(element),true);
-			element.addEventListener("mousemove",drag,true);
-			element.addEventListener("mouseup",deselect(element),true);
+			//element.addEventListener("mousedown",select(element),true);
+			element.addEventListener("mousedown", eventHandler(element).mouseDown,true);
+			element.addEventListener("mousemove", drag,true);
+			element.addEventListener("mouseup", eventHandler(element).mouseUp,true);
+			//element.addEventListener("mouseup",deselect(element),true);			
 		}
 		else
 		{
@@ -103,6 +111,7 @@ var Renkbench = (() => {
 			element.attachEvent("onmousedown",select(element));
 			element.attachEvent("onmousemove",drag);
 			element.attachEvent("onmouseup",deselect(element));
+			//element.attachEvent("oncontextmenu",showmenu);
 		}
 		
 		//Get data via AJAX request
@@ -121,7 +130,7 @@ var Renkbench = (() => {
 		{
 			var window=windows[i];
 			if(window.content)
-				registerWindow(window.window,window.icons,pid,window.content);
+				registerWindow(window.window, window.icons, pid, window.menu, window.content);
 			if(window.children)
 			{
 				newPid=registerWindow(window.window,window.icons,pid);
@@ -136,7 +145,7 @@ var Renkbench = (() => {
 	};
 	
 	//Adds a window and its icon to the registry
-	var registerWindow = (windowProperties, imageProperties, pid, content) =>
+	var registerWindow = (windowProperties, imageProperties, pid, menuProperties, content) =>
 	{
 		/*
 		if(typeof name!="string" || name=="" 
@@ -144,7 +153,7 @@ var Renkbench = (() => {
 			return false;
 		*/
 //console.debug(windowProperties);
-		if(typeof pid!="number")
+		if(typeof pid !== "number")
 			pid=0;
 		/*
 		if(typeof imageSelected!="string" || imageSelected=="" )
@@ -152,9 +161,7 @@ var Renkbench = (() => {
 		*/
 				
 		//Create items
-		var icon=createIcon(imageProperties);
-		var window=createWindow(windowProperties, ICONS);
-		icon.init(pid);
+		var window = createWindow(windowProperties, ICONS);
 		window.init();
 		
 		//Fill the window with content
@@ -165,14 +172,28 @@ var Renkbench = (() => {
 			else
 				window.setContent(content);
 		}
+		
+		
 		//Set window id and add items to registry
 		var id = registry.length;
 		window.setId(id);
-		icon.element.id+=id;
+		
+		// Create the context menu
+		var menu = createMenu(menuProperties, window);
+		
+		// Special handling for main context menu
+		if(id === 1)
+			registry[0].menu = menu;			
+		
+		var icon = createIcon(imageProperties);
+		icon.init(id, pid);
+		icon.element.id += id;
+		
 		registry.push({
 				icon : icon,
 				window : window,
-				pid : pid
+				pid : pid,
+				menu : menu
 		});
 //console.dir(this.registry);
 //console.debug("Id: %i",window.id);
@@ -210,7 +231,7 @@ var Renkbench = (() => {
 			
 			//The DOM-element of this icon
 			element : {},
-			init : function(pid)
+			init : function(id, pid)
 			{	
 				// Image
 				var image = createNode("div").class("iconElements").style({
@@ -229,7 +250,13 @@ var Renkbench = (() => {
 				.getNode();
 				
 				//Create div element and set background source files
-				this.element = createNode("div").class("icon").id("icon_").append(image).append(textImage).getNode();
+				this.element = createNode("div")
+				.class("icon")
+				.id("icon_")
+				.append(image)
+				.append(textImage)
+				.data({id:id})
+				.getNode();
 					//.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
 
 				registry[pid]["window"].element.appendChild(this.element);
@@ -727,11 +754,56 @@ var Renkbench = (() => {
 		};
 	};
 	
+	var createMenu = (items, window) =>
+	{
+		var create = (items, window) => {	
+		/*			
+		  <div class="dropdown">
+			<button class="dropbtn">Dropdown 
+			  <i class="fa fa-caret-down"></i>
+			</button>
+			<div class="dropdown-content">
+			  <a href="#">Link 1</a>
+			  <a href="#">Link 2</a>
+			  <a href="#">Link 3</a>
+			</div>
+		  </div> 
+		  */
+			var menu = createNode("div").class("menu-" + window.id).getNode();
+			for(var itemIndex in items)
+			{
+				var item = items[itemIndex];
+				var dropdown = createNode("div").class("dropdown").appendTo(menu).getNode();
+				var title = convertText(item.name, fontColor["blueOnWhite"]);
+				var titleNode = createNode("button").class("dropdown-title").appendTo(dropdown).innerHtml(title).getNode();
+				var content = createNode("div").class("dropdown-content").appendTo(dropdown).getNode();
+				for(var entryId in item.entries)
+				{
+					var entry = item.entries[entryId];
+					var text = convertText(entry.name, fontColor["blueOnWhite"]);
+					var command = window[entry.command];
+					createNode("div").class("dropdown-entry")
+						.appendTo(content)
+						.innerHtml(text)
+						.data({command: command})
+						.getNode();
+				}
+			}
+			return menu;
+		};
+		
+		var menu = create(items, window);
+		return  {
+			id : window.id,
+			
+			//The DOM-element of this menu
+			element : menu			
+		};
+	};
+	
 	// Event listener functions
 	var select = element => {
 		return event => {
-//console.debug(element);
-//console.debug(event);
 			//Store old selection
 			var selection=getSelection(event);
 			var oldSelection=oldSelectedElement;
@@ -1121,6 +1193,47 @@ var Renkbench = (() => {
 		return false;
 	};
 	
+	var eventHandler = element => {
+		var element = element;
+		return {
+			mouseDown : event => {
+				if(event.button === 0)
+					return select(element)(event);
+				if(event.button === 2)
+					return showMenu();
+				return false();
+			},
+			mouseUp : event => {
+				if(event.button === 0)
+					return deselect(element)(event);
+				if(event.button === 2)
+					return hideMenu();
+				return false();
+			}
+		}
+	};
+	
+	// Shows the context menu
+	var showMenu = () => {
+		var mainBarDefault = document.getElementById("main-bar-default");
+		var menu = document.getElementById("main-menu");
+		var id = oldSelectedElement.dataset !== undefined ? oldSelectedElement.dataset["id"] : 0;
+		var currentMenu = registry[id].menu;
+		menu.appendChild(currentMenu.element);
+		menu.style.display = "block";
+		mainBarDefault.style.display = "none";
+		return false;
+	};
+	
+		// Shows the context menu
+	var hideMenu = () => {
+		var mainBarDefault = document.getElementById("main-bar-default");
+		var menu = document.getElementById("main-menu");
+		menu.style.display = "none";
+		mainBarDefault.style.display = "block";
+		return false;
+	};
+	
 	var resize = (event, selection) => {
 		//Calculate new window size
 		var newPosX=event.clientX;
@@ -1204,10 +1317,9 @@ var Renkbench = (() => {
 		//Get the window titlebar
 		element=getWindowElement(element);
 		var id = element.dataset["id"];
-
-		if(id < 0)
+		if(id < 1)
 			return;
-		
+
 		var window = registry[id].window;
 		window.select();
 		//if(element.id!=="workbench")

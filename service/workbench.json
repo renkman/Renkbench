@@ -29,7 +29,6 @@
 		},
 		"menu" : [
 			{
-				"mainMenu" : true,
 				"name" : "Renkbench",
 				"entries" : [
 					{
