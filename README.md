@@ -1,5 +1,5 @@
 # Renkbench
-A Javascript Amiga Workbench 1.3.3 look and feel clone.
+A Javascript Amiga Workbench 1.3.3 look and feel clone. [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/lachsfilet/Renkbench/blob/master/LICENSE)
 
 ## Goal
 For getting some Javascript practice, in the year 2009 I created an Amiga Workbench clone and hosted it on [Lachsfilet.de](http://www.lachsfilet.de/).
