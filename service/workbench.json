@@ -3,7 +3,7 @@
 		"id" : 1,
 		"pid" : 0,
 		"icons" : {
-			"title": "Note!",
+			"title": "Double click me!",
 			"image" : { 
 				"file" : "workbench.png",
 				"width" : 35,
@@ -23,9 +23,82 @@
 			"articles" : [
 				{
 					"title": "Renkbench relaunch",
-					"text": "Currently lachsfilet.de is just running with static content from a node.js service, since my webhost has updated the PHP version.<br/>I took advantage of the resulting downtime to refactor my Workbench Javascript code and added some missing features like window resizing and scrolling by arrow buttons and scrollbar.<br/>A reworked backend and new content will follow soon.<br/><br/>Well, to be serious, as soon as possible. Whenever that is..."
+					"text": "Currently the Renkbench is just running with static content from a node.js service, since my webhost has updated the PHP version.<br/>I took advantage of the resulting downtime to refactor my Workbench Javascript code and added some missing features like window resizing and scrolling by arrow buttons and scrollbar.<br/>The new node.js backend is set up and hosted on Microsof Azure. Accordingly, the build and deployment pipeline, feeded by the Github repository, is setup on Azure Devops.<br/><br/>Now, I can go on with the content and the next Renkbench features like the context menu."
 				}
 			]
-		}
+		},
+		"menu" : [
+			{
+				"mainMenu" : true,
+				"name" : "Renkbench",
+				"entries" : [
+					{
+						"name" : "Open",
+						"command" : "open"
+					},
+										{
+						"name" : "Close",
+						"command" : "close"
+					},
+										{
+						"name" : "Duplicate",
+						"command" : "duplicate"
+					},
+										{
+						"name" : "Rename",
+						"command" : "rename"
+					},
+										{
+						"name" : "Info",
+						"command" : "info"
+					},
+										{
+						"name" : "Discard",
+						"command" : "info"
+					}
+				]
+			},	
+			{			
+				"name" : "Disk",
+				"entries" : [
+					{
+						"name" : "Empty trash",
+						"command" : "emptyTrash"
+					},
+										{
+						"name" : "Initialize",
+						"command" : "initialize"
+					}
+				]
+			},
+			{			
+				"name" : "Special",
+				"entries" : [
+					{
+						"name" : "Clean up",
+						"command" : "cleanUp"
+					},
+										{
+						"name" : "Last error",
+						"command" : "lastError",
+						"static": true
+					},
+										{
+						"name" : "Redraw",
+						"command" : "redraw",
+						"static": true
+					},
+										{
+						"name" : "Snapshot",
+						"command" : "snapshot"
+					},
+										{
+						"name" : "Version",
+						"command" : "version",
+						"static": true
+					}
+				]
+			}
+		]
 	}
 ]
