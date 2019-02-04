@@ -1085,11 +1085,11 @@ var Renkbench = (() => {
 			&& (curSelection.className=="buttonUp"
 			|| curSelection.className=="buttonDown"))
 			{
-				var id=selection.parentNode.parentNode.dataset["id"];
+				var id = getWindowElement(selection).dataset["id"];
 				var order=openOrder;
 				var window=registry[id]["window"].element;
 //console.debug(curSelection.className);
-			var change=false;
+				var change=false;
 //console.dir(order);
 				if(curSelection.className=="buttonUp")
 				{

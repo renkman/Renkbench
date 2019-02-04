@@ -43,12 +43,16 @@ body
 {
 	width: 100%;
 	display: none;
+	float: left;
+	background-color: #ffffff;
+	height: 19px;
 }
 
 .dropdown
 {
 	float: left;
 	overflow: hidden;
+	margin-right: 20px;
 }
 
 .dropdown .dropdown-title
