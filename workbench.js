@@ -50,6 +50,8 @@ var Renkbench = (() => {
 	// The context menu of the currently selected window
 	var contextMenu = {};
 	
+	var dropdownFocus = null;
+	
 	// The height in of the window title bar in pixels
 	const TITLE_BAR_HEIGHT = 21;
 	
@@ -100,9 +102,9 @@ var Renkbench = (() => {
 		if(document.addEventListener)
 		{
 			//element.addEventListener("mousedown",select(element),true);
-			element.addEventListener("mousedown", eventHandler(element).mouseDown,true);
+			element.addEventListener("mousedown", eventHandler(element).mouseDown, true);
 			element.addEventListener("mousemove", drag,true);
-			element.addEventListener("mouseup", eventHandler(element).mouseUp,true);
+			element.addEventListener("mouseup", eventHandler(element).mouseUp, true);
 			//element.addEventListener("mouseup",deselect(element),true);			
 		}
 		else
@@ -757,32 +759,33 @@ var Renkbench = (() => {
 	var createMenu = (items, window) =>
 	{
 		var create = (items, window) => {	
-		/*			
-		  <div class="dropdown">
-			<button class="dropbtn">Dropdown 
-			  <i class="fa fa-caret-down"></i>
-			</button>
-			<div class="dropdown-content">
-			  <a href="#">Link 1</a>
-			  <a href="#">Link 2</a>
-			  <a href="#">Link 3</a>
-			</div>
-		  </div> 
-		  */
-			var menu = createNode("div").class("menu-" + window.id).getNode();
+			/*			
+			  <div class="dropdown">
+				<button class="dropbtn">Dropdown 
+				  <i class="fa fa-caret-down"></i>
+				</button>
+				<div class="dropdown-content">
+				  <a href="#">Link 1</a>
+				  <a href="#">Link 2</a>
+				  <a href="#">Link 3</a>
+				</div>
+			  </div> 
+			 */
+			var menu = createNode("div").id("menu-" + window.id).getNode();
 			for(var itemIndex in items)
 			{
 				var item = items[itemIndex];
 				var dropdown = createNode("div").class("dropdown").appendTo(menu).getNode();
 				var title = convertText(item.name, fontColor["blueOnWhite"]);
 				var titleNode = createNode("button").class("dropdown-title").appendTo(dropdown).innerHtml(title).getNode();
+				
 				var content = createNode("div").class("dropdown-content").appendTo(dropdown).getNode();
 				for(var entryId in item.entries)
 				{
 					var entry = item.entries[entryId];
 					var text = convertText(entry.name, fontColor["blueOnWhite"]);
 					var command = window[entry.command];
-					createNode("div").class("dropdown-entry")
+					var entryNode = createNode("div").class("dropdown-entry")
 						.appendTo(content)
 						.innerHtml(text)
 						.data({command: command})
@@ -797,7 +800,7 @@ var Renkbench = (() => {
 			id : window.id,
 			
 			//The DOM-element of this menu
-			element : menu			
+			element : menu
 		};
 	};
 	
@@ -1137,6 +1140,37 @@ var Renkbench = (() => {
 	var drag = event =>
 	{
 		var selection=selectedElement;
+
+		if(dropdownFocus && !event.target.className.includes("dropdown") && event.target.className !== "char")
+		{	
+			var word = dropdownFocus;
+			for(var charId in word.children)
+			{
+				if(!word.children[charId].style)
+					continue;
+				var position = word.children[charId].style.backgroundPosition;
+				var coordinates = position.split(" ");
+				word.children[charId].style.backgroundPosition = coordinates[0] + " -" + fontColor.blueOnWhite + "px";
+			}
+			dropdownFocus = null;
+		}
+		
+		if(dropdownFocus === null && event.target.className === "dropdown-title" || event.target.className === "dropdown-entry")
+		{
+			var word = event.target.firstChild;
+console.debug(word);
+			for(var charId in word.children)
+			{
+				if(!word.children[charId].style)
+					continue;
+console.debug(word.children[charId]);
+				var position = word.children[charId].style.backgroundPosition;
+				var coordinates = position.split(" ");
+				word.children[charId].style.backgroundPosition = coordinates[0] + " -" + fontColor.whiteOnBlack + "px";
+			}
+			dropdownFocus = word;
+			return false;
+		}
 		
 		//Look if there is an item to drag
 		if(selection.className!=="image"
