@@ -1263,7 +1263,7 @@ var Renkbench = (() => {
 				var position = word.children[charId].style.backgroundPosition;
 				var coordinates = position.split(" ");
 				var currentColor = -parseInt(coordinates[1]);
-				var color = currentColor == fontColor.blueOnWhite ? fontColor.whiteOnBlack : fontColor.blueOnWhite;
+				var color = currentColor == fontColor.blueOnWhite ? fontColor.orangeOnBlack : fontColor.blueOnWhite;
 				word.children[charId].style.backgroundPosition = coordinates[0] + " -" + color + "px";
 			}
 		}
@@ -1656,7 +1656,8 @@ var Renkbench = (() => {
 		blackOnBlue : 48,
 		blackOnWhite : 64,
 		whiteOnBlack : 80,
-		blueOnWhiteInactive : 96
+		blueOnWhiteInactive : 96,
+		orangeOnBlack : 112
 	};
 	
 	//Convert string text to amiga style font div-element-text

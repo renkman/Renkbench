@@ -81,6 +81,7 @@ body
 	height: 19px;
 	float: none;
 	text-align: left;
+	padding-left: 2px;
 }
 
 .dropdown-entry:hover {
