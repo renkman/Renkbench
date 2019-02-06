@@ -10,16 +10,26 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
+# Delete GIMP file
+- task: DeleteFiles@1
+  inputs: 
+    Contents: '**/*xcf'
+  displayName: 'Delete GIMP file'
+
+# Install Node.js
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
+# Install app.js
 - script: |
     cd service
     npm install
   displayName: 'npm install'
 
+# Publish build artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(System.DefaultWorkingDirectory)'
+  displayName: 'Publish build artifact'
