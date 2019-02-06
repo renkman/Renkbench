@@ -47,9 +47,8 @@ var Renkbench = (() => {
 	//Last element clicked for coubleclick detection
 	var lastClickedElement = {};
 	
-	// The context menu of the currently selected window
-	var contextMenu = {};
-	
+	// The currently selected context menu
+	var menuOpenend = null;	
 	var dropdownFocus = null;
 	
 	// The height in of the window title bar in pixels
@@ -63,7 +62,7 @@ var Renkbench = (() => {
 	const ICONS = IMAGES+"icons/";
 	
 	//The AJAX URL
-	const URL = "http://localhost:8080/";
+	const URL = "https://renkbench.azurewebsites.net/";
 	//const URL = "workbench.json";
 	
 	// The workbench main title text
@@ -1139,39 +1138,38 @@ var Renkbench = (() => {
 	//Moves the icon and window elements
 	var drag = event =>
 	{
-		var selection=selectedElement;
+		var selection = selectedElement;
 
-		if(dropdownFocus && !event.target.className.includes("dropdown") && event.target.className !== "char")
+		if(menuOpenend && !event.target.className.includes("dropdown") && event.target.className !== "char")
+		{	
+			var word = menuOpenend;
+			hoverMenuEntry(word);
+			menuOpenend = null;
+		}
+	
+		if(dropdownFocus && event.target.className !== "dropdown-entry")
 		{	
 			var word = dropdownFocus;
-			for(var charId in word.children)
-			{
-				if(!word.children[charId].style)
-					continue;
-				var position = word.children[charId].style.backgroundPosition;
-				var coordinates = position.split(" ");
-				word.children[charId].style.backgroundPosition = coordinates[0] + " -" + fontColor.blueOnWhite + "px";
-			}
+			hoverMenuEntry(word);
 			dropdownFocus = null;
 		}
-		
-		if(dropdownFocus === null && event.target.className === "dropdown-title" || event.target.className === "dropdown-entry")
+
+		if(menuOpenend === null && event.target.className === "dropdown-title")
 		{
 			var word = event.target.firstChild;
-console.debug(word);
-			for(var charId in word.children)
-			{
-				if(!word.children[charId].style)
-					continue;
-console.debug(word.children[charId]);
-				var position = word.children[charId].style.backgroundPosition;
-				var coordinates = position.split(" ");
-				word.children[charId].style.backgroundPosition = coordinates[0] + " -" + fontColor.whiteOnBlack + "px";
-			}
+			hoverMenuEntry(word);
+			menuOpenend = word;
+			return false;
+		}
+				
+		if(dropdownFocus === null && event.target.className === "dropdown-entry")
+		{
+			var word = event.target.firstChild;
+			hoverMenuEntry(word);
 			dropdownFocus = word;
 			return false;
 		}
-		
+
 		//Look if there is an item to drag
 		if(selection.className!=="image"
 		&& selection.className!=="frame"
@@ -1259,7 +1257,7 @@ console.debug(word.children[charId]);
 		return false;
 	};
 	
-		// Shows the context menu
+	// Shows the context menu
 	var hideMenu = () => {
 		var mainBarDefault = document.getElementById("main-bar-default");
 		var menu = document.getElementById("main-menu");
@@ -1267,6 +1265,21 @@ console.debug(word.children[charId]);
 		mainBarDefault.style.display = "block";
 		return false;
 	};
+
+	var hoverMenuEntry = (word) => {
+		for(var charId in word.children)
+		{
+			if(!word.children[charId].style)
+				continue;
+			var position = word.children[charId].style.backgroundPosition;
+			var coordinates = position.split(" ");
+			var currentColor = -parseInt(coordinates[1]);
+			var color = currentColor == fontColor.blueOnWhite ? fontColor.whiteOnBlack : fontColor.blueOnWhite;
+			word.children[charId].style.backgroundPosition = coordinates[0] + " -" + color + "px";
+		}
+		dropdownFocus = null;
+	};
+	
 	
 	var resize = (event, selection) => {
 		//Calculate new window size
