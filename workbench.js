@@ -62,7 +62,7 @@ var Renkbench = (() => {
 	const ICONS = IMAGES+"icons/";
 	
 	//The AJAX URL
-	const URL = "https://renkbench.azurewebsites.net/";
+	const URL = "http://localhost:8080/";
 	//const URL = "workbench.json";
 	
 	// The workbench main title text
