@@ -519,7 +519,7 @@ var Renkbench = (() => {
 				var contentElement=createNode("div").class("content").appendTo(this.viewport).style(content.css).getNode();
 				
 				// Set the content title
-				var title=createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
+				createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
 				var stopper=createNode("div").class("stop").appendTo(contentElement);
 				
 				// Set form if there is any
@@ -758,33 +758,21 @@ var Renkbench = (() => {
 	var createMenu = (items, window) =>
 	{
 		var create = (items, window) => {	
-			/*			
-			  <div class="dropdown">
-				<button class="dropbtn">Dropdown 
-				  <i class="fa fa-caret-down"></i>
-				</button>
-				<div class="dropdown-content">
-				  <a href="#">Link 1</a>
-				  <a href="#">Link 2</a>
-				  <a href="#">Link 3</a>
-				</div>
-			  </div> 
-			 */
 			var menu = createNode("div").id("menu-" + window.id).getNode();
 			for(var itemIndex in items)
 			{
 				var item = items[itemIndex];
 				var dropdown = createNode("div").class("dropdown").appendTo(menu).getNode();
 				var title = convertText(item.name, fontColor["blueOnWhite"]);
-				var titleNode = createNode("button").class("dropdown-title").appendTo(dropdown).innerHtml(title).getNode();
+				createNode("button").class("dropdown-title").appendTo(dropdown).innerHtml(title).getNode();
 				
 				var content = createNode("div").class("dropdown-content").appendTo(dropdown).getNode();
 				for(var entryId in item.entries)
 				{
 					var entry = item.entries[entryId];
 					var text = convertText(entry.name, fontColor["blueOnWhite"]);
-					var command = window[entry.command];
-					var entryNode = createNode("div").class("dropdown-entry")
+					var command = entry.command;
+					createNode("div").class("dropdown-entry")
 						.appendTo(content)
 						.innerHtml(text)
 						.data({command: command})
@@ -1140,33 +1128,30 @@ var Renkbench = (() => {
 	{
 		var selection = selectedElement;
 
-		if(menuOpenend && !event.target.className.includes("dropdown") && event.target.className !== "char")
+		if(menuOpenend && !event.target.className.includes("dropdown") && !menuOpenend.contains(event.target) && !isChildOfClass(event.target, "dropdown"))
 		{	
-			var word = menuOpenend;
-			hoverMenuEntry(word);
+			hoverMenuEntry(menuOpenend);
 			menuOpenend = null;
 		}
 	
-		if(dropdownFocus && event.target.className !== "dropdown-entry")
-		{	
-			var word = dropdownFocus;
-			hoverMenuEntry(word);
+		if(dropdownFocus && event.target !== dropdownFocus && !dropdownFocus.contains(event.target))
+		{
+			hoverMenuEntry(dropdownFocus);
 			dropdownFocus = null;
 		}
 
 		if(menuOpenend === null && event.target.className === "dropdown-title")
-		{
-			var word = event.target.firstChild;
-			hoverMenuEntry(word);
-			menuOpenend = word;
+		{			
+			hoverMenuEntry(event.target);
+			menuOpenend = event.target;
 			return false;
 		}
-				
-		if(dropdownFocus === null && event.target.className === "dropdown-entry")
+		
+		if(dropdownFocus === null && (event.target.className === "dropdown-entry" || isChildOfClass(event.target, "dropdown-entry")))
 		{
-			var word = event.target.firstChild;
-			hoverMenuEntry(word);
-			dropdownFocus = word;
+			var menuEntry = event.target.className === "dropdown-entry" ? event.target : event.target.parentNode.parentNode;
+			hoverMenuEntry(menuEntry);
+			dropdownFocus = menuEntry;
 			return false;
 		}
 
@@ -1266,18 +1251,22 @@ var Renkbench = (() => {
 		return false;
 	};
 
-	var hoverMenuEntry = (word) => {
-		for(var charId in word.children)
+	var 
+	hoverMenuEntry = (menuEntry) => {
+		for(var wordId in menuEntry.children)
 		{
-			if(!word.children[charId].style)
-				continue;
-			var position = word.children[charId].style.backgroundPosition;
-			var coordinates = position.split(" ");
-			var currentColor = -parseInt(coordinates[1]);
-			var color = currentColor == fontColor.blueOnWhite ? fontColor.whiteOnBlack : fontColor.blueOnWhite;
-			word.children[charId].style.backgroundPosition = coordinates[0] + " -" + color + "px";
+			var word = menuEntry.children[wordId];
+			for(var charId in word.children)
+			{
+				if(!word.children[charId].style)
+					continue;
+				var position = word.children[charId].style.backgroundPosition;
+				var coordinates = position.split(" ");
+				var currentColor = -parseInt(coordinates[1]);
+				var color = currentColor == fontColor.blueOnWhite ? fontColor.whiteOnBlack : fontColor.blueOnWhite;
+				word.children[charId].style.backgroundPosition = coordinates[0] + " -" + color + "px";
+			}
 		}
-		dropdownFocus = null;
 	};
 	
 	
@@ -1638,7 +1627,7 @@ var Renkbench = (() => {
 		}
 		return "";
 	};
-	
+
 	//Changes between mouse cursors (Normal and wait)
 	var changeCursor = wait =>
 	{
