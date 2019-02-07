@@ -63,7 +63,7 @@ var Renkbench = (() => {
 	
 	//The AJAX URL
 	const URL = "http://localhost:8080/";
-		
+	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
 	
@@ -99,11 +99,9 @@ var Renkbench = (() => {
 				
 		if(document.addEventListener)
 		{
-			//element.addEventListener("mousedown",select(element),true);
 			element.addEventListener("mousedown", eventHandler(element).mouseDown, true);
 			element.addEventListener("mousemove", eventHandler(element).mouseMove, true);
 			element.addEventListener("mouseup", eventHandler(element).mouseUp, true);
-			//element.addEventListener("mouseup",deselect(element),true);			
 		}
 		else
 		{
@@ -111,12 +109,9 @@ var Renkbench = (() => {
 			element.attachEvent("onmousedown",select(element));
 			element.attachEvent("onmousemove",drag);
 			element.attachEvent("onmouseup",deselect(element));
-			//element.attachEvent("oncontextmenu",showmenu);
 		}
 		
 		//Get data via AJAX request
-		//addWindows(data,0);
-		//changeCursor(false);
 		var request=createHTTPRequest(URL, getWindowsTree);
 		request.send(null);
 //console.debug(registry);
@@ -762,19 +757,22 @@ var Renkbench = (() => {
 			{
 				var item = items[itemIndex];
 				var dropdown = createNode("div").class("dropdown").appendTo(menu).getNode();
-				var title = convertText(item.name, fontColor["blueOnWhite"]);
+				var title = convertText(item.name, fontColor.blueOnWhite);
 				createNode("button").class("dropdown-title").appendTo(dropdown).innerHtml(title).getNode();
 				
 				var content = createNode("div").class("dropdown-content").appendTo(dropdown).getNode();
 				for(var entryId in item.entries)
 				{
-					var entry = item.entries[entryId];
-					var text = convertText(entry.name, fontColor["blueOnWhite"]);
+					var entry = item.entries[entryId];					
+					var text = convertText(entry.name, entry.static ? fontColor.blueOnWhite : fontColor.blueOnWhiteInactive);
 					var command = entry.command;
-					createNode("div").class("dropdown-entry")
+					createNode("div").class(entry.static ? "dropdown-entry" : "dropdown-entry-disabled")
 						.appendTo(content)
 						.innerHtml(text)
-						.data({command: command})
+						.data({
+							command: command,
+							isEnabled: entry.static
+						})
 						.getNode();
 				}
 			}
@@ -1251,6 +1249,11 @@ var Renkbench = (() => {
 		if(dropdownFocus === null && (node.className === "dropdown-entry" || isChildOfClass(node, "dropdown-entry")))
 		{
 			var menuEntry = node.className === "dropdown-entry" ? node : node.parentNode.parentNode;
+			
+			var isEnabled = menuEntry.dataset.isEnabled === "true";
+			if(!isEnabled)
+				return false;
+
 			hoverMenuEntry(menuEntry);
 			dropdownFocus = menuEntry;
 			return false;

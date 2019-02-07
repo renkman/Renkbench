@@ -76,7 +76,7 @@ body
 	border: 2px solid #000099;
 }
 
-.dropdown-entry
+.dropdown-entry, .dropdown-entry-disabled
 {
 	height: 19px;
 	float: none;
