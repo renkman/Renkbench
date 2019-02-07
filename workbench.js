@@ -63,8 +63,7 @@ var Renkbench = (() => {
 	
 	//The AJAX URL
 	const URL = "http://localhost:8080/";
-	//const URL = "workbench.json";
-	
+		
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
 	
@@ -102,7 +101,7 @@ var Renkbench = (() => {
 		{
 			//element.addEventListener("mousedown",select(element),true);
 			element.addEventListener("mousedown", eventHandler(element).mouseDown, true);
-			element.addEventListener("mousemove", drag,true);
+			element.addEventListener("mousemove", eventHandler(element).mouseMove, true);
 			element.addEventListener("mouseup", eventHandler(element).mouseUp, true);
 			//element.addEventListener("mouseup",deselect(element),true);			
 		}
@@ -1126,34 +1125,7 @@ var Renkbench = (() => {
 	//Moves the icon and window elements
 	var drag = event =>
 	{
-		var selection = selectedElement;
-
-		if(menuOpenend && !event.target.className.includes("dropdown") && !menuOpenend.contains(event.target) && !isChildOfClass(event.target, "dropdown"))
-		{	
-			hoverMenuEntry(menuOpenend);
-			menuOpenend = null;
-		}
-	
-		if(dropdownFocus && event.target !== dropdownFocus && !dropdownFocus.contains(event.target))
-		{
-			hoverMenuEntry(dropdownFocus);
-			dropdownFocus = null;
-		}
-
-		if(menuOpenend === null && event.target.className === "dropdown-title")
-		{			
-			hoverMenuEntry(event.target);
-			menuOpenend = event.target;
-			return false;
-		}
-		
-		if(dropdownFocus === null && (event.target.className === "dropdown-entry" || isChildOfClass(event.target, "dropdown-entry")))
-		{
-			var menuEntry = event.target.className === "dropdown-entry" ? event.target : event.target.parentNode.parentNode;
-			hoverMenuEntry(menuEntry);
-			dropdownFocus = menuEntry;
-			return false;
-		}
+		var selection = selectedElement;	
 
 		//Look if there is an item to drag
 		if(selection.className!=="image"
@@ -1218,14 +1190,19 @@ var Renkbench = (() => {
 					return select(element)(event);
 				if(event.button === 2)
 					return showMenu();
-				return false();
+				return false;
 			},
 			mouseUp : event => {
 				if(event.button === 0)
 					return deselect(element)(event);
 				if(event.button === 2)
 					return hideMenu();
-				return false();
+				return false;
+			},
+			mouseMove : event => {
+				if(selectedElement.nodeType)
+					return drag(event);
+				return hoverContextMenu(event.target);
 			}
 		}
 	};
@@ -1234,7 +1211,7 @@ var Renkbench = (() => {
 	var showMenu = () => {
 		var mainBarDefault = document.getElementById("main-bar-default");
 		var menu = document.getElementById("main-menu");
-		var id = oldSelectedElement.dataset !== undefined ? oldSelectedElement.dataset["id"] : 0;
+		var id = oldSelectedElement.dataset !== undefined && oldSelectedElement.dataset["id"] !== undefined  ? oldSelectedElement.dataset["id"] : 0;
 		var currentMenu = registry[id].menu;
 		menu.appendChild(currentMenu.element);
 		menu.style.display = "block";
@@ -1251,8 +1228,37 @@ var Renkbench = (() => {
 		return false;
 	};
 
-	var 
-	hoverMenuEntry = (menuEntry) => {
+	var hoverContextMenu = node => {
+		if(menuOpenend && !node.className.includes("dropdown") && !menuOpenend.contains(node) && !isChildOfClass(node, "dropdown"))
+		{	
+			hoverMenuEntry(menuOpenend);
+			menuOpenend = null;
+		}
+	
+		if(dropdownFocus && node !== dropdownFocus && !dropdownFocus.contains(node))
+		{
+			hoverMenuEntry(dropdownFocus);
+			dropdownFocus = null;
+		}
+
+		if(menuOpenend === null && node.className === "dropdown-title")
+		{			
+			hoverMenuEntry(node);
+			menuOpenend = node;
+			return false;
+		}
+		
+		if(dropdownFocus === null && (node.className === "dropdown-entry" || isChildOfClass(node, "dropdown-entry")))
+		{
+			var menuEntry = node.className === "dropdown-entry" ? node : node.parentNode.parentNode;
+			hoverMenuEntry(menuEntry);
+			dropdownFocus = menuEntry;
+			return false;
+		}
+		return false;
+	};
+
+	var hoverMenuEntry = (menuEntry) => {
 		for(var wordId in menuEntry.children)
 		{
 			var word = menuEntry.children[wordId];
