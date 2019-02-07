@@ -250,7 +250,10 @@ var Renkbench = (() => {
 				.id("icon_")
 				.append(image)
 				.append(textImage)
-				.data({id:id})
+				.data({
+					id: id,
+					status: "closed"
+				})
 				.getNode();
 					//.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
 
@@ -399,19 +402,19 @@ var Renkbench = (() => {
 							
 				// Create vertical scrollbar
 				var scrollbarVertical=createNode("div").class("scrollbarVertical").appendTo(this.element).getNode();
-				var buttonArrowUp=createNode("div").class("scrollButtonUp").appendTo(scrollbarVertical).getNode();
+				createNode("div").class("scrollButtonUp").appendTo(scrollbarVertical).getNode();
 				var scrollSpaceVertical=createNode("div").class("scrollSpaceVertical").appendTo(scrollbarVertical).getNode();
-				var scrollButtonVertical=createNode("div").class("scrollButtonVertical").appendTo(scrollSpaceVertical).getNode();
-				var buttonArrowDown=createNode("div").class("scrollButtonDown").appendTo(scrollbarVertical).getNode();
+				createNode("div").class("scrollButtonVertical").appendTo(scrollSpaceVertical).getNode();
+				createNode("div").class("scrollButtonDown").appendTo(scrollbarVertical).getNode();
 				
 				this.scrollbar.vertical=scrollbarVertical;
 
 				//Create horizontal scrollbar
 				var scrollbarHorizontal=createNode("div").class("scrollbarHorizontal").appendTo(this.element).getNode();
-				var buttonArrowLeft=createNode("div").class("scrollButtonLeft").appendTo(scrollbarHorizontal).getNode();
+				createNode("div").class("scrollButtonLeft").appendTo(scrollbarHorizontal).getNode();
 				var scrollSpaceHorizontal=createNode("div").class("scrollSpaceHorizontal").appendTo(scrollbarHorizontal).getNode();
-				var scrollButtonHorizontal=createNode("div").class("scrollButtonHorizontal").appendTo(scrollSpaceHorizontal).getNode();
-				var buttonArrowRight=createNode("div").class("scrollButtonRight").appendTo(scrollbarHorizontal).getNode();
+				createNode("div").class("scrollButtonHorizontal").appendTo(scrollSpaceHorizontal).getNode();
+				createNode("div").class("scrollButtonRight").appendTo(scrollbarHorizontal).getNode();
 				
 				this.scrollbar.horizontal=scrollbarHorizontal;
 				
@@ -771,7 +774,8 @@ var Renkbench = (() => {
 						.innerHtml(text)
 						.data({
 							command: command,
-							isEnabled: entry.static
+							isEnabled: entry.static,
+							isAlwaysEnabled : entry.static
 						})
 						.getNode();
 				}
@@ -779,12 +783,40 @@ var Renkbench = (() => {
 			return menu;
 		};
 		
+		var enableMenu = (node, enable) => {
+			for(var i=0; i < node.children.length; i++)
+			{
+				var child = node.children[i];
+				enableMenu(child, enable);				
+				if(child.dataset.isAlwaysEnabled === "true")
+					continue;
+
+				if(child.className === "dropdown-entry" && !enable)
+				{
+					child.className = "dropdown-entry-disabled";
+					switchMenuEntryColor(child, fontColor.blueOnWhite, fontColor.blueOnWhiteInactive)
+					child.dataset.isEnabled = false;
+				}
+				
+				if(child.className === "dropdown-entry-disabled" && enable)
+				{
+					switchMenuEntryColor(child, fontColor.blueOnWhiteInactive, fontColor.blueOnWhite)
+					child.className = "dropdown-entry";
+					child.dataset.isEnabled = true;
+				}
+			}
+		};
+
 		var menu = create(items, window);
 		return  {
 			id : window.id,
 			
 			//The DOM-element of this menu
-			element : menu
+			element : menu,
+
+			enableMenu : () => enableMenu(menu, true),
+
+			disableMenu : () => enableMenu(menu, false)
 		};
 	};
 	
@@ -1211,6 +1243,10 @@ var Renkbench = (() => {
 		var menu = document.getElementById("main-menu");
 		var id = oldSelectedElement.dataset !== undefined && oldSelectedElement.dataset["id"] !== undefined  ? oldSelectedElement.dataset["id"] : 0;
 		var currentMenu = registry[id].menu;
+		if(oldSelectedElement.className === "icon")
+			currentMenu.enableMenu();
+		else
+			currentMenu.disableMenu();
 		menu.appendChild(currentMenu.element);
 		menu.style.display = "block";
 		mainBarDefault.style.display = "none";
@@ -1261,23 +1297,22 @@ var Renkbench = (() => {
 		return false;
 	};
 
-	var hoverMenuEntry = (menuEntry) => {
-		for(var wordId in menuEntry.children)
+	var hoverMenuEntry = menuEntry => switchMenuEntryColor(menuEntry, fontColor.orangeOnBlack, fontColor.blueOnWhite);
+
+	var switchMenuEntryColor = (menuEntry, fromColor, toColor) => {
+		for(var i = 0; i < menuEntry.children.length; i++)
 		{
-			var word = menuEntry.children[wordId];
-			for(var charId in word.children)
+			var word = menuEntry.children[i];
+			for(var j = 0; j < word.children.length; j++)
 			{
-				if(!word.children[charId].style)
-					continue;
-				var position = word.children[charId].style.backgroundPosition;
+				var position = word.children[j].style.backgroundPosition;
 				var coordinates = position.split(" ");
 				var currentColor = -parseInt(coordinates[1]);
-				var color = currentColor == fontColor.blueOnWhite ? fontColor.orangeOnBlack : fontColor.blueOnWhite;
-				word.children[charId].style.backgroundPosition = coordinates[0] + " -" + color + "px";
+				var color = currentColor == fromColor ? toColor : fromColor;
+				word.children[j].style.backgroundPosition = coordinates[0] + " -" + color + "px";
 			}
 		}
 	};
-	
 	
 	var resize = (event, selection) => {
 		//Calculate new window size
