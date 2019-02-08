@@ -156,7 +156,7 @@ var Renkbench = (() => {
 		*/
 				
 		//Create items
-		var window = createWindow(windowProperties, ICONS);
+		var window = createWindow(windowProperties);
 		window.init();
 		
 		//Fill the window with content
@@ -173,22 +173,22 @@ var Renkbench = (() => {
 		var id = registry.length;
 		window.setId(id);
 		
-		// Create the context menu
-		var menu = createMenu(menuProperties, window);
-		
-		// Special handling for main context menu
-		if(id === 1)
-			registry[0].menu = menu;			
-		
+		// Create the window related context menu	
+		var menu = createMenu(menuProperties, id);
+
 		var icon = createIcon(imageProperties);
 		icon.init(id, pid);
 		icon.element.id += id;
 		
 		registry.push({
+				id: id,
 				icon : icon,
 				window : window,
 				pid : pid,
-				menu : menu
+				menu : menu,
+				isSelected : false,
+				isTrashcan : false,
+				isOpened : false
 		});
 //console.dir(this.registry);
 //console.debug("Id: %i",window.id);
@@ -302,7 +302,7 @@ var Renkbench = (() => {
 	};
 	
 	//Creates a window and its content
-	var createWindow = (properties, iconPath) =>
+	var createWindow = (properties) =>
 	{
 		return {
 			id : 0,
@@ -752,10 +752,13 @@ var Renkbench = (() => {
 		};
 	};
 	
-	var createMenu = (items, window) =>
+	var createMenu = (items, id) =>
 	{
-		var create = (items, window) => {	
-			var menu = createNode("div").id("menu-" + window.id).getNode();
+		if(!items)
+			return null;
+
+		var create = (items, id) => {
+			var menu = createNode("div").id("menu-" + id).getNode();
 			for(var itemIndex in items)
 			{
 				var item = items[itemIndex];
@@ -766,16 +769,16 @@ var Renkbench = (() => {
 				var content = createNode("div").class("dropdown-content").appendTo(dropdown).getNode();
 				for(var entryId in item.entries)
 				{
-					var entry = item.entries[entryId];					
-					var text = convertText(entry.name, entry.static ? fontColor.blueOnWhite : fontColor.blueOnWhiteInactive);
-					var command = entry.command;
-					createNode("div").class(entry.static ? "dropdown-entry" : "dropdown-entry-disabled")
+					var entry = item.entries[entryId];
+					var enabled = entry.conditions === "true";			
+					var text = convertText(entry.name, enabled ? fontColor.blueOnWhite : fontColor.blueOnWhiteInactive);
+					createNode("div").class(enabled ? "dropdown-entry" : "dropdown-entry-disabled")
 						.appendTo(content)
 						.innerHtml(text)
 						.data({
-							command: command,
-							isEnabled: entry.static,
-							isAlwaysEnabled : entry.static
+							command: entry.command,
+							conditions : entry.conditions,
+							isEnabled : enabled
 						})
 						.getNode();
 				}
@@ -788,7 +791,7 @@ var Renkbench = (() => {
 			{
 				var child = node.children[i];
 				enableMenu(child, enable);				
-				if(child.dataset.isAlwaysEnabled === "true")
+				if(child.dataset.conditions === "true")
 					continue;
 
 				if(child.className === "dropdown-entry" && !enable)
@@ -798,7 +801,7 @@ var Renkbench = (() => {
 					child.dataset.isEnabled = false;
 				}
 				
-				if(child.className === "dropdown-entry-disabled" && enable)
+				if(child.className === "dropdown-entry-disabled" && enable && checkConditions(child.dataset.conditions))
 				{
 					switchMenuEntryColor(child, fontColor.blueOnWhiteInactive, fontColor.blueOnWhite)
 					child.className = "dropdown-entry";
@@ -807,9 +810,21 @@ var Renkbench = (() => {
 			}
 		};
 
+		var checkConditions = conditionString => {
+			var selectedId = oldSelectedElement.dataset.id;
+			var record = registry[selectedId];
+			var conditions = JSON.parse(conditionString);
+			return conditions.every(condition => {
+				if(condition.operand === "greaterThan")
+					return record[condition.property] > condition.value;
+				return record[condition.property] === condition.value;
+			});
+		};
+		
+
 		var menu = create(items, window);
 		return  {
-			id : window.id,
+			id : id,
 			
 			//The DOM-element of this menu
 			element : menu,
@@ -902,6 +917,7 @@ var Renkbench = (() => {
 					selection=copyImage(selection);
 					element.appendChild(selection);
 					selection.zIndex=-1;
+					registry[oldSelectedElement.dataset.id].isSelected = true;
 					break;
 				//If the element is a window button, change button image
 				case "buttonClose":
@@ -1147,6 +1163,9 @@ var Renkbench = (() => {
 //console.dir(order);
 			}
 
+			if(oldSelectedElement != selection && oldSelectedElement.dataset && oldSelectedElement.dataset.id)
+				registry[oldSelectedElement.dataset.id].isEnabled = false;
+
 			oldSelectedElement=selection;
 			selectedElement={};
 		};
@@ -1242,11 +1261,14 @@ var Renkbench = (() => {
 		var mainBarDefault = document.getElementById("main-bar-default");
 		var menu = document.getElementById("main-menu");
 		var id = oldSelectedElement.dataset !== undefined && oldSelectedElement.dataset["id"] !== undefined  ? oldSelectedElement.dataset["id"] : 0;
-		var currentMenu = registry[id].menu;
+		
+		// Get main menu as default menu
+		var currentMenu = registry[id].menu ? registry[id].menu : registry[0].menu;
 		if(oldSelectedElement.className === "icon")
 			currentMenu.enableMenu();
 		else
 			currentMenu.disableMenu();
+		
 		menu.appendChild(currentMenu.element);
 		menu.style.display = "block";
 		mainBarDefault.style.display = "none";
@@ -1344,9 +1366,10 @@ var Renkbench = (() => {
 			selection=oldSelectedElement.firstChild;
 		if(selection.className!="iconElements")
 			return false;
-		var id=/^icon_([0-9]+)$/.exec(selection.parentNode.id)[1];
-		var window=registry[id]["window"];
-		
+		//var id=/^icon_([0-9]+)$/.exec(selection.parentNode.id)[1];
+		var id = selection.parentNode.dataset.id;	
+		var window = registry[id].window;
+		registry[id].isOpened = true;
 		//Download file
 		if(window.type=="file")
 		{
@@ -1372,7 +1395,9 @@ var Renkbench = (() => {
 		
 		var newOrder=[];
 		var curOrder=openOrder;
-		var id=/^window_([0-9]+)$/.exec(window.id)[1];
+		//var id=/^window_([0-9]+)$/.exec(window.id)[1];
+		var id = window.dataset.id;
+		registry[id].isOpened = false;
 
 		//Delete closed window from open order.
 		for(var i=0;i<curOrder.length;i++)
@@ -1582,7 +1607,6 @@ var Renkbench = (() => {
 		//MS IE 7
 		else
 			return event.srcElement;
-		return selection;
 	};
 	
 	//Creates a new HTTPRequest instance.
@@ -1612,7 +1636,11 @@ var Renkbench = (() => {
 
 		//Register the windows, icons and the content
 		var data = JSON.parse(event.target.response)
-		addWindows(data,0);
+		addWindows(data.windows, 0);
+
+		// Create the main context menu	
+		var menu = createMenu(data.menu, 0);
+		registry[0].menu = menu;	
 
 		//Change cursor to normal mode
 		changeCursor();
