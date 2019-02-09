@@ -107,7 +107,7 @@
 				"articles" : [
 					{
 						"title": "Renkbench relaunch",
-						"text": "Currently the Renkbench is just running with static content from a node.js service, since my webhost has updated the PHP version.<br/>I took advantage of the resulting downtime to refactor my Workbench Javascript code and added some missing features like window resizing and scrolling by arrow buttons and scrollbar.<br/>The new node.js backend is set up and hosted on Microsof Azure. Accordingly, the build and deployment pipeline, feeded by the Github repository, is setup on Azure Devops.<br/><br/>Now, I can go on with the content and the next Renkbench features like the context menu.<br /><br />The current sources and project status are available on <a href=\"https://github.com/lachsfilet/Renkbench\" target=\"_blank\">GitHub</a>."
+						"text": "Currently the Renkbench is just running with static content from a node.js service, since my webhost has updated the PHP version.<br/>I took advantage of the resulting downtime to refactor my Workbench Javascript code and added some missing features like window resizing and scrolling by arrow buttons and scrollbar.<br/>The new node.js backend is set up and hosted on Microsof Azure. Accordingly, the build and deployment pipeline, feeded by the <a href=\"https://github.com/lachsfilet/Renkbench\" target=\"_blank\">Github repository</a>, is setup on Azure Devops.<br/><br/>Now, I can go on with the content and the next Renkbench features like the context menu."
 					}
 				]
 			}
