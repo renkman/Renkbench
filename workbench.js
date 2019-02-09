@@ -748,6 +748,51 @@ var Renkbench = (() => {
 				changeImage(titlebar,"window",WINDOW+"titlebar_background.png");
 				this.titleInactive.style.display = "none";
 				this.title.style.display = "block";
+			},
+				
+			open : function() {
+				registry[this.id].isOpened = true;
+				
+				//Download file
+				if(this.type=="file")
+				{
+					var temp=open(URL+"/file/get/"+this.fileId,"Download");
+					return true;
+				}
+				
+				if(this.element.style.zIndex>0)
+					return;
+				
+				element.appendChild(this.element);
+				openOrder.push(this.id);
+				this.element.style.zIndex=openOrder.length+1;
+				this.element.style.visibility="visible";
+
+				var menu = registry[this.id].menu ? registry[this.id].menu : registry[0].menu;
+				menu.updateMenu();
+			},
+
+			close : function() {
+				element.parentNode.appendChild(this.element);
+				this.element.style.zIndex=-1;
+				this.element.style.visibility="hidden";
+				
+				var newOrder=[];
+				var curOrder=openOrder;
+
+				//var id = this.element.dataset.id;
+				registry[this.id].isOpened = false;
+
+				//Delete closed window from open order.
+				for(var i=0;i<curOrder.length;i++)
+				{
+					if(curOrder[i]!=this.id)
+						newOrder.push(curOrder[i]);
+				}
+				openOrder=newOrder;
+				
+				var menu = registry[this.id].menu ? registry[this.id].menu : registry[0].menu;
+				menu.updateMenu();
 			}
 		};
 	};
@@ -791,17 +836,34 @@ var Renkbench = (() => {
 			{
 				var child = node.children[i];
 				enableMenu(child, enable);				
-				if(child.dataset.conditions === "true")
+	
+				if(!child.className.includes("dropdown-entry"))
 					continue;
 
-				if(child.className === "dropdown-entry" && !enable)
+				if(child.dataset.conditions === "true")
+					continue;
+/*
+				var isEnabled = enabled && enable && checkConditions(child.dataset.conditions);// && child.className === "dropdown-entry-disabled"; 
+console.debug("isEnabled: %s enable: %s,conditions: %s, enabled: %s", isEnabled, enable, checkConditions(child.dataset.conditions),enabled);
+				child.className = isEnabled ? "dropdown-entry": "dropdown-entry-disabled";
+				switchMenuEntryColor(child, 
+					//var color = currentColor == fromColor ? toColor : fromColor;
+					isEnabled ? fontColor.blueOnWhiteInactive : fontColor.blueOnWhite,
+					isEnabled ? fontColor.blueOnWhite : fontColor.blueOnWhiteInactive  
+				); 
+				child.dataset.isEnabled = isEnabled;
+
+				continue;
+*/				
+				var isEnabled = enabled && enable && checkConditions(child.dataset.conditions);
+				if(child.className === "dropdown-entry" && !isEnabled)
 				{
 					child.className = "dropdown-entry-disabled";
 					switchMenuEntryColor(child, fontColor.blueOnWhite, fontColor.blueOnWhiteInactive)
 					child.dataset.isEnabled = false;
 				}
 				
-				if(child.className === "dropdown-entry-disabled" && enable && checkConditions(child.dataset.conditions))
+				if(child.className === "dropdown-entry-disabled" && isEnabled && checkConditions(child.dataset.conditions))
 				{
 					switchMenuEntryColor(child, fontColor.blueOnWhiteInactive, fontColor.blueOnWhite)
 					child.className = "dropdown-entry";
@@ -811,6 +873,9 @@ var Renkbench = (() => {
 		};
 
 		var checkConditions = conditionString => {
+			if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
+				return false;
+
 			var selectedId = oldSelectedElement.dataset.id;
 			var record = registry[selectedId];
 			var conditions = JSON.parse(conditionString);
@@ -821,17 +886,36 @@ var Renkbench = (() => {
 			});
 		};
 		
+		var update = () => {		
+			menu.childNodes.forEach(node => {
+				node.childNodes[1].style.zIndex = openOrder.length + 2;
+			});
 
+			if(enabled)
+				enableMenu(menu, true);
+		};
+		
+		var enabled = false;
 		var menu = create(items, window);
+		update();
+		
 		return  {
 			id : id,
 			
 			//The DOM-element of this menu
 			element : menu,
 
-			enableMenu : () => enableMenu(menu, true),
+			enableMenu : () => {
+				enabled = true;
+				enableMenu(menu, true)
+			},
 
-			disableMenu : () => enableMenu(menu, false)
+			disableMenu : () => {
+				enabled = false;
+				enableMenu(menu, false)
+			},
+
+			updateMenu : () => update()
 		};
 	};
 	
@@ -855,7 +939,10 @@ var Renkbench = (() => {
 			if(selection.parentNode === lastClickedElement && span<=500 && !selection.className.includes("Button"))
 			{
 				deselect(element)(event);
-				return openWindow(event);
+				var selection = getSelection(event);
+				var image = getIconElement(selection);
+				var window = registry[image.dataset.id].window;
+				return window.open();
 			}
 			lastClickedElement=selection.parentNode;
 			
@@ -1070,16 +1157,17 @@ var Renkbench = (() => {
 					selection=windowElement;
 					break;
 			}
-			
+
 			//Switch simple button functionality
 			switch(curSelection.className)
 			{				
 				//If the currently selected element is a close button, close the
 				//belonging window.
 				case "buttonClose":
-					var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
+					//var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
+					var id = getWindowElement(selection).dataset.id;
 					var window=registry[id]["window"];
-					closeWindow(window.element);
+					window.close();
 					break;
 				case "scrollButtonLeft":
 				case "scrollButtonUp":
@@ -1245,7 +1333,11 @@ var Renkbench = (() => {
 				if(event.button === 0)
 					return deselect(element)(event);
 				if(event.button === 2)
-					return hideMenu();
+				{
+					executeMenuCommand(event);
+					hideMenu();
+					return 
+				}
 				return false;
 			},
 			mouseMove : event => {
@@ -1283,6 +1375,21 @@ var Renkbench = (() => {
 		mainBarDefault.style.display = "block";
 		return false;
 	};
+
+	var executeMenuCommand = event => {
+		if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
+			return;
+		
+		var menuEntry = getParentWithClass(event.target, "dropdown-entry");
+		if(!menuEntry)
+			return;
+
+		var command = menuEntry.dataset.command;
+		var id = oldSelectedElement.dataset.id;
+		var window = registry[id].window;
+		if(window[command])
+			window[command]();
+	};	
 
 	var hoverContextMenu = node => {
 		if(menuOpenend && !node.className.includes("dropdown") && !menuOpenend.contains(node) && !isChildOfClass(node, "dropdown"))
@@ -1357,57 +1464,7 @@ var Renkbench = (() => {
 
 		return false;
 	};
-	
-	var openWindow = event => {
-		var selection=getSelection(event);
-		
-//console.debug(selection.id);
-		if(selection.className=="image")
-			selection=oldSelectedElement.firstChild;
-		if(selection.className!="iconElements")
-			return false;
-		//var id=/^icon_([0-9]+)$/.exec(selection.parentNode.id)[1];
-		var id = selection.parentNode.dataset.id;	
-		var window = registry[id].window;
-		registry[id].isOpened = true;
-		//Download file
-		if(window.type=="file")
-		{
-			var temp=open(URL+"/file/get/"+window.fileId,"Download");
-			return true;
-		}
-		
-		if(window.element.style.zIndex<1)
-		{
-			element.appendChild(window.element);
-			openOrder.push(id);
-			window.element.style.zIndex=openOrder.length+1;
-			window.element.style.visibility="visible";
-		}
-//console.dir(openOrder);
-	};
-	
-	var closeWindow = window =>
-	{
-		element.parentNode.appendChild(window);
-		window.style.zIndex=-1;
-		window.style.visibility="hidden";
-		
-		var newOrder=[];
-		var curOrder=openOrder;
-		//var id=/^window_([0-9]+)$/.exec(window.id)[1];
-		var id = window.dataset.id;
-		registry[id].isOpened = false;
 
-		//Delete closed window from open order.
-		for(var i=0;i<curOrder.length;i++)
-		{
-			if(curOrder[i]!=id)
-				newOrder.push(curOrder[i]);
-		}
-		openOrder=newOrder;
-	};
-	
 	//Changes the selection status of the titlebar
 	var selectWindow = element =>
 	{
@@ -1442,7 +1499,7 @@ var Renkbench = (() => {
 	//Get the icon element of the current element.
 	var getIconElement = element =>
 	{
-		if(element.className=="icon")
+		if(element.className === "icon")
 			return element;
 		return getIconElement(element.parentNode);
 	};
@@ -1458,12 +1515,22 @@ var Renkbench = (() => {
 	// Determines whether an element is a child node 
 	// of a node with the passed class name
 	var isChildOfClass = (element, className) => {
-		if(!element.parentNode)
-			return false;
 		if(element.className === className)
 			return true;
+		if(!element.parentNode)
+			return false;
 		return isChildOfClass(element.parentNode, className);
-	};	
+	};
+
+	// Gets the anchestor element
+	var getParentWithClass = (node, className) => {
+		if(!node.className)
+			return null;
+		if(node.className.toLowerCase() === className.toLowerCase())
+			return node;
+		return getParentWithClass(node.parentNode, className);
+	};
+
 	
 	//Changes/switches the background image of an icon or a window/workbench
 	//button.
