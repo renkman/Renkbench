@@ -16,11 +16,13 @@ Currently, the Workbench clone contains the following features:
 * Window to the front and to the back buttons
 * Closing of windows
 * Directories displayed as drawers
+* Context menu in the main title bar triggered by mouse right click
 
 ## Todo
 
 * Customized keyboard input using Topaz font
-* Context menu in the main title bar triggered by mouse right click
+* Add ability for handheld usage
+
 
 ## Backend
 

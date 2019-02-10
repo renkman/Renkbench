@@ -842,33 +842,11 @@ var Renkbench = (() => {
 
 				if(child.dataset.conditions === "true")
 					continue;
-/*
-				var isEnabled = enabled && enable && checkConditions(child.dataset.conditions);// && child.className === "dropdown-entry-disabled"; 
-console.debug("isEnabled: %s enable: %s,conditions: %s, enabled: %s", isEnabled, enable, checkConditions(child.dataset.conditions),enabled);
-				child.className = isEnabled ? "dropdown-entry": "dropdown-entry-disabled";
-				switchMenuEntryColor(child, 
-					//var color = currentColor == fromColor ? toColor : fromColor;
-					isEnabled ? fontColor.blueOnWhiteInactive : fontColor.blueOnWhite,
-					isEnabled ? fontColor.blueOnWhite : fontColor.blueOnWhiteInactive  
-				); 
-				child.dataset.isEnabled = isEnabled;
 
-				continue;
-*/				
 				var isEnabled = enabled && enable && checkConditions(child.dataset.conditions);
-				if(child.className === "dropdown-entry" && !isEnabled)
-				{
-					child.className = "dropdown-entry-disabled";
-					switchMenuEntryColor(child, fontColor.blueOnWhite, fontColor.blueOnWhiteInactive)
-					child.dataset.isEnabled = false;
-				}
-				
-				if(child.className === "dropdown-entry-disabled" && isEnabled && checkConditions(child.dataset.conditions))
-				{
-					switchMenuEntryColor(child, fontColor.blueOnWhiteInactive, fontColor.blueOnWhite)
-					child.className = "dropdown-entry";
-					child.dataset.isEnabled = true;
-				}
+				child.className = isEnabled ? "dropdown-entry": "dropdown-entry-disabled";
+				setMenuEntryColor(child, isEnabled ? fontColor.blueOnWhite : fontColor.blueOnWhiteInactive);
+				child.dataset.isEnabled = isEnabled;
 			}
 		};
 
@@ -899,10 +877,10 @@ console.debug("isEnabled: %s enable: %s,conditions: %s, enabled: %s", isEnabled,
 		var menu = create(items, window);
 		update();
 		
-		return  {
+		return  {			
 			id : id,
 			
-			//The DOM-element of this menu
+			// The DOM-element of this menu
 			element : menu,
 
 			enableMenu : () => {
@@ -1055,7 +1033,7 @@ console.debug("isEnabled: %s enable: %s,conditions: %s, enabled: %s", isEnabled,
 		};
 	};
 	
-	//Mouseup callback method
+	// Mouseup callback method
 	var deselect = workbenchElement => {
 		return event =>	{
 			var curSelection=getSelection(event);
@@ -1367,12 +1345,16 @@ console.debug("isEnabled: %s enable: %s,conditions: %s, enabled: %s", isEnabled,
 		return false;
 	};
 	
-	// Shows the context menu
+	// Hides the context menu
 	var hideMenu = () => {
 		var mainBarDefault = document.getElementById("main-bar-default");
 		var menu = document.getElementById("main-menu");
 		menu.style.display = "none";
 		mainBarDefault.style.display = "block";
+
+		// Reset hover effects
+		hoverContextMenu(element);
+
 		return false;
 	};
 
@@ -1404,8 +1386,14 @@ console.debug("isEnabled: %s enable: %s,conditions: %s, enabled: %s", isEnabled,
 			dropdownFocus = null;
 		}
 
-		if(menuOpenend === null && node.className === "dropdown-title")
-		{			
+		if(menuOpenend === null && (node.className === "dropdown-title" || node.className === "dropdown" || node.className === "dropdown-content"))
+		{
+			if(node.className === "dropdown")
+				node = node.firstChild;
+
+			if(node.className === "dropdown-content")
+				node = node.parentNode.firstChild;
+			
 			hoverMenuEntry(node);
 			menuOpenend = node;
 			return false;
@@ -1441,6 +1429,16 @@ console.debug("isEnabled: %s enable: %s,conditions: %s, enabled: %s", isEnabled,
 				word.children[j].style.backgroundPosition = coordinates[0] + " -" + color + "px";
 			}
 		}
+	};
+
+	var setMenuEntryColor = (menuEntry, color) => {
+		menuEntry.childNodes.forEach(word => {
+			word.childNodes.forEach(character => {
+				var position = character.style.backgroundPosition;
+				var coordinates = position.split(" ");
+				character.style.backgroundPosition = coordinates[0] + " -" + color + "px";
+			});
+		});
 	};
 	
 	var resize = (event, selection) => {
