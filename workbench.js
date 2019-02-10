@@ -13,6 +13,10 @@
 
 //The workbench main object
 var Renkbench = (() => {
+	var version = 0;
+	var build = 0;
+	var release = 0;
+
 	//The DOM-element of the workbench (<div>)
 	var element = {};
 	
@@ -66,7 +70,7 @@ var Renkbench = (() => {
 	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
-	
+
 	//The initialization method.
 	var init = () =>
 	{		
@@ -100,8 +104,11 @@ var Renkbench = (() => {
 		if(document.addEventListener)
 		{
 			element.addEventListener("mousedown", eventHandler(element).mouseDown, true);
+			element.addEventListener("touchstart", eventHandler(element).mouseDown, true);
 			element.addEventListener("mousemove", eventHandler(element).mouseMove, true);
+			element.addEventListener("touchmove", eventHandler(element).mouseMove, true);
 			element.addEventListener("mouseup", eventHandler(element).mouseUp, true);
+			element.addEventListener("touchend", eventHandler(element).mouseUp, true);
 		}
 		else
 		{
@@ -1301,6 +1308,7 @@ var Renkbench = (() => {
 		var element = element;
 		return {
 			mouseDown : event => {
+				resetTitleBar();
 				if(event.button === 0)
 					return select(element)(event);
 				if(event.button === 2)
@@ -1359,14 +1367,20 @@ var Renkbench = (() => {
 	};
 
 	var executeMenuCommand = event => {
-		if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
-			return;
-		
 		var menuEntry = getParentWithClass(event.target, "dropdown-entry");
 		if(!menuEntry)
-			return;
+			return;		
 
 		var command = menuEntry.dataset.command;
+		if(menuEntry.dataset.conditions === "true" && core[command])
+		{
+			core[command]();
+			return;
+		}
+
+		if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
+			return;
+
 		var id = oldSelectedElement.dataset.id;
 		var window = registry[id].window;
 		if(window[command])
@@ -1705,7 +1719,13 @@ var Renkbench = (() => {
 
 		// Create the main context menu	
 		var menu = createMenu(data.menu, 0);
-		registry[0].menu = menu;	
+		registry[0].menu = menu;
+
+		// Set version and build numbers
+		version = data.version;
+		build = data.build;
+		release = data.release;
+		createVersionInfo(version, build, release);
 
 		//Change cursor to normal mode
 		changeCursor();
@@ -1783,6 +1803,16 @@ var Renkbench = (() => {
 		element.style.MozUserSelect=cssProperty;
 		//...and KHTML-browsers.
 		element.style.KhtmlUserSelect=cssProperty;
+	};
+
+	var createVersionInfo = (version, build, release) => {
+		var text = "Renkbench version " + version + " Release " + release + " Build " + build;
+		var info = document.getElementById("info-bar");
+		var textNode = convertText(text, fontColor.blueOnWhite);
+		createNode("div").style({
+			marginTop:"2px",
+		}).innerHtml(textNode)
+		.appendTo(info);
 	};
 	
 	//Text, charset and font properties and methods
@@ -1956,6 +1986,22 @@ var Renkbench = (() => {
 		})(name);
 		return instance;
 	};
+
+	var core = {
+		version : () => {
+			var infoNode = document.getElementById("info-bar");
+			infoNode.style.display = "block";
+			var titleNode = document.getElementById("mainTitle");
+			titleNode.style.display = "none";
+		}
+	};
+
+	var resetTitleBar = () => {
+		var infoNode = document.getElementById("info-bar");
+		infoNode.style.display = "none";
+		var titleNode = document.getElementById("mainTitle");
+		titleNode.style.display = "block";
+	}
 	
 	// Initialize workbench
 	init();	

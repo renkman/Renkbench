@@ -16,13 +16,7 @@ body
 	z-index: 1;
 }
 
-#mainBar
-{
-	width: 100%;
-	background-color: #ffffff;
-	float: left;
-}
-
+#mainBar,
 #main-bar-default
 {
 	width: 100%;
@@ -35,6 +29,14 @@ body
 	padding: 0 0 0 5px;
 	float: left;
 	height: 19px;
+	display: block;
+}
+
+#info-bar {
+	padding: 0 0 0 5px;
+	float: left;
+	height: 19px;
+	display: none;
 }
 
 /* The Workbench context menu */
