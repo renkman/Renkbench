@@ -90,7 +90,7 @@
 			"id" : 1,
 			"pid" : 0,
 			"icons" : {
-				"title": "Double click me!",
+				"title": "Renkbench",
 				"image" : { 
 					"file" : "workbench.png",
 					"width" : 35,
@@ -100,6 +100,57 @@
 					"file" : "workbench_selected.png",
 					"width" : 35,
 					"height" : 30
+				}
+			},
+			"window" : {
+				"title": "Renkbech"
+			},
+			"children" : [
+				{
+					"id" : 3,
+					"pid" : 0,
+					"icons" : {
+						"title": "Notepad",
+						"image" : { 
+							"file" : "notepad.png",
+							"width" : 32,
+							"height" : 32
+						},
+						"imageSelected" : {
+							"file" : "notepad_selected.png",
+							"width" : 32,
+							"height" : 32
+						}
+					},
+					"window" : {
+						"title": "Notepad"
+					},
+					"content" : {
+						"title": "Textbox",
+						"articles" : [
+							{
+								"title": "Placeholder",
+								"text": "This should be a text input box or field."
+							}
+						]
+					}
+				}	
+			]
+		},
+		{
+			"id" : 2,
+			"pid" : 0,
+			"icons" : {
+				"title": "Double click me!",
+				"image" : { 
+					"file" : "disk.png",
+					"width" : 32,
+					"height" : 32
+				},
+				"imageSelected" : {
+					"file" : "disk_selected.png",
+					"width" : 32,
+					"height" : 32
 				}
 			},
 			"window" : {
