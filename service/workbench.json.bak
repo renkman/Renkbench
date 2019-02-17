@@ -1,0 +1,119 @@
+﻿{	
+	"version" : "1.2.0",
+	"build" : "20190210.1",
+	"release" : "25",
+	"menu" : 
+		[
+			{
+			"name" : "Renkbench",
+			"entries" : [
+				{
+					"name" : "Open",
+					"command" : "open",
+					"conditions" : "[ {\"property\" : \"isSelected\", \"value\" : true } ]"
+				},
+				{
+					"name" : "Close",
+					"command" : "close",					
+					"conditions" :  "[{\"property\" : \"isSelected\", \"value\" : true }, {\"property\" : \"isOpened\", \"value\" : true } ]"
+				},
+				{
+					"name" : "Duplicate",
+					"command" : "duplicate",
+					"conditions" :   "[ {\"property\" : \"isSelected\", \"value\" : true } ]"
+				},
+				{
+					"name" : "Rename",
+					"command" : "rename",
+					"conditions" :  "[ {\"property\" : \"isSelected\", \"value\" : true } ]"
+				},
+				{
+					"name" : "Info",
+					"command" : "info",
+					"conditions" : "[ {\"property\" : \"isSelected\", \"value\" : true } ]"
+				},
+				{
+					"name" : "Discard",
+					"command" : "discard",
+					"conditions" :  "[ {\"property\" : \"isSelected\", \"value\" : true },  {\"property\" : \"pid\", \"value\" : 0, \"operand\": \"greaterThan\" }]"
+				}
+			]
+		},	
+		{			
+			"name" : "Disk",
+			"entries" : [
+				{
+					"name" : "Empty trash",
+					"command" : "emptyTrash",
+					"conditions" :  "[{\"property\" : \"isSelected\", \"value\" : true },  {\"property\" : \"isTrashcan\", \"value\" : true }]"
+				},
+									{
+					"name" : "Initialize",
+					"command" : "initialize",
+					"conditions" : "[{\"property\" : \"isSelected\", \"value\" : true }, {\"property\" : \"pid\", \"value\" : 0 }]"
+				}
+			]
+		},
+		{			
+			"name" : "Special",
+			"entries" : [
+				{
+					"name" : "Clean up",
+					"command" : "cleanUp",
+					"conditions" : "[{\"property\" : \"isSelected\", \"value\" : true },  {\"property\" : \"id\", \"value\" : 1 }]"
+				},
+									{
+					"name" : "Last error",
+					"command" : "lastError",
+					"conditions": "true"
+				},
+									{
+					"name" : "Redraw",
+					"command" : "redraw",
+					"conditions": "true"
+				},
+									{
+					"name" : "Snapshot",
+					"command" : "snapshot",
+					"conditions" :  "[ {\"property\" : \"isSelected\", \"value\" : true } ]"
+				},
+									{
+					"name" : "Version",
+					"command" : "version",
+					"conditions": "true"
+				}
+			]
+		}
+	],
+	"windows" : [
+		{
+			"id" : 1,
+			"pid" : 0,
+			"icons" : {
+				"title": "Double click me!",
+				"image" : { 
+					"file" : "workbench.png",
+					"width" : 35,
+					"height" : 30
+				},
+				"imageSelected" : {
+					"file" : "workbench_selected.png",
+					"width" : 35,
+					"height" : 30
+				}
+			},
+			"window" : {
+				"title": "Note!"
+			},
+			"content" : {
+				"title": "Hello again!",
+				"articles" : [
+					{
+						"title": "Renkbench relaunch",
+						"text": "Currently the Renkbench is just running with static content from a node.js service, since my webhost has updated the PHP version.<br/>I took advantage of the resulting downtime to refactor my Workbench Javascript code and added some missing features like window resizing, scrolling by arrow buttons and scrollbar and implementing the context menu.<br/>The new node.js backend is set up and hosted on Microsof Azure. Accordingly, the build and deployment pipeline, feeded by the <a href=\"https://github.com/lachsfilet/Renkbench\" target=\"_blank\">Github repository</a>, is setup on Azure Devops.<br/><br/>Now, I can go on with topaz style input possibilities and the content."
+					}
+				]
+			}
+		}
+	]
+}

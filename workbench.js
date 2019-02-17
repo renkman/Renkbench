@@ -92,7 +92,8 @@ var Renkbench = (() => {
 			window: {
 				element: element,
 				iconStartPos: iconStartPos,
-				arrangeIcons: arrangeIcons
+				arrangeIcons: arrangeIcons,
+				addIcon : addIcon
 			}
 		});
 		
@@ -135,7 +136,7 @@ var Renkbench = (() => {
 				registerWindow(window.window, window.icons, pid, window.menu, window.content);
 			if(window.children)
 			{
-				newPid=registerWindow(window.window,window.icons,pid);
+				var newPid=registerWindow(window.window,window.icons,pid);
 				addWindows(window.children,newPid);
 			}
 		}
@@ -149,19 +150,10 @@ var Renkbench = (() => {
 	//Adds a window and its icon to the registry
 	var registerWindow = (windowProperties, imageProperties, pid, menuProperties, content) =>
 	{
-		/*
-		if(typeof name!="string" || name=="" 
-		|| typeof image!="string" || image=="")
-			return false;
-		*/
 //console.debug(windowProperties);
 		if(typeof pid !== "number")
 			pid=0;
-		/*
-		if(typeof imageSelected!="string" || imageSelected=="" )
-			imageSelected=image;
-		*/
-				
+
 		//Create items
 		var window = createWindow(windowProperties);
 		window.init();
@@ -174,7 +166,8 @@ var Renkbench = (() => {
 			else
 				window.setContent(content);
 		}
-		
+		else
+			window.setIconArea();
 		
 		//Set window id and add items to registry
 		var id = registry.length;
@@ -203,6 +196,10 @@ var Renkbench = (() => {
 		return window.id;
 	};
 	
+	var addIcon = (icon) =>{
+		element.appendChild(icon.element);
+	};
+
 	//Arranges the workbench icons
 	var arrangeIcons = () =>
 	{
@@ -263,21 +260,23 @@ var Renkbench = (() => {
 				})
 				.getNode();
 					//.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
-
-				registry[pid]["window"].element.appendChild(this.element);
 				
-				this.element.style.top=registry[pid]["window"].iconStartPos.y;
+				//Setup window containing icon
+				var window=registry[pid]["window"];
+				window.addIcon(this);
 				
-				//Coordinates of the next icon are top and right, if it is
-				//a direct child of the workbench
+				// Coordinates of the next icon are top and right, if it is
+				// a direct child of the workbench
 				var x=this.element.offsetWidth;
 				var y=this.element.offsetHeight;
 				this.element.style.width=x+"px";
 				this.element.style.height=y+"px";
 				
+				this.element.style.top=registry[pid]["window"].iconStartPos.y;
+
 				if(pid==0)
 				{
-					//Set workbench icon with highest width
+					// Set workbench icon with highest width
 					if(x>iconWidth)
 						iconWidth=x;
 					
@@ -285,31 +284,27 @@ var Renkbench = (() => {
 					this.element.style.right=iconStartPos.x;
 					this.initX=parseInt(iconStartPos.x);
 					
-					//Setup coordinates for next icon
+					// Setup coordinates for next icon
 					var nextPosY=parseInt(iconStartPos.y)+y+20;
 					var borderBottom=element.offsetTop+element.offsetHeight;
-					//Just put the next icon under the current one.
+					
+					// Just put the next icon under the current one.
 					if (nextPosY+y+10<borderBottom)
 					{
 						iconStartPos.y=nextPosY+"px";
 						return;
 					}
 					
-					//Set the next icon left to the current icon column.
+					// Set the next icon left to the current icon column.
 					iconStartPos.x=(parseInt(iconStartPos.x)+x+10)+"px";
 					iconStartPos.y="40px";
-					return;
 				}
-				
-				//Setup window containing icon
-				var window=registry[pid]["window"];
-				window.addIcon(this);
 			}
 		};
 	};
 	
 	//Creates a window and its content
-	var createWindow = (properties) =>
+	var createWindow = properties =>
 	{
 		return {
 			id : 0,
@@ -430,13 +425,6 @@ var Renkbench = (() => {
 								
 				// Add viewport
 				this.viewport = createNode("div").class("viewport").appendTo(this.element).getNode();
-				/*
-				this.element.style.height="200px";
-				this.element.style.width="400px";
-*/
-				//Setup element
-				//element.appendChild(this.element);
-				//element.parentNode.appendChild(this.element);
 //console.debug("Id: %i, minWidth: %i",this.id,this.minWidth);
 			},
 			
@@ -460,13 +448,17 @@ var Renkbench = (() => {
 			//Adds an icon to the window
 			addIcon : function(icon)
 			{
-				//A content window does not show any icons.
+				// A content window does not show any icons.
 				if(this.hasContent)
 					return false;
 				
+				// Add icon to the dropzone
+				this.viewport.childNodes[0].appendChild(icon.element);
+
 				//Get maximum icon size
-				var sizeX=parseInt(icon.element.style.width);
-				var sizeY=parseInt(icon.element.style.height);
+				var sizeX=parseInt(icon.element.offsetWidth);
+				var sizeY=parseInt(icon.element.offsetHeight);
+
 				if(this.maxIconSize.x<sizeX)
 					this.maxIconSize.x=sizeX;
 				if(this.maxIconSize.y<sizeY)
@@ -474,6 +466,7 @@ var Renkbench = (() => {
 				
 				//Add icon
 				this.icons.push(icon);
+
 			},
 			
 			//Arranges the child icons of the window and resizes it.
@@ -483,8 +476,12 @@ var Renkbench = (() => {
 				var height=Math.ceil(this.icons.length/4);
 				
 				this.element.style.width=(this.maxIconsInRow*(this.maxIconSize.x+this.iconDistance))+"px";
-				this.element.style.height=(height*(this.maxIconSize.y+this.iconDistance)+20+18)+"px";
+				this.element.style.height=(height*(this.maxIconSize.y+this.iconDistance)+60)+"px";
+				this.viewport.childNodes[0].style.width=(this.maxIconsInRow*(this.maxIconSize.x+this.iconDistance))+"px";
+				this.viewport.childNodes[0].style.height=(height*(this.maxIconSize.y+this.iconDistance))+"px";
 				
+				var posX;
+				var posY;
 				var startX=posX=10;
 				var startY=posY=25;
 				
@@ -493,7 +490,7 @@ var Renkbench = (() => {
 				{
 					this.icons[i].element.style.left=posX+"px";
 					this.icons[i].element.style.top=posY+"px";
-//console.debug("Id: %i, left: %i, top: %i",icons[i].id,posX,posY);
+//console.debug("Id: %i, left: %i, top: %i",this.icons[i].id,posX,posY);
 					if(this.maxIconsInRow%i==1)
 					{
 						posX=startX;
@@ -506,6 +503,11 @@ var Renkbench = (() => {
 				this.resizeScrollbars();
 			},
 			
+			setIconArea : function()
+			{
+				createNode("div").class("dropzone").appendTo(this.viewport);
+			},
+
 			// Sets the content elements of a window
 			setContent : function(content)
 			{
@@ -516,9 +518,7 @@ var Renkbench = (() => {
 					return false;
 				
 				this.hasContent=true;
-				var maxWidth=Math.ceil(element.offsetWidth/4);
-//console.debug(maxWidth);
-												
+
 				// Set the content element
 				var contentElement=createNode("div").class("content").appendTo(this.viewport).style(content.css).getNode();
 				
@@ -640,13 +640,13 @@ var Renkbench = (() => {
 				var scrollButtonHorizontal=scrollSpaceHorizontal.childNodes[0];
 				var maxHeight=scrollSpaceHeight;
 				var maxWidth=width-30;
-				
+				/*
 				if(!this.hasContent)
 				{
 					scrollButtonVertical.style.height=maxHeight+"px";
 					scrollButtonHorizontal.style.width=maxWidth+"px";
 					return;
-				}
+				}*/
 				
 				var content = this.viewport.childNodes[0];
 				
@@ -945,7 +945,7 @@ var Renkbench = (() => {
 				if(win.id!="workbench")
 				{
 					posX+=win.offsetLeft;
-					posY+=win.offsetTop;
+					posY+=win.offsetTop + 21;
 				}
 				
 				offset.x=event.clientX-posX;
@@ -1095,25 +1095,25 @@ var Renkbench = (() => {
 					
 					//Set new parent element
 					var parentElement=getDropzone();
+				
 					var id=/^icon_([0-9]+)$/.exec(icon.id)[1];
 					if(!registry[id]["icon"].disk
 					|| (registry[id]["icon"].disk
-					&& parentElement.id=="workbench"))
+					&& parentElement.id==="workbench"))
 					{
-						//Get position
+						// Get position
 						var posX=parseInt(selection.style.left)-(parseInt(icon.style.width)-parseInt(selection.style.width))/2;
 						var posY=parseInt(selection.style.top);
-						//Remove window x and y position for icon positioning
-						if(parentElement.className=="window")
+						// Remove window x and y position for icon positioning
+						if(parentElement.className=="dropzone")
 						{
-							//Subtract 2px for window border
-							posX-=parentElement.offsetLeft-2;
-							posY-=parentElement.offsetTop;
+							posX-=parentElement.parentNode.parentNode.offsetLeft;
+							posY-=parentElement.parentNode.parentNode.offsetTop;
 						}
 						icon.style.left=posX+"px";
 						icon.style.top=posY+"px";
 						
-						//select new parent node
+						// Select new parent node
 						parentElement.appendChild(icon);
 					}
 //console.debug("parentElement: %s, %s",parentElement.id,parentElement.className);
@@ -1593,7 +1593,7 @@ var Renkbench = (() => {
 			posX+=win.offsetLeft;
 			posY+=win.offsetTop;
 		}
-		
+
 		image.style.left=posX+"px";
 		image.style.top=posY+"px";
 		//image.style.zIndex=openOrder.length+2;
@@ -1661,7 +1661,7 @@ var Renkbench = (() => {
 			{
 				//Only consider windows with higher z-index
 				if(elements[i].style.zIndex>posZ
-				|| elements[i].id=="workbench")
+				|| elements[i].id==="workbench")
 				{
 					posZ=(elements[i].id!="workbench")
 						?elements[i].style.zIndex:posZ;
@@ -1669,7 +1669,12 @@ var Renkbench = (() => {
 				}
 			}
 		}
-		return element;
+
+		if(element.id === "workbench")
+			return element;
+
+		var window = registry[element.dataset.id].window;
+		return window.viewport.childNodes[0];
 	};
 	
 	//Get selected element browser specific event object

@@ -360,12 +360,8 @@ div.buttonResize
 	z-index: 2;	
 }
 
-div.dropArea
-{
-	position: relative;
-}
-
-div.content
+div.content,
+div.dropzone
 {
   	position: relative;
 	padding: 16px 8px 16px 8px;
