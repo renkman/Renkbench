@@ -1623,76 +1623,28 @@ var Renkbench = (() => {
 		return frame;
 	};
 	
-	//Get Dropzone
+	// Get Dropzone
 	var getDropzone = () =>
 	{
-		//Get icon dummy position
+		// Get dragged icon position
 		var icon=selectedElement;
 		var posX=icon.offsetLeft+icon.offsetWidth/2;
 		var posY=icon.offsetTop+icon.offsetHeight/2;
 
-		//Get possible dropzone elements:
+		// Get possible dropzone elements:
 		// The workbench and displayed windows (means zIndex >= 0)
-		var elements = document.getElementsByTagName("div")
-			.filter(node => (node.className === "window" && node.style.zIndex >= 0) || node.id === "workbench")
-			.sort(a, b => b.zIndex - a.zIndex)
-			.filter(node => (node.offsetLeft < posX && node.offsetTop < posY 
-				&& node.offsetLeft+node.ofsetLeft > posX && node.offsetTop+node.offsetHeight > posY));
+		var elements = Array.from(document.getElementsByTagName("div"))
+			.filter(node => (node.className === "window" && parseInt(node.style.zIndex) >= 0) || node.id === "workbench")
+			.sort((a, b) =>parseInt(b.style.zIndex) - parseInt(a.style.zIndex))
+			.filter(node => node.offsetLeft < posX && node.offsetTop < posY 
+				&& node.offsetLeft + node.offsetWidth > posX && node.offsetTop + node.offsetHeight > posY);
 
 		var node = elements[0];
-		var window = registry[node.dataset.id].window;
-		return window.viewport.childNodes[0];	
-			
+		if(node.id === "workbench")
+			return node;
 
-	//	//Get possible dropzone elements
-	//	var elements=document.getElementsByTagName("div");
-	//	
-	//	//Get icon dummy position
-	//	var icon=selectedElement;
-	//	var posX=icon.offsetLeft+icon.offsetWidth/2;
-	//	var posY=icon.offsetTop+icon.offsetHeight/2;
-	//	
-	//	var posZ=0;
-	//	//The return value
-	//	var element={};
-	//	for(var i=0;i<elements.length;i++)
-	//	{
-	//		//Only consider windows and the workbench
-	//		if(elements[i].className!="window" && elements[i].id!="workbench")
-	//			continue;
-	//		
-	//		if(elements[i].style.zIndex<0 && elements[i].id!="workbench")
-	//			continue;
-	//		
-//console.debug("Id: %s, name: %s, posZ: %s",elements[i].id,elements[i].className,elements[i].style.zIndex);			
-	//		//Get drop element position
-	//		var elementPosX=elements[i].offsetLeft;
-	//		var elementWidth=elements[i].offsetWidth;
-	//		var elementPosY=elements[i].offsetTop;
-	//		var elementHeight=elements[i].offsetHeight;
-//
-	//		//Choose element if the icon is in the current frame
-	//		if(elementPosX<posX
-	//		&& elementPosX+elementWidth>posX
-	//		&& elementPosY<posY
-	//		&& elementPosY+elementHeight>posY)
-	//		{
-	//			//Only consider windows with higher z-index
-	//			if(elements[i].style.zIndex>posZ
-	//			|| elements[i].id==="workbench")
-	//			{
-	//				posZ=(elements[i].id!="workbench")
-	//					?elements[i].style.zIndex:posZ;
-	//				element=getWindowElement(elements[i]);
-	//			}
-	//		}
-	//	}
-//
-	//	if(element.id === "workbench")
-	//		return element;
-//
-	//	var window = registry[element.dataset.id].window;
-	//	return window.viewport.childNodes[0];
+		var window = registry[node.dataset.id].window;
+		return window.viewport.childNodes[0];
 	};
 	
 	//Get selected element browser specific event object

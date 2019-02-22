@@ -1,5 +1,8 @@
 # Ignore text editor backup files
 *~
 
+# Ignore backup files
+*.bak
+
 # Ignore node modules
 service/node_modules
