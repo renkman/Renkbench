@@ -26,6 +26,7 @@ var Renkbench = (() => {
 	//The element currently selected by the user
 	var selectedElement = {};
 	var oldSelectedElement = {};
+	var focus = {};
 	
 	//The mouse offset
 	var offset = {x:0,y:0};
@@ -110,6 +111,7 @@ var Renkbench = (() => {
 			element.addEventListener("touchmove", eventHandler(element).mouseMove, true);
 			element.addEventListener("mouseup", eventHandler(element).mouseUp, true);
 			element.addEventListener("touchend", eventHandler(element).mouseUp, true);
+			element.addEventListener("keydown", eventHandler(element).keyDown, true)
 		}
 		else
 		{
@@ -320,14 +322,17 @@ var Renkbench = (() => {
 			
 			titleInactive : {},
 			
-			//The creation coordinates of the next icon.
+			// The creation coordinates of the next icon.
 			iconStartPos : {x:"10px",y:"25px"},
 			
-			//The icons contained by the window
+			// The icons contained by the window
 			icons : [],
 			
-			//A content window does not show any icons.
+			// A content window does not show any icons.
 			hasContent : false,
+
+			// Contains the window's form elements
+			formElements : [],
 			
 			// The minimum width of this window
 			minWidth : 400,
@@ -512,9 +517,7 @@ var Renkbench = (() => {
 			setContent : function(content)
 			{
 //console.dir(content);
-				if(typeof content != "object"
-				|| typeof content.title != "string"
-				|| typeof content.articles != "object")
+				if(typeof content != "object")
 					return false;
 				
 				this.hasContent=true;
@@ -522,23 +525,39 @@ var Renkbench = (() => {
 				// Set the content element
 				var contentElement=createNode("div").class("content").appendTo(this.viewport).style(content.css).getNode();
 				
-				// Set the content title
-				createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
-				var stopper=createNode("div").class("stop").appendTo(contentElement);
-				
 				// Set form if there is any
 				if(content.form)
 				{
-					var formNode=createNode("div").innerHtml(content.form).getNode().firstChild;
+					//var formNode=createNode("div").innerHtml(content.form).getNode().firstChild;
 					/*
 					var tempNode=document.createElement("div");
 					tempNode.innerHTML=content.form;
 					var formNode=tempNode.firstChild;
+					this.viewport.appendChild(formNode);
 					*/
 					// Append form
-					this.element.appendChild(formNode);
+					contentElement.innerHTML = content.form;
+					contentElement.childNodes.forEach(node => this.formElements.push(node));
+					
+
+					//Reset window size
+					this.element.style.width=Math.max(contentElement.offsetWidth,this.minWidth)+"px";
+					this.element.style.height=Math.max(contentElement.offsetHeight,this.minHeight)+"px";
+					//this.element.style.width=maxWidth+"px";
+					//Reset scrollbar size
+					this.resizeScrollbars();
+					this.setPosition();
+					return;
 				}
-				
+
+				if(typeof content.title != "string"
+				|| typeof content.articles != "object")
+					return false;
+
+				// Set the content title
+				createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
+				var stopper=createNode("div").class("stop").appendTo(contentElement);
+
 				for(var i=0;i<content.articles.length;i++)
 				{
 					var article=content.articles[i];
@@ -638,16 +657,7 @@ var Renkbench = (() => {
 				//Set scroll buttons height and width
 				var scrollButtonVertical=scrollSpaceVertical.childNodes[0];
 				var scrollButtonHorizontal=scrollSpaceHorizontal.childNodes[0];
-				var maxHeight=scrollSpaceHeight;
-				var maxWidth=width-30;
-				/*
-				if(!this.hasContent)
-				{
-					scrollButtonVertical.style.height=maxHeight+"px";
-					scrollButtonHorizontal.style.width=maxWidth+"px";
-					return;
-				}*/
-				
+
 				var content = this.viewport.childNodes[0];
 				
 				var factorHeight = Math.min(1, height/content.offsetHeight);
@@ -667,7 +677,7 @@ var Renkbench = (() => {
 				var borderY = scrollSpaceHorizontal.offsetHeight-scrollButtonHorizontal.offsetHeight-2;
 				
 				scrollButtonHorizontal.style.left = Math.max(2,Math.min(left, borderX)) + "px";
-				scrollButtonVertical.style.top = Math.max(2,Math.min(top, borderX)) + "px";
+				scrollButtonVertical.style.top = Math.max(2,Math.min(top, borderY)) + "px";
 			},
 			
 			resize : function(width, height) {
@@ -748,6 +758,9 @@ var Renkbench = (() => {
 				changeImage(titlebar,"window",WINDOW+"titlebar_background_deselected.png");
 				this.titleInactive.style.display = "block";
 				this.title.style.display = "none";
+
+				if(this.formElements.length > 0 && focus === this.formElements[0])
+					focus = null;
 			},
 			
 			select : function() {
@@ -755,6 +768,9 @@ var Renkbench = (() => {
 				changeImage(titlebar,"window",WINDOW+"titlebar_background.png");
 				this.titleInactive.style.display = "none";
 				this.title.style.display = "block";
+
+				if(this.formElements.length > 0)
+					focus = this.formElements[0];
 			},
 				
 			open : function() {
@@ -1330,6 +1346,10 @@ var Renkbench = (() => {
 				if(selectedElement.nodeType)
 					return drag(event);
 				return hoverContextMenu(event.target);
+			},
+			keyDown : event => {
+				if(focus)
+					return enterText(event);
 			}
 		}
 	};
@@ -1542,8 +1562,18 @@ var Renkbench = (() => {
 			return node;
 		return getParentWithClass(node.parentNode, className);
 	};
-
 	
+	// Gets the anchestor element
+	var hasChildWithClass = (node, className) => {
+		if(node.className.toLowerCase() === className.toLowerCase())
+			return node;
+		
+		for(let child of node.childNodes)
+		{
+			hasChildWithClass(child, className);
+		}
+	};
+
 	//Changes/switches the background image of an icon or a window/workbench
 	//button.
 	var changeImage = (element, type, image) =>
@@ -1737,27 +1767,6 @@ var Renkbench = (() => {
 		if(value.match(/<.*>/))
 			return false;
 		return value;
-	};
-	
-	//Returns the style property value of the element.
-	var getStyle = (element, styleProperty) =>
-	{
-		if (window.getComputedStyle)
-		{
-			return document.defaultView.getComputedStyle(element,null).getPropertyValue(styleProperty);
-//console.debug("Element: %s, style: %s, value: %s",element.className,styleProperty,value);
-		}
-		if (element.currentStyle)
-		{
-			if(styleProperty.match(/[a-z]+-[a-z]+/))
-			{
-				//Rename the property the IE conform way
-				var bigLetter=styleProperty.replace(/[a-z]+-([a-z])[a-z]+/,"$1").toUpperCase();
-				styleProperty=styleProperty.replace(/([a-z]+)-[a-z]([a-z]+)/,"$1"+bigLetter+"$2");
-			}
-			return element.currentStyle[styleProperty];
-		}
-		return "";
 	};
 
 	//Changes between mouse cursors (Normal and wait)
@@ -1976,7 +1985,16 @@ var Renkbench = (() => {
 		infoNode.style.display = "none";
 		var titleNode = document.getElementById("mainTitle");
 		titleNode.style.display = "block";
-	}
+	};
+
+	var enterText = event => {
+		if(!focus)
+			return false;
+
+		var character = parseChar(event.key, fontColor.blackOnWhite, "text");
+		focus.innerHTML = focus.innerHTML + character;
+		return false;
+	};
 	
 	// Initialize workbench
 	init();	

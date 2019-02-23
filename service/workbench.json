@@ -126,13 +126,7 @@
 						"title": "Notepad"
 					},
 					"content" : {
-						"title": "Textbox",
-						"articles" : [
-							{
-								"title": "Placeholder",
-								"text": "This should be a text input box or field."
-							}
-						]
+						"form": "<div class=\"textbox\" tabindex=\"0\"></div>"
 					}
 				}	
 			]

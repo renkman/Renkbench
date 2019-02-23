@@ -368,6 +368,14 @@ div.dropzone
 	background-color: #000099;
 }
 
+/* Textbox element */
+div.textbox
+{
+	position: relative;
+	padding: 16px 8px 16px 8px;
+	background-color: #ffffff;
+}
+
 div.text
 {
 	position: relative;
