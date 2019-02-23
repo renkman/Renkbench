@@ -368,6 +368,11 @@ div.dropzone
 	background-color: #000099;
 }
 
+div.raw-content
+{
+	display: none;
+}
+
 div.text
 {
 	position: relative;

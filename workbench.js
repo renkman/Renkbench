@@ -524,7 +524,12 @@ var Renkbench = (() => {
 				
 				// Set the content title
 				createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
-				var stopper=createNode("div").class("stop").appendTo(contentElement);
+										
+				// Add raw text for search engines and readers
+				var rawText = createNode("h1").innerHtml(content.title).getNode();
+				createNode("div").class("raw-content").append(rawText).appendTo(contentElement);
+
+				createNode("div").class("stop").appendTo(contentElement);
 				
 				// Set form if there is any
 				if(content.form)
@@ -551,8 +556,7 @@ var Renkbench = (() => {
 						{
 							case "title":
 							case "text":
-								temp=document.createElement("div");
-								temp.className="text";
+								temp=createNode("div").class("text").getNode();
 								lastText=temp;
 								break;
 							case "images":
@@ -585,13 +589,16 @@ var Renkbench = (() => {
 							continue;
 						
 						var text=convertText(article[contentType], fontColor["whiteOnBlue"]);
+						
+						// Add raw text for search engines and readers
+						var rawText = createNode(contentType === "title" ? "h2" : "p").innerHtml(article[contentType]).getNode();
+						createNode("div").class("raw-content").append(rawText).appendTo(contentElement);
 //console.debug(text);
+
 						temp.innerHTML=text;
 //console.debug("Text written");
 						contentElement.appendChild(temp);
-						stopper=document.createElement("div");
-						stopper.className="stop";
-						contentElement.appendChild(stopper);
+						createNode("div").class("stop").appendTo(contentElement);
 					}
 					
 //console.debug(contentElement.offsetWidth);
