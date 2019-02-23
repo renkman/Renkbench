@@ -926,6 +926,8 @@ var Renkbench = (() => {
 				deselect(element)(event);
 				var selection = getSelection(event);
 				var image = getIconElement(selection);
+				if(image == null)
+					return false;
 				var window = registry[image.dataset.id].window;
 				return window.open();
 			}
@@ -1511,6 +1513,8 @@ var Renkbench = (() => {
 	//Get the icon element of the current element.
 	var getIconElement = element =>
 	{
+		if(!element.parentNode)
+			return null;
 		if(element.className === "icon")
 			return element;
 		return getIconElement(element.parentNode);
