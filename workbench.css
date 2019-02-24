@@ -367,6 +367,10 @@ div.dropzone
 	padding: 16px 8px 16px 8px;
 	background-color: #000099;
 }
+div.raw-content
+{
+	display: none;
+}
 
 /* Textbox element */
 div.textbox

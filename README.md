@@ -17,13 +17,12 @@ Currently, the Workbench clone contains the following features:
 * Closing of windows
 * Directories displayed as drawers
 * Context menu in the main title bar triggered by mouse right click
+* Touch events for handheld usage
 
 ## Todo
 
 * Customized keyboard input using Topaz font
-* Add ability for handheld usage
-
 
 ## Backend
 
-The old PHP 5.x backend must be reworked, updated or even replaced by something else. Or just removed.
+The Node.js backend currently delivers the menu and windows tree as JSON.
