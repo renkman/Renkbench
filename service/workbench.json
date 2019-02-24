@@ -110,7 +110,7 @@
 					"id" : 3,
 					"pid" : 0,
 					"icons" : {
-						"title": "Notepad",
+						"title": "Edit",
 						"image" : { 
 							"file" : "notepad.png",
 							"width" : 32,
@@ -123,7 +123,7 @@
 						}
 					},
 					"window" : {
-						"title": "Notepad"
+						"title": "Edit"
 					},
 					"content" : {
 						"form": "<div class=\"textbox\" tabindex=\"0\"></div>"

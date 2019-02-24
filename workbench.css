@@ -376,8 +376,15 @@ div.raw-content
 div.textbox
 {
 	position: relative;
-	padding: 16px 8px 16px 8px;
-	background-color: #ffffff;
+}
+
+div.cursor
+{
+	position: absolute;
+	width: 8px;
+	height: 16px;
+	background-color: #ff8A00;
+	z-index: 1;
 }
 
 div.text

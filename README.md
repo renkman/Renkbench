@@ -18,11 +18,15 @@ Currently, the Workbench clone contains the following features:
 * Directories displayed as drawers
 * Context menu in the main title bar triggered by mouse right click
 * Touch events for handheld usage
-
-## Todo
-
 * Customized keyboard input using Topaz font
 
-## Backend
+## To-do
+* Bugfixing
+* Content
+* Introduce applications
+* Further refactoring
+* Split frontent code into multiple files?
+* Err... unit tests?
 
+## Backend
 The Node.js backend currently delivers the menu and windows tree as JSON.

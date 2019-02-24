@@ -355,8 +355,11 @@ var Renkbench = (() => {
 				horizontal: {}
 			},
 			
-			// The resize button node of the this window
+			// The resize button node of this window
 			buttonResize : {},
+
+			// The currently active form of this window
+			activeForm : {},
 			
 			init : function()
 			{
@@ -366,6 +369,7 @@ var Renkbench = (() => {
 				style({visibility:"hidden"}).
 				// Set custom css properties if there are any.								
 				style(properties.css).
+				tabIndex(0).
 				appendTo(element.parentNode).getNode();
 				
 				// Create title bar
@@ -521,35 +525,20 @@ var Renkbench = (() => {
 					return false;
 				
 				this.hasContent=true;
-
+				
 				// Set the content element
 				var contentElement=createNode("div").class("content").appendTo(this.viewport).style(content.css).getNode();
-				
-<<<<<<< HEAD
-=======
-				// Set the content title
-				createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
-										
-				// Add raw text for search engines and readers
-				var rawText = createNode("h1").innerHtml(content.title).getNode();
-				createNode("div").class("raw-content").append(rawText).appendTo(contentElement);
 
-				createNode("div").class("stop").appendTo(contentElement);
-				
->>>>>>> master
 				// Set form if there is any
 				if(content.form)
 				{
-					//var formNode=createNode("div").innerHtml(content.form).getNode().firstChild;
-					/*
-					var tempNode=document.createElement("div");
-					tempNode.innerHTML=content.form;
-					var formNode=tempNode.firstChild;
-					this.viewport.appendChild(formNode);
-					*/
 					// Append form
 					contentElement.innerHTML = content.form;
-					contentElement.childNodes.forEach(node => this.formElements.push(node));
+					contentElement.childNodes.forEach(node => {
+						this.formElements.push(node);
+						if(node.className === "textbox")
+							createNode("div").class("cursor").appendTo(node);
+					});
 					
 
 					//Reset window size
@@ -561,14 +550,18 @@ var Renkbench = (() => {
 					this.setPosition();
 					return;
 				}
-
+				
 				if(typeof content.title != "string"
 				|| typeof content.articles != "object")
 					return false;
 
 				// Set the content title
 				createNode("div").class("text").innerHtml(convertText(content.title, fontColor["whiteOnBlue"])).appendTo(contentElement);
-				var stopper=createNode("div").class("stop").appendTo(contentElement);
+				createNode("div").class("stop").appendTo(contentElement);
+														
+				// Add raw text for search engines and readers
+				var rawText = createNode("h1").innerHtml(content.title).getNode();
+				createNode("div").class("raw-content").append(rawText).appendTo(contentElement);
 
 				for(var i=0;i<content.articles.length;i++)
 				{
@@ -773,7 +766,7 @@ var Renkbench = (() => {
 				this.titleInactive.style.display = "block";
 				this.title.style.display = "none";
 
-				if(this.formElements.length > 0 && focus === this.formElements[0])
+				if(this.formElements.length > 0 && focus === this)
 					focus = null;
 			},
 			
@@ -783,8 +776,11 @@ var Renkbench = (() => {
 				this.titleInactive.style.display = "none";
 				this.title.style.display = "block";
 
-				if(this.formElements.length > 0)
-					focus = this.formElements[0];
+				if(this.formElements.length === 0)
+					return;
+
+				focus = this;
+				this.activeForm = this.formElements[0];
 			},
 				
 			open : function() {
@@ -830,6 +826,51 @@ var Renkbench = (() => {
 				
 				var menu = registry[this.id].menu ? registry[this.id].menu : registry[0].menu;
 				menu.updateMenu();
+			},
+			
+			enterText : function(event) {
+				event.preventDefault();
+
+				if(event.key === "Backspace")
+				{
+					this.moveCursor(cursorDirection.left);
+					var cursorPosition = {
+						x : this.activeForm.firstChild.offsetLeft,
+						y : this.activeForm.firstChild.offsetTop
+					};
+					var character = Array.from(this.activeForm.childNodes).filter(node => 
+						node.className === "char" && 
+						node.offsetLeft === cursorPosition.x && 
+						node.offsetTop === cursorPosition.y);
+					
+					if(character.length > 0)
+						this.activeForm.removeChild(character[0]);
+					return false;
+				}
+
+				if(event.key.includes("Arrow"))
+				{
+					var direction = event.key.replace("Arrow", "");
+					this.moveCursor(cursorDirection[direction.toLowerCase()]);
+					return false;
+				}
+
+				var character = parseChar(event.key, fontColor.whiteOnBlue, "text");
+				this.activeForm.innerHTML = this.activeForm.innerHTML + character;
+				this.moveCursor(cursorDirection.right);
+				return false;
+			},
+		
+			moveCursor : function (direction) {
+				var cursor = this.activeForm.firstChild;
+				if(direction === cursorDirection.left && cursor.offsetLeft > 0)
+					cursor.style.left = (cursor.offsetLeft - cursor.offsetWidth) + "px";
+				if(direction === cursorDirection.right && cursor.offsetLeft + cursor.offsetWidth < cursor.parentNode.offsetWidth)
+					cursor.style.left = (cursor.offsetLeft + cursor.offsetWidth) + "px";
+				if(direction === cursorDirection.up && cursor.offsetTop > 0)
+					cursor.style.top = (cursor.offsetTop - cursor.offsetHeight) + "px";
+				if(direction === cursorDirection.down && cursor.offsetTop + cursor.offsetHeight > 0)
+					cursor.style.top = (cursor.offsetTop + cursor.offsetHeight) + "px";				
 			}
 		};
 	};
@@ -1364,8 +1405,10 @@ var Renkbench = (() => {
 				return hoverContextMenu(event.target);
 			},
 			keyDown : event => {
-				if(focus)
-					return enterText(event);
+				event.preventDefault();
+				if(focus && focus.enterText)
+					return focus.enterText(event);
+				return false;
 			}
 		}
 	};
@@ -1970,17 +2013,22 @@ var Renkbench = (() => {
 					return instance;
 				},
 				
-				clone : (deep) => {
+				clone : deep => {
 					node=node.cloneNode(deep);
 					return instance;
 				},
 				
-				data : (dataset) => {
+				data : dataset => {
 					for(var record in dataset)
 						node.dataset[record]=dataset[record];
 					return instance;
 				},
 				
+				tabIndex : tabIndex => {
+					node.tabIndex = tabIndex
+					return instance;
+				},
+
 				getNode : () => {
 					return node;
 				}
@@ -2005,15 +2053,13 @@ var Renkbench = (() => {
 		titleNode.style.display = "block";
 	};
 
-	var enterText = event => {
-		if(!focus)
-			return false;
-
-		var character = parseChar(event.key, fontColor.blackOnWhite, "text");
-		focus.innerHTML = focus.innerHTML + character;
-		return false;
+	var cursorDirection = {
+		up: 0,
+		right: 1,
+		down: 2,
+		left: 3	
 	};
-	
+
 	// Initialize workbench
 	init();	
 })();
