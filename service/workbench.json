@@ -1,7 +1,4 @@
-{	
-	"version" : "1.2.1",
-	"build" : "$$_BUILD_NUMBER_$$",
-	"release" : "$$_RELEASE_NUMBER_$$",
+{
 	"menu" : 
 		[
 			{

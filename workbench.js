@@ -13,9 +13,9 @@
 
 //The workbench main object
 var Renkbench = (() => {
-	var version = 0;
-	var build = 0;
-	var release = 0;
+	const version = "1.2.2.";
+	const build = "$$_BUILD_NUMBER_$$";
+	const release = "$$_RELEASE_NUMBER_$$";
 
 	//The DOM-element of the workbench (<div>)
 	var element = {};
@@ -77,6 +77,9 @@ var Renkbench = (() => {
 	{		
 		//Set cursor to wait mode
 		changeCursor(true);
+		
+		// Set version and build numbers
+		createVersionInfo(version, build, release);
 
 		var title = convertText(MAIN_TITLE, fontColor["blueOnWhite"]);
 		var mainTitle = document.getElementById("mainTitle");
@@ -857,9 +860,20 @@ var Renkbench = (() => {
 					this.moveCursor(cursorDirection[direction.toLowerCase()]);
 					return false;
 				}
+
+				if(event.key === "Enter")
+				{
+					this.moveCursor(cursorDirection.down);
+					this.activeForm.firstChild.style.left = 0;
+					return false;
+				}
 				
 				var character = parseChar(event.key, fontColor.whiteOnBlue, "text");
 				this.activeForm.innerHTML = this.activeForm.innerHTML + character;
+				var lastChar = this.activeForm.childNodes[this.activeForm.childNodes.length-1];
+				lastChar.style.position = "absolute";
+				lastChar.style.left = this.activeForm.firstChild.offsetLeft + "px";
+				lastChar.style.top = this.activeForm.firstChild.offsetTop + "px";
   				this.moveCursor(cursorDirection.right);
 				return false;
 			},
@@ -1789,12 +1803,6 @@ var Renkbench = (() => {
 		// Create the main context menu	
 		var menu = createMenu(data.menu, 0);
 		registry[0].menu = menu;
-
-		// Set version and build numbers
-		version = data.version;
-		build = data.build;
-		release = data.release;
-		createVersionInfo(version, build, release);
 
 		//Change cursor to normal mode
 		changeCursor();
