@@ -25,7 +25,7 @@ Currently, the Workbench clone contains the following features:
 * Content
 * Introduce applications
 * Further refactoring
-* Split frontent code into multiple files?
+* Split frontend code into multiple files?
 * Err... unit tests?
 
 ## Backend

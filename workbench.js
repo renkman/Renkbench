@@ -829,7 +829,10 @@ var Renkbench = (() => {
 			},
 			
 			enterText : function(event) {
-				event.preventDefault();
+				event.preventDefault();		
+			
+				if(event.key === "Shift" || event.key === "Alt" || event.key === "AltGraph" || event.key === "Control")
+					return false;
 
 				if(event.key === "Backspace")
 				{
@@ -854,10 +857,10 @@ var Renkbench = (() => {
 					this.moveCursor(cursorDirection[direction.toLowerCase()]);
 					return false;
 				}
-
+				
 				var character = parseChar(event.key, fontColor.whiteOnBlue, "text");
 				this.activeForm.innerHTML = this.activeForm.innerHTML + character;
-				this.moveCursor(cursorDirection.right);
+  				this.moveCursor(cursorDirection.right);
 				return false;
 			},
 		
