@@ -363,6 +363,9 @@ var Renkbench = (() => {
 
 			// The currently active form of this window
 			activeForm : {},
+
+			// Insert mode for form keyboard input
+			insertMode : true,
 			
 			init : function()
 			{
@@ -833,61 +836,143 @@ var Renkbench = (() => {
 			
 			enterText : function(event) {
 				event.preventDefault();		
-			
-				if(event.key === "Shift" || event.key === "Alt" || event.key === "AltGraph" || event.key === "Control")
+
+				if(event.key === "Insert")
+					this.insertMode = !this.insertMode;
+
+				if(cursorIgnoredKeys.includes(event.key))
 					return false;
+
+				var cursor = this.activeForm.firstChild;
 
 				if(event.key === "Backspace")
 				{
-					this.moveCursor(cursorDirection.left);
-					var cursorPosition = {
-						x : this.activeForm.firstChild.offsetLeft,
-						y : this.activeForm.firstChild.offsetTop
-					};
-					var character = Array.from(this.activeForm.childNodes).filter(node => 
-						node.className === "char" && 
-						node.offsetLeft === cursorPosition.x && 
-						node.offsetTop === cursorPosition.y);
-					
-					if(character.length > 0)
-						this.activeForm.removeChild(character[0]);
+					this.moveCursor(cursorDirection.left, 1);				
+					this.removeChar();
 					return false;
 				}
 
 				if(event.key.includes("Arrow"))
 				{
 					var direction = event.key.replace("Arrow", "");
-					this.moveCursor(cursorDirection[direction.toLowerCase()]);
+					this.moveCursor(cursorDirection[direction.toLowerCase()], 1);
 					return false;
 				}
 
 				if(event.key === "Enter")
 				{
-					this.moveCursor(cursorDirection.down);
+					this.moveCursor(cursorDirection.down, 1);
+					this.activeForm.firstChild.style.left = 0;
+					return false;
+				}
+
+				if(event.key === "Tab")
+				{
+					this.moveCursor(cursorDirection.right, event.shiftKey ? -4 : 4);
+					return false;
+				}
+				
+				if(event.key === "Home")
+				{
 					this.activeForm.firstChild.style.left = 0;
 					return false;
 				}
 				
+				if(event.key === "End")
+				{
+					var offsetRight = this.activeForm.offsetWidth % cursor.offsetWidth;
+					cursor.style.left = (this.activeForm.offsetWidth - offsetRight - cursor.offsetWidth) + "px";
+					return false;
+				}
+
+				if(event.key === "PageUp")
+				{
+					var steps = Math.floor(Math.min(cursor.offsetTop, this.viewport.offsetHeight) / cursor.offsetHeight);
+					this.moveCursor(cursorDirection.up, steps);
+					return false;
+				}
+				
+				if(event.key === "PageDown")
+				{
+					var steps = Math.floor(Math.min(this.activeForm.offsetHeight - cursor.offsetTop, this.viewport.offsetHeight) / cursor.offsetHeight);
+					this.moveCursor(cursorDirection.down, steps);
+					return false;
+				}
+				
+				if(event.key === "Delete")
+				{
+					var nextChars = Array.from(this.activeForm.childNodes)
+						.filter(node => node.className === "char" 
+							&& node.offsetHeight === cursor.offsetHeight
+							&& node.offsetLeft >= cursor.offsetLeft)
+						.sort((a, b) => a.offsetLeft - b.offsetLeft);
+					
+					if(nextChars[0].offsetLeft === cursor.offsetLeft)
+						this.activeForm.removeChild(nextChars[0]);
+					
+					nextChars.forEach(node => {
+						node.style.left = (node.offsetLeft - node.offsetWidth) + "px";
+					});
+				}
+
+				if(!this.insertMode)
+					this.removeChar();
+
 				var character = parseChar(event.key, fontColor.whiteOnBlue, "text");
 				this.activeForm.innerHTML = this.activeForm.innerHTML + character;
 				var lastChar = this.activeForm.childNodes[this.activeForm.childNodes.length-1];
 				lastChar.style.position = "absolute";
-				lastChar.style.left = this.activeForm.firstChild.offsetLeft + "px";
-				lastChar.style.top = this.activeForm.firstChild.offsetTop + "px";
-  				this.moveCursor(cursorDirection.right);
+				cursor = this.activeForm.firstChild;
+				lastChar.style.left = cursor.offsetLeft + "px";
+				lastChar.style.top = cursor.offsetTop + "px";
+
+				// Move trailing characters
+				if(this.insertMode)
+				{
+					Array.from(this.activeForm.childNodes).filter(node => 
+						node.className === "char"
+						&& node.offsetHeight === cursor.offsetHeight
+						&& node.offsetLeft > cursor.offsetLeft
+					).forEach(node => 
+						node.style.left = (node.offsetLeft + node.offsetWidth) + "px"
+					);
+				}
+
+  				this.moveCursor(cursorDirection.right, 1);
 				return false;
 			},
 		
-			moveCursor : function (direction) {
+			moveCursor : function (direction, steps) {
 				var cursor = this.activeForm.firstChild;
 				if(direction === cursorDirection.left && cursor.offsetLeft > 0)
-					cursor.style.left = (cursor.offsetLeft - cursor.offsetWidth) + "px";
+					cursor.style.left = (cursor.offsetLeft - cursor.offsetWidth * steps) + "px";
 				if(direction === cursorDirection.right && cursor.offsetLeft + cursor.offsetWidth < cursor.parentNode.offsetWidth)
-					cursor.style.left = (cursor.offsetLeft + cursor.offsetWidth) + "px";
+					cursor.style.left = (cursor.offsetLeft + cursor.offsetWidth * steps) + "px";
 				if(direction === cursorDirection.up && cursor.offsetTop > 0)
-					cursor.style.top = (cursor.offsetTop - cursor.offsetHeight) + "px";
+					cursor.style.top = (cursor.offsetTop - cursor.offsetHeight * steps) + "px";
 				if(direction === cursorDirection.down && cursor.offsetTop + cursor.offsetHeight > 0)
-					cursor.style.top = (cursor.offsetTop + cursor.offsetHeight) + "px";				
+					cursor.style.top = (cursor.offsetTop + cursor.offsetHeight * steps) + "px";
+				
+				var character = Array.from(this.activeForm.childNodes).filter(node => 
+					node.className === "char" && 
+					node.offsetLeft === cursor.offsetLeft && 
+					node.offsetTop === cursor.offsetTop);
+
+				if(cursor.childNodes.length > 0)
+					cursor.removeChild(cursor.firstChild);
+				if(character.length > 0)
+					cursor.innerHTML = parseChar(character[0].dataset.char, fontColor.orangeOnBlack, "text");
+			},
+
+			removeChar : function() {
+				var cursor = this.activeForm.firstChild;
+				var character = Array.from(this.activeForm.childNodes).filter(node => 
+					node.className === "char" && 
+					node.offsetLeft === cursor.offsetLeft && 
+					node.offsetTop === cursor.offsetTop);
+				
+				if(character.length > 0)
+					this.activeForm.removeChild(character[0]);
 			}
 		};
 	};
@@ -1958,7 +2043,9 @@ var Renkbench = (() => {
 		if(typeof color!=="number")
 			return null;
 		if(mode==="text")
-			return '<div class="char" style="background-position: -'+xCoord+'px -'+color+'px"></div>';
+			return '<div class="char" data-char="'+ character +
+				'" style="background-position: -'+xCoord+'px -'
+				+color+'px"></div>';
 	};
 	
 	//Charset mapping for topaz font
@@ -2070,6 +2157,13 @@ var Renkbench = (() => {
 		down: 2,
 		left: 3	
 	};
+
+	var cursorIgnoredKeys = [
+		"Alt", "Control", "Shift", "AltGraph", "OS", "Escape",
+		"ContextMenu", 	"Insert", "Delete", "CapsLock", "F1", 
+		"F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", 
+		"F11", "F12"
+	];
 
 	// Initialize workbench
 	init();	
