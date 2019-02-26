@@ -849,6 +849,7 @@ var Renkbench = (() => {
 				{
 					this.moveCursor(cursorDirection.left, 1);				
 					this.removeChar();
+					this.moveCursor(0,0);
 					return false;
 				}
 
@@ -909,12 +910,18 @@ var Renkbench = (() => {
 							&& node.offsetLeft >= cursor.offsetLeft)
 						.sort((a, b) => a.offsetLeft - b.offsetLeft);
 					
+					if(nextChars.length === 0)
+						return false;
+
 					if(nextChars[0].offsetLeft === cursor.offsetLeft)
 						this.activeForm.removeChild(nextChars[0]);
 					
 					nextChars.forEach(node => {
 						node.style.left = (node.offsetLeft - node.offsetWidth) + "px";
 					});
+					this.moveCursor(0, 0);
+
+					return false;
 				}
 
 				if(!this.insertMode)
@@ -2163,7 +2170,7 @@ var Renkbench = (() => {
 
 	var cursorIgnoredKeys = [
 		"Alt", "Control", "Shift", "AltGraph", "OS", "Escape",
-		"ContextMenu", 	"Insert", "Delete", "CapsLock", "F1", 
+		"ContextMenu", "Insert", "CapsLock", "F1", 
 		"F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", 
 		"F11", "F12"
 	];
