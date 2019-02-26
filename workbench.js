@@ -875,6 +875,7 @@ var Renkbench = (() => {
 				if(event.key === "Home")
 				{
 					this.activeForm.firstChild.style.left = 0;
+					this.moveCursor(0,0);
 					return false;
 				}
 				
@@ -882,6 +883,7 @@ var Renkbench = (() => {
 				{
 					var offsetRight = this.activeForm.offsetWidth % cursor.offsetWidth;
 					cursor.style.left = (this.activeForm.offsetWidth - offsetRight - cursor.offsetWidth) + "px";
+					this.moveCursor(0,0);
 					return false;
 				}
 
@@ -903,7 +905,7 @@ var Renkbench = (() => {
 				{
 					var nextChars = Array.from(this.activeForm.childNodes)
 						.filter(node => node.className === "char" 
-							&& node.offsetHeight === cursor.offsetHeight
+							&& node.offsetTop === cursor.offsetTop
 							&& node.offsetLeft >= cursor.offsetLeft)
 						.sort((a, b) => a.offsetLeft - b.offsetLeft);
 					
@@ -931,7 +933,7 @@ var Renkbench = (() => {
 				{
 					Array.from(this.activeForm.childNodes).filter(node => 
 						node.className === "char"
-						&& node.offsetHeight === cursor.offsetHeight
+						&& node.offsetTop === cursor.offsetTop
 						&& node.offsetLeft > cursor.offsetLeft
 					).forEach(node => 
 						node.style.left = (node.offsetLeft + node.offsetWidth) + "px"
@@ -961,7 +963,7 @@ var Renkbench = (() => {
 				if(cursor.childNodes.length > 0)
 					cursor.removeChild(cursor.firstChild);
 				if(character.length > 0)
-					cursor.innerHTML = parseChar(character[0].dataset.char, fontColor.orangeOnBlack, "text");
+					cursor.innerHTML = parseChar(character[0].dataset.char, fontColor.blackOnOrange, "text");
 			},
 
 			removeChar : function() {
@@ -1965,7 +1967,8 @@ var Renkbench = (() => {
 		blackOnWhite : 64,
 		whiteOnBlack : 80,
 		blueOnWhiteInactive : 96,
-		orangeOnBlack : 112
+		orangeOnBlack : 112,
+		blackOnOrange : 128
 	};
 	
 	//Convert string text to amiga style font div-element-text
