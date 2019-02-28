@@ -71,7 +71,7 @@ var Renkbench = (() => {
 	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
-
+	
 	//The initialization method.
 	var init = () =>
 	{		

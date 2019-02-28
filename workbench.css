@@ -496,3 +496,14 @@ textarea
 	border-bottom-width: 2px;
 	margin: 2px;
 }
+
+/* Guru meditation */
+div.guru-meditation
+{
+	position: absolute;
+	height: 95%;
+	width: 95%;	
+	background-image: url(images/system/guru-meditation.gif);
+	background-repeat: no-repeat;
+    background-position: center;
+}
