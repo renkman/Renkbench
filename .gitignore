@@ -4,5 +4,8 @@
 # Ignore backup files
 *.bak
 
+# Ignore package-lock.json
+package-lock.json
+
 # Ignore node modules
-service/node_modules
+node_modules

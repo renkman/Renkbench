@@ -13,7 +13,7 @@
 
 //The workbench main object
 var Renkbench = (() => {
-	const version = "1.2.2.";
+	const version = "1.3.2.";
 	const build = "$$_BUILD_NUMBER_$$";
 	const release = "$$_RELEASE_NUMBER_$$";
 
@@ -67,7 +67,7 @@ var Renkbench = (() => {
 	const ICONS = IMAGES+"icons/";
 	
 	//The AJAX URL
-	const URL = "http://localhost:8080/";
+	const URL = "http://localhost:8080/data";
 	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
