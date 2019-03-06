@@ -67,7 +67,7 @@ var Renkbench = (() => {
 	const ICONS = IMAGES+"icons/";
 	
 	//The AJAX URL
-	const URL = "http://localhost:8080/data";
+	const URL = "/data";
 	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
