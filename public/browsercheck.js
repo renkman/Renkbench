@@ -13,6 +13,7 @@ if (supportsES6)
 { 
     var script = document.createElement("script");
     script.src = "workbench.js";
+    script.type = "module";
     document.body.appendChild(script);
 }
 else 

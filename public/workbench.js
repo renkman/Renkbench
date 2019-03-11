@@ -11,8 +11,10 @@
 
 "use strict";
 
+import {createNode} from "./modules/domTree.js";
+
 //The workbench main object
-var Renkbench = (() => {
+(() => {
 	const version = "1.3.2.";
 	const build = "$$_BUILD_NUMBER_$$";
 	const release = "$$_RELEASE_NUMBER_$$";
@@ -2082,67 +2084,6 @@ var Renkbench = (() => {
 			   return index*8;
 		}
 		return 0;
-	};
-	
-	// Fluent node creation interface
-	var createNode = name => {
-		var instance = (name => {
-			var node = document.createElement(name);
-			
-			return {
-				id : id => {
-					node.id = id;
-					return instance;
-				},
-				
-				class : className => {
-					node.className=className;
-					return instance;
-				},
-				
-				style : style => {
-					for(var setting in style)
-						node.style[setting]=style[setting];
-					return instance;
-				},
-				
-				appendTo : parent => {
-					parent.appendChild(node);
-					return instance;
-				},
-								
-				append : child => {
-					node.appendChild(child);
-					return instance;
-				},
-				
-				innerHtml : content => {
-					node.innerHTML=content;
-					return instance;
-				},
-				
-				clone : deep => {
-					node=node.cloneNode(deep);
-					return instance;
-				},
-				
-				data : dataset => {
-					for(var record in dataset)
-						node.dataset[record]=dataset[record];
-					return instance;
-				},
-				
-				tabIndex : tabIndex => {
-					node.tabIndex = tabIndex
-					return instance;
-				},
-
-				getNode : () => {
-					return node;
-				}
-			};
-		})(name);
-		return instance;
 	};
 
 	var core = {
