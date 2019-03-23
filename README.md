@@ -35,3 +35,6 @@ The Node.js backend currently delivers the menu and windows tree as JSON.
 
 ## Docker
 I added a Dockerfile to enhance the delivery process and get the advantage to run it locally without setting up a Node.js deamon.
+
+## Unit tests
+I started with unit testing using [Jasmine](https://github.com/jasmine/jasmine), [jasmine-es6](https://github.com/vinsonchuong/jasmine-es6) and [window](https://github.com/lukechilds/window), after I cut the createNode builder out of the monolith.
