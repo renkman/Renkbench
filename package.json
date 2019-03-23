@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,10 @@
   "dependencies": {
     "express": "^4.16.4",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "jasmine": "^3.3.1",
+    "jasmine-es6": "^0.4.3",
+    "window": "^4.2.6"
   }
 }

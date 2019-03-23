@@ -12,9 +12,9 @@
 "use strict";
 
 // Fluent node creation interface
-export var createNode = name => {
-    var instance = (name => {
-        var node = document.createElement(name);
+export var createNode = (name, doc) => {
+    var instance = ((name, doc) => {
+        var node = (doc || document).createElement(name);
         
         return {
             id : id => {
@@ -68,6 +68,6 @@ export var createNode = name => {
                 return node;
             }
         };
-    })(name);
+    })(name, doc);
     return instance;
 };

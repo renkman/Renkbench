@@ -28,7 +28,6 @@ Currently, the Workbench clone contains the following features:
 * Introduce applications
 * Further refactoring
 * Split frontend code into multiple files?
-* Err... unit tests?
 * Put the workbench.json data into a NoSQL database (e. g. [MongoDB](https://www.mongodb.com/))
 
 ## Backend
