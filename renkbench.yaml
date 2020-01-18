@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: renkbench-deployment
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+        app: renkbench
+  template:
+    metadata:
+      labels:
+        app: renkbench
+    spec:
+      containers:
+      - name: renkbench-site
+        image: renkbench
+        imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: renkbench-entrypoint
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: renkbench
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30001
