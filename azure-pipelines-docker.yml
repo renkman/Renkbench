@@ -27,3 +27,8 @@ stages:
         dockerfile: '**/Dockerfile'
         tags: |
           $(tag)
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker Hub'
+        repository: 'renkman/renkbench'
+        command: 'push'
