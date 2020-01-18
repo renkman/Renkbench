@@ -21,9 +21,10 @@ stages:
       vmImage: 'ubuntu-latest'
     steps:    
     - task: Docker@2
-      displayName: Build ans publish the image
+      displayName: Build and publish the image
       inputs:
         containerRegistry: 'Docker Hub'
         repository: 'renkman/renkbench'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
+        tags: latest
