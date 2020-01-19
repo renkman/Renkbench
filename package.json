@@ -20,6 +20,7 @@
   "devDependencies": {
     "jasmine": "^3.5.0",
     "jasmine-es6": "^0.4.3",
+    "jasmine-reporters": "^2.3.2",
     "window": "^4.2.6"
   }
 }

@@ -27,4 +27,4 @@ stages:
         repository: 'renkman/renkbench'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
-        tags: latest
+        tags: tag
