@@ -9,7 +9,7 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  build: '$(Build.BuildId)'
 
 stages:
 - stage: Build
@@ -21,10 +21,17 @@ stages:
       vmImage: 'ubuntu-latest'
     steps:    
     - task: Docker@2
-      displayName: Build and publish the image
+      displayName: Build the image
+      inputs:
+        repository: 'renkman/renkbench'
+        command: 'build'
+        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+        tags: $(build)
+        arguments: --build-arg buildnumber=$(build)
+    - task: Docker@2
+      displayName: Push the image
       inputs:
         containerRegistry: 'Docker Hub'
         repository: 'renkman/renkbench'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: tag
+        command: 'push'
+        tags: $(build)

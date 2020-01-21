@@ -1,6 +1,5 @@
 FROM node
-ARG buildNumber=1
-ARG releaseNumber=1
+ARG buildnumber=1
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,7 +15,9 @@ RUN npm install
 
 # Bundle app source
 COPY . .
-# TODO: Replace $$_BUILD_NUMBER_$$ and $$_RELEASE_NUMBER_$$ in workbench.js with buildNumber and releaseNumber
+
+# Set the build number
+RUN sed -i "s/\\$\\$\__BUILD_NUMBER_\_\\$\\$/${buildnumber}/g" workbench.js
 
 RUN npm test
 
