@@ -18,7 +18,6 @@ import {textConverter} from "./modules/text.js";
 (() => {
 	const version = "1.3.2.";
 	const build = "$$_BUILD_NUMBER_$$";
-	const release = "$$_RELEASE_NUMBER_$$";
 
 	//The DOM-element of the workbench (<div>)
 	var element = {};
@@ -82,7 +81,7 @@ import {textConverter} from "./modules/text.js";
 		changeCursor(true);
 		
 		// Set version and build numbers
-		createVersionInfo(version, build, release);
+		createVersionInfo(version, build);
 
 		var title = textConverter().convertText(MAIN_TITLE, textConverter().fontColor["blueOnWhite"]);
 		var mainTitle = document.getElementById("mainTitle");
@@ -1958,8 +1957,8 @@ import {textConverter} from "./modules/text.js";
 		element.style.KhtmlUserSelect=cssProperty;
 	};
 
-	var createVersionInfo = (version, build, release) => {
-		var text = "Renkbench version " + version + " Release " + release + " Build " + build;
+	var createVersionInfo = (version, build) => {
+		var text = "Renkbench version " + version + " Build " + build;
 		var info = document.getElementById("info-bar");
 		var textNode = textConverter().convertText(text, textConverter().fontColor.blueOnWhite);
 		createNode("div").style({
