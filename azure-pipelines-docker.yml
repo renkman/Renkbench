@@ -9,7 +9,7 @@ resources:
 - repo: self
 
 variables:
-  build: '$(Build.BuildId)'
+  build: '$(Build.BuildNumber)'
 
 stages:
 - stage: Build
@@ -26,7 +26,6 @@ stages:
         repository: 'renkman/renkbench'
         command: 'build'
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        tags: $(build)
         arguments: --build-arg buildnumber=$(build)
     - task: Docker@2
       displayName: Push the image
@@ -34,4 +33,3 @@ stages:
         containerRegistry: 'Docker Hub'
         repository: 'renkman/renkbench'
         command: 'push'
-        tags: $(build)
