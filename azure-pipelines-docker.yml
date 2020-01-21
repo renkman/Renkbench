@@ -27,9 +27,11 @@ stages:
         command: 'build'
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         arguments: --build-arg buildnumber=$(build)
+        tags: latest
     - task: Docker@2
       displayName: Push the image
       inputs:
         containerRegistry: 'Docker Hub'
         repository: 'renkman/renkbench'
         command: 'push'
+        tags: latest
