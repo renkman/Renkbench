@@ -17,7 +17,7 @@ RUN npm install
 COPY . .
 
 # Set the build number
-RUN sed -i "s/\\$\\$\__BUILD_NUMBER_\_\\$\\$/${buildnumber}/g" workbench.js
+RUN sed -i "s/\\$\\$\_BUILD\_NUMBER_\\$\\$/${buildnumber}/g" public/workbench.js
 
 RUN npm test
 
