@@ -1,4 +1,5 @@
 FROM node
+
 ARG buildnumber=1
 
 # Create app directory
