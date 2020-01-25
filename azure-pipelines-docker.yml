@@ -35,3 +35,7 @@ stages:
         repository: 'renkman/renkbench'
         command: 'push'
         tags: latest
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)'        
+      displayName: 'Publish files'
