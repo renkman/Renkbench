@@ -22,5 +22,5 @@ RUN sed -i "s/\\$\\$\_BUILD\_NUMBER_\\$\\$/${buildnumber}/g" public/workbench.js
 
 RUN npm test
 
-EXPOSE 8080
+EXPOSE 80
 CMD [ "npm", "start" ]

@@ -15,6 +15,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "express": "^4.17.1",
+    "nano": "^8.1.0",
     "path": "^0.12.7"
   },
   "devDependencies": {

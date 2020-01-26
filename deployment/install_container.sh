@@ -9,4 +9,4 @@ fi
 
 # Get and run container
 docker pull renkman/renkbench:latest
-docker run -d -p 80:8080 renkman/renkbench
+docker run -d -p 80:80 renkman/renkbench

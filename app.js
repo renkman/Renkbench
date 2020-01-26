@@ -17,4 +17,4 @@ app.get('/data', (request, response) => {
 
 app.use('/', express.static(public))
 
-app.listen(process.env.PORT || 8080, () => console.log(`Renkbench service app listening on port ${process.env.PORT || 8080}!`));
+app.listen(process.env.PORT || 80, () => console.log(`Renkbench service app listening on port ${process.env.PORT || 80}!`));
