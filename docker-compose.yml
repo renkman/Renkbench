@@ -1,9 +1,11 @@
 version: '3'
 services:
     web:
-        build: .
+        build:
+            context: .
+            args:
+                - buildnumber
         ports:
             - "80:80"
     storage:
         image: "couchdb"
-        container_name: "renkbench_store"

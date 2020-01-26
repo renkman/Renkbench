@@ -1,8 +1,9 @@
-# Renkbench
-A Javascript Amiga Workbench 1.3.3 look and feel clone.
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/lachsfilet/Renkbench/blob/master/LICENSE)
 [![Build Status](https://dev.azure.com/janrenken/Renkbench/_apis/build/status/lachsfilet.Renkbench?branchName=master)](https://dev.azure.com/janrenken/Renkbench/_build/latest?definitionId=1&branchName=master)
 [![Release Status](https://vsrm.dev.azure.com/janrenken/_apis/public/Release/badge/efce0c4b-a0fc-45d4-b52e-d8852f6bf714/2/3)](https://vsrm.dev.azure.com/janrenken/_apis/public/Release/badge/efce0c4b-a0fc-45d4-b52e-d8852f6bf714/2/3)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/lachsfilet/Renkbench/blob/master/LICENSE)
+
+# Renkbench
+A Javascript Amiga Workbench 1.3.3 look and feel clone.
 
 ## Goal
 For getting some Javascript practice, in the year 2009 I created an [Amiga Workbench](https://en.wikipedia.org/wiki/Workbench_(AmigaOS)#Workbench_1.x) clone and hosted it on [Lachsfilet.de](http://www.lachsfilet.de/).
@@ -29,8 +30,8 @@ Currently, the Workbench clone contains the following features:
 * Introduce applications
 * Further refactoring
 * Continue splitting frontend code into multiple files
-* Put the workbench.json data into the NoSQL database [CouchDB](https://couchdb.apache.org/)
-* Setup Docker Compose
+* Put the workbench.json data into the NoSQL database [CouchDB](https://couchdb.apache.org/) in an own container
+* Setup [Docker Compose](https://docs.docker.com/compose/) for setup and running Renkbench and database
 
 ## Backend
 The Node.js backend currently delivers the menu and windows tree as JSON.
