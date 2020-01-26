@@ -4,7 +4,7 @@ services:
         build:
             context: .
             args:
-                - buildnumber
+                - buildnumber=${build}
         ports:
             - "80:80"
     storage:
