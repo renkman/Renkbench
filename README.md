@@ -1,9 +1,8 @@
 # Renkbench
 A Javascript Amiga Workbench 1.3.3 look and feel clone.
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/lachsfilet/Renkbench/blob/master/LICENSE)
-[![Build Status](https://janrenkenproximity.visualstudio.com/Renkbench/_apis/build/status/lachsfilet.Renkbench%20(1)?branchName=master)](https://janrenkenproximity.visualstudio.com/Renkbench/_build/latest?definitionId=4&branchName=master)
-[![Release Status](https://janrenkenproximity.vsrm.visualstudio.com/_apis/public/Release/badge/32667b41-0105-4d9e-9373-339cff2ee9ae/1/1)](https://janrenkenproximity.vsrm.visualstudio.com/_apis/public/Release/badge/32667b41-0105-4d9e-9373-339cff2ee9ae/1/1)
-<!-- [![Build Status](https://dev.azure.com/janrenken/Renkbench/_apis/build/status/lachsfilet.Renkbench?branchName=master)](https://dev.azure.com/janrenken/Renkbench/_build/latest?definitionId=1&branchName=master) -->
+[![Build Status](https://dev.azure.com/janrenken/Renkbench/_apis/build/status/lachsfilet.Renkbench?branchName=master)](https://dev.azure.com/janrenken/Renkbench/_build/latest?definitionId=1&branchName=master)
+[![Release Status](https://vsrm.dev.azure.com/janrenken/_apis/public/Release/badge/efce0c4b-a0fc-45d4-b52e-d8852f6bf714/2/3)](https://vsrm.dev.azure.com/janrenken/_apis/public/Release/badge/efce0c4b-a0fc-45d4-b52e-d8852f6bf714/2/3)
 
 ## Goal
 For getting some Javascript practice, in the year 2009 I created an [Amiga Workbench](https://en.wikipedia.org/wiki/Workbench_(AmigaOS)#Workbench_1.x) clone and hosted it on [Lachsfilet.de](http://www.lachsfilet.de/).
@@ -30,7 +29,8 @@ Currently, the Workbench clone contains the following features:
 * Introduce applications
 * Further refactoring
 * Continue splitting frontend code into multiple files
-* Put the workbench.json data into a NoSQL database (e. g. [MongoDB](https://www.mongodb.com/))
+* Put the workbench.json data into the NoSQL database [CouchDB](https://couchdb.apache.org/)
+* Setup Docker Compose
 
 ## Backend
 The Node.js backend currently delivers the menu and windows tree as JSON.
