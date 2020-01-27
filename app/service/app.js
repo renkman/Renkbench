@@ -2,12 +2,12 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 
-const public = path.join(__dirname, 'public');
+const public = path.join(__dirname, '../public');
 
 const app = express();
 
 app.get('/data', (request, response) => {
-	var filePath = path.join(__dirname, "data", "workbench.json");
+	var filePath = path.join(__dirname, '../../data', "workbench.json");
 	var file = fs.readFileSync(filePath);
 	var data = JSON.parse(file);
 	
@@ -17,4 +17,4 @@ app.get('/data', (request, response) => {
 
 app.use('/', express.static(public))
 
-app.listen(process.env.PORT || 80, () => console.log(`Renkbench service app listening on port ${process.env.PORT || 80}!`));
+app.listen(process.env.PORT || 8080, () => console.log(`Renkbench service app listening on port ${process.env.PORT || 8080}!`));

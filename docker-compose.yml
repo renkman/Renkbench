@@ -6,6 +6,6 @@ services:
             args:
                 - buildnumber=${build}
         ports:
-            - "80:80"
+            - "80:8080"
     storage:
         image: "couchdb"

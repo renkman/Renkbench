@@ -2,9 +2,9 @@
   "name": "renkbench",
   "version": "1.2.2",
   "description": "Renkbench data service",
-  "main": "app.js",
+  "main": "./service/app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node ./service/app.js",
     "test": "jasmine"
   },
   "repository": {
