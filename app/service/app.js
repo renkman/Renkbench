@@ -6,6 +6,10 @@ const public = path.join(__dirname, '../public');
 
 const app = express();
 
+const db = require('./repositories/initializer')('workbench');
+
+db.initDatabase();
+
 app.get('/data', (request, response) => {
 	var filePath = path.join(__dirname, '../../data', "workbench.json");
 	var file = fs.readFileSync(filePath);

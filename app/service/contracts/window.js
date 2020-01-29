@@ -1,24 +1,30 @@
-create = function(id, pid, title) {
-    if(!id)
-        throw "Parameter id is not set";
+windowFactory = function() {
+    function create(id, pid, title) {
+        if(id === undefined || id === null)
+           throw "Parameter id is not set";
 
-    if(!pid)
-        throw "Parameter pid is not set";
+        if(pid === undefined || pid === null)
+            throw "Parameter pid is not set";
 
-    if(!title)
-        throw "Parameter title is not set";
+        if(title === undefined || title === null)
+            throw "Parameter title is not set";
+
+        return {
+            id : id,
+            pid : pid,
+            icons : {
+                image : {},
+                imageSelected : {}
+            },
+            window : {
+                title : title
+            }
+        };
+    }
 
     return {
-        id : id,
-        pid : pid,
-        icons : {
-            image : {},
-            imageSelected : {}
-        },
-        window : {
-            title : title
-        }
+        create : create
     };
 }();
 
-module.exports = create;
+module.exports = windowFactory;

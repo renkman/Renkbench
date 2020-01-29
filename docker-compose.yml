@@ -7,5 +7,11 @@ services:
                 - buildnumber=${build}
         ports:
             - "80:8080"
+        links:
+            - storage
+        depends_on: 
+            - storage
+        environment:
+            DB_URL: http://storage:5984/
     storage:
-        image: "couchdb"
+        image: couchdb    
