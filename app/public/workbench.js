@@ -16,9 +16,6 @@ import {textConverter} from "./modules/text.js";
 
 //The workbench main object
 (() => {
-	const version = "1.3.2.";
-	const build = "$$_BUILD_NUMBER_$$";
-
 	//The DOM-element of the workbench (<div>)
 	var element = {};
 	
@@ -61,15 +58,16 @@ import {textConverter} from "./modules/text.js";
 	// The height in of the window title bar in pixels
 	const TITLE_BAR_HEIGHT = 21;
 	
-	//The image path structure
+	// The image path structure
 	const IMAGES = "images/";
 	
 	const WINDOW = IMAGES+"window/";
 	
 	const ICONS = IMAGES+"icons/";
 	
-	//The AJAX URL
-	const URL = "/data";
+	// The AJAX url paths
+	const DATA_PATH = "/data";
+	const VERSION_PATH = '/version';
 	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
@@ -81,7 +79,8 @@ import {textConverter} from "./modules/text.js";
 		changeCursor(true);
 		
 		// Set version and build numbers
-		createVersionInfo(version, build);
+		var versionRequest = createHTTPRequest(VERSION_PATH, createVersionInfo);
+		versionRequest.send(null);
 
 		var title = textConverter().convertText(MAIN_TITLE, textConverter().fontColor["blueOnWhite"]);
 		var mainTitle = document.getElementById("mainTitle");
@@ -127,7 +126,7 @@ import {textConverter} from "./modules/text.js";
 		}
 		
 		//Get data via AJAX request
-		var request=createHTTPRequest(URL, getWindowsTree);
+		var request=createHTTPRequest(DATA_PATH, getWindowsTree);
 		request.send(null);
 //console.debug(registry);
 	};
@@ -797,7 +796,7 @@ import {textConverter} from "./modules/text.js";
 				//Download file
 				if(this.type=="file")
 				{
-					var temp=open(URL+"/file/get/"+this.fileId,"Download");
+					var temp=open(DATA_PATH+"/file/get/"+this.fileId,"Download");
 					return true;
 				}
 				
@@ -1953,12 +1952,17 @@ import {textConverter} from "./modules/text.js";
 		
 		//Set properties for Firefox...
 		element.style.MozUserSelect=cssProperty;
-		//...and KHTML-browsers.
+		//... and KHTML-browsers.
 		element.style.KhtmlUserSelect=cssProperty;
 	};
 
-	var createVersionInfo = (version, build) => {
-		var text = "Renkbench version " + version + " Build " + build;
+	var createVersionInfo = (event) => {
+		if(event.target.readyState != 4)
+			return;
+		
+		var versionInfo = JSON.parse(event.target.response)
+
+		var text = "Renkbench version " + versionInfo.version + " Build " + versionInfo.build;
 		var info = document.getElementById("info-bar");
 		var textNode = textConverter().convertText(text, textConverter().fontColor.blueOnWhite);
 		createNode("div").style({

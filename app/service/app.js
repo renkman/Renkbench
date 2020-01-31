@@ -3,12 +3,14 @@ const fs = require('fs');
 const path = require('path');
 
 const public = path.join(__dirname, '../public');
+const build = process.env.buildnumber || 'Local';
+const release = process.env.release || 'Local';
+const version = process.env.npm_package_version || 'Local';
 
 const app = express();
 
 const db = require('./repositories/initializer')('workbench');
 
-db.initDatabase();
 
 app.get('/data', (request, response) => {
 	var filePath = path.join(__dirname, '../../data', "workbench.json");
@@ -19,6 +21,15 @@ app.get('/data', (request, response) => {
 	response.json(data);
 });
 
-app.use('/', express.static(public))
+app.get('/version', (request, response) => {
+	response.json({
+		version: version,
+		build: build,
+		release: release
+	})
+});
 
-app.listen(process.env.PORT || 8080, () => console.log(`Renkbench service app listening on port ${process.env.PORT || 8080}!`));
+db.initDatabase().then(() => {
+	app.use('/', express.static(public));
+	app.listen(process.env.PORT || 8080, () => console.log(`Renkbench service app listening on port ${process.env.PORT || 8080}!`));
+});

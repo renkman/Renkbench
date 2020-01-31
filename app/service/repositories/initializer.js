@@ -7,11 +7,10 @@ init = function (name) {
 
   const SYSTEM_DATABASES = ['_replicator', '_users'];
   let installedDatabases = [];
-  
-  function loadDatabases() {
-    return nano.db.list().then(databases => {    
-      installedDatabases=databases;
-    });
+
+  async function loadDatabases() {
+    const databases = await nano.db.list();
+    installedDatabases = databases;
   }  
 
   function initSystemDatabases() {
@@ -21,17 +20,18 @@ init = function (name) {
     });
   }
 
-  function initDatabase() {
-    loadDatabases().then(() => {
+  async function initDatabase() {
+    try {
+      await loadDatabases();
       initSystemDatabases();
-
-      if(installedDatabases.includes(name))
+      if (installedDatabases.includes(name))
         return;
-      
-      nano.db.create(name)
-        .then(db => seedDatabase(name))
-        .catch(e => console.log(e));      
-    });
+      await nano.db.create(name);
+      return seedDatabase(name);
+    }
+    catch (e) {
+      return console.log(e);
+    }
   }
 
   function seedDatabase(name)

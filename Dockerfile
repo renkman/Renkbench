@@ -21,7 +21,7 @@ COPY ./app .
 COPY ./data ../data
 
 # Set the build number
-RUN sed -i "s/\\$\\$\_BUILD\_NUMBER_\\$\\$/${buildnumber}/g" public/workbench.js
+ENV buildnumber=${buildnumber}
 
 RUN npm test
 
