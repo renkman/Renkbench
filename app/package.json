@@ -1,6 +1,6 @@
 {
   "name": "renkbench",
-  "version": "1.2.2",
+  "version": "1.3.2",
   "description": "Renkbench data service",
   "main": "./service/app.js",
   "scripts": {
