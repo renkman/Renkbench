@@ -35,8 +35,8 @@ stages:
       displayName: Copy docker-compose.yml to $(Build.ArtifactStagingDirectory)
       inputs:
         Contents: |
-          '**/docker-compose.yml'
-          '**/deployment/run_docker_compose.sh'
+          **/docker-compose.yml
+          **/run_docker_compose.sh
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
     - task: PublishBuildArtifacts@1
       displayName: Publish build artifacts
