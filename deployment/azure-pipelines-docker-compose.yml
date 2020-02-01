@@ -1,27 +1,33 @@
 trigger:
     - master
     
-    resources:
-    - repo: self
-    
-    variables:
-      build: '$(Build.BuildNumber)'
-    
-    stages:
+resources:
+- repo: self
 
-    - stage: Build
-      displayName: Build image
-      jobs:  
-      - job: Build
-        displayName: Build
-        pool:
-        vmImage: 'ubuntu-latest'
-        steps:    
-        - task: DockerCompose@0
-            displayName: Build the images
-            inputs:
-            containerregistrytype: 'Container Registry'
-            dockerRegistryEndpoint: 'Docker Hub'
-            dockerComposeFile: '**/docker-compose.yml'
-            dockerComposeFileArgs: 'buildnumber=$(build)'
-            action: 'Build services'
+variables:
+  build: '$(Build.BuildNumber)'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:  
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:    
+    - task: DockerCompose@0
+      displayName: Build the images
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: 'Docker Hub'
+        dockerComposeFile: '**/docker-compose.yml'
+        dockerComposeFileArgs: 'buildnumber=$(build)'
+        action: 'Build services'    
+    - task: DockerCompose@0
+      displayName: Push the images
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: 'Docker Hub'
+        dockerComposeFile: '**/docker-compose.yml'
+        action: 'Push services'
