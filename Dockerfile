@@ -1,6 +1,6 @@
 FROM node
 
-ARG buildnumber=1
+ARG BUILDNUMBER=1
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -21,7 +21,7 @@ COPY ./app .
 COPY ./data ../data
 
 # Set the build number
-ENV BUILDNUMBER=${buildnumber}
+ENV BUILDNUMBER=${BUILDNUMBER}
 
 RUN npm test
 

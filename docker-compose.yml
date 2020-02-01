@@ -13,7 +13,7 @@ services:
         depends_on: 
             - storage
         environment:
-            - DB_URL: http://storage:5984/
+            - DB_URL=http://storage:5984/
             - RELEASENUMBER=${RELEASENUMBER}
     storage:
         image: couchdb
