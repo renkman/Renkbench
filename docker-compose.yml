@@ -5,6 +5,7 @@ services:
             context: .
             args:
                 - buildnumber=${build}
+        image: renkman/renkbench
         ports:
             - "80:8080"
         links:
