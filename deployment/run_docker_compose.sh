@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # Get and run container
-if[ -n $1 ]
+if [ -n $1 ]
     then RELEASENUMBER=$1
+fi
+echo "Set RELEASENUMBER to "$RELEASENUMBER
 
 cd deploy
 docker-compose pull
