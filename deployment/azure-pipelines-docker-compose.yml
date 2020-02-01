@@ -36,7 +36,7 @@ stages:
       inputs:
         Contents: |
           '**/docker-compose.yml'
-          '**/run_docker_compose.sh'
+          '**/deployment/run_docker_compose.sh'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
     - task: PublishBuildArtifacts@1
       displayName: Publish build artifacts
