@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 const public = path.join(__dirname, '../public');
-const build = process.env.buildnumber || 'Local';
-const release = process.env.release || 'Local';
+const build = process.env.BUILDNUMBER || 'Local';
+const release = process.env.RELEASENUMBER || 'Local';
 const version = process.env.npm_package_version || 'Local';
 
 const app = express();

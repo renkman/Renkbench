@@ -21,7 +21,7 @@ COPY ./app .
 COPY ./data ../data
 
 # Set the build number
-ENV buildnumber=${buildnumber}
+ENV BUILDNUMBER=${buildnumber}
 
 RUN npm test
 

@@ -4,7 +4,7 @@ services:
         build:
             context: .
             args:
-                - buildnumber=${build}
+                - BUILDNUMBER=${BUILDNUMBER}
         image: renkman/renkbench
         ports:
             - "80:8080"
@@ -13,6 +13,7 @@ services:
         depends_on: 
             - storage
         environment:
-            DB_URL: http://storage:5984/
+            - DB_URL: http://storage:5984/
+            - RELEASENUMBER=${RELEASENUMBER}
     storage:
         image: couchdb

@@ -1962,7 +1962,7 @@ import {textConverter} from "./modules/text.js";
 		
 		var versionInfo = JSON.parse(event.target.response)
 
-		var text = "Renkbench version " + versionInfo.version + " Build " + versionInfo.build;
+		var text = "Renkbench version " + versionInfo.version + " Build " + versionInfo.build + " Release " + versionInfo.release;
 		var info = document.getElementById("info-bar");
 		var textNode = textConverter().convertText(text, textConverter().fontColor.blueOnWhite);
 		createNode("div").style({
