@@ -3,6 +3,7 @@
 # Get and run container
 if [ -n $1 ]
     then RELEASENUMBER=$1
+    export RELEASENUMBER
 fi
 echo "Set RELEASENUMBER to "$RELEASENUMBER
 
