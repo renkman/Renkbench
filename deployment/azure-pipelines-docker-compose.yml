@@ -6,6 +6,7 @@ resources:
 
 variables:
   build: '$(Build.BuildNumber)'
+
 stages:
 - stage: Build
   displayName: Build image
