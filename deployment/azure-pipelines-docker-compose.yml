@@ -22,7 +22,7 @@ stages:
         containerregistrytype: 'Container Registry'
         dockerRegistryEndpoint: 'Docker Hub'
         dockerComposeFile: '**/docker-compose.yml'
-        dockerComposeFileArgs: 'buildnumber=$(build)'
+        dockerComposeFileArgs: 'build=$(build)'
         action: 'Build services'    
     - task: DockerCompose@0
       displayName: Push the images
