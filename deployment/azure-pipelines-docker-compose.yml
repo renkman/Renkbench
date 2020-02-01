@@ -6,7 +6,6 @@ resources:
 
 variables:
   build: '$(Build.BuildNumber)'
-
 stages:
 - stage: Build
   displayName: Build image
@@ -31,3 +30,14 @@ stages:
         dockerRegistryEndpoint: 'Docker Hub'
         dockerComposeFile: '**/docker-compose.yml'
         action: 'Push services'
+    - task: CopyFiles@2
+      displayName: Copy docker-compose.yml to $(Build.ArtifactStagingDirectory)
+      inputs:
+        Contents: '**/docker-compose.yml'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      displayName: Publish build artifacts
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
