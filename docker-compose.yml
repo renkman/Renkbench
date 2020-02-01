@@ -14,4 +14,4 @@ services:
         environment:
             DB_URL: http://storage:5984/
     storage:
-        image: couchdb    
+        image: couchdb
