@@ -31,13 +31,18 @@ Currently, the Workbench clone contains the following features:
 * Further refactoring
 * Continue splitting frontend code into multiple files
 * Put the workbench.json data into the NoSQL database [CouchDB](https://couchdb.apache.org/) in an own container
-* Setup [Docker Compose](https://docs.docker.com/compose/) for setup and running Renkbench and database
+* Setup for setup and running Renkbench and database
 
 ## Backend
-The Node.js backend currently delivers the menu and windows tree as JSON.
+The Node.js backend currently delivers the menu and windows tree as JSON. It has now success on the Couch DB container. The next task here is to migrate the content of the static workbench.json file into the database and change the whole data success and its application integration.
 
 ## Docker
-I added a Dockerfile to enhance the delivery process and get the advantage to run it locally without setting up a Node.js deamon. For CI build and release I added Azure DevOps pipelines as YAML code.
+The system is setup with [Docker Compose](https://docs.docker.com/compose/), consisting of two containers:
+
+* The renkbench app
+* The CouchDB instance
+
+Putting the application into a Docker image enhanced the delivery process and brought the advantage to run it locally without setting up a Node.js deamon. For CI build and release I added the Azure DevOps pipelines as YAML code.
 
 ## Unit tests
 I started with unit testing using [Jasmine](https://github.com/jasmine/jasmine), [jasmine-es6](https://github.com/vinsonchuong/jasmine-es6) and [window](https://github.com/lukechilds/window), after I cut the createNode builder out of the monolith.
