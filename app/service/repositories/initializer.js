@@ -1,7 +1,7 @@
 const nano = require('nano')(process.env.DB_URL);
 const windowFactory = require('../contracts/window');
 
-init = function (name) {  
+init = name => {  
   if(!name)
     throw "Parameter name is not set";
 
@@ -11,9 +11,9 @@ init = function (name) {
   async function loadDatabases() {
     const databases = await nano.db.list();
     installedDatabases = databases;
-  }  
+  }
 
-  function initSystemDatabases() {
+  initSystemDatabases = () => {
     SYSTEM_DATABASES.forEach(db => {
       if(!installedDatabases.includes(db))
           nano.db.create(db).catch(e => console.log(e));          
@@ -34,7 +34,7 @@ init = function (name) {
     }
   }
 
-  function seedDatabase(name)
+  seedDatabase = name =>
   {
     var database = nano.db.use(name);
     database.insert(windowFactory.create(1, 0, "Renkbench")).catch(e=>console.log(e));

@@ -1,18 +1,18 @@
 const nano = require('nano')('http://localhost:5984');
 
-createWindowRepository = function () {  
+createWindowRepository = (() => {  
   let renkbench = nano.use('renkbench');
 
-  function getWindow(name) {
+  getWindow = name => {
     let result;    
     renkbench.get(name)
-    .then(window =>{
+    .then(window => {
       result = window;
     });
     return result;
   }
 
-  function addWindow(window) {
+  addWindow = window => {
     renkbench.insert(window)
   }
 
@@ -20,6 +20,6 @@ createWindowRepository = function () {
     getWindow : getWindow,
     addWindow : addWindow
   };
-}();
+})();
 
 module.exports = createWindowRepository;

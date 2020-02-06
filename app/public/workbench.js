@@ -13,6 +13,7 @@
 
 import {createNode} from "./modules/domTree.js";
 import {textConverter} from "./modules/text.js";
+import {httpClient} from "./modules/httpClient.js";
 
 //The workbench main object
 (() => {
@@ -79,8 +80,9 @@ import {textConverter} from "./modules/text.js";
 		changeCursor(true);
 		
 		// Set version and build numbers
-		var versionRequest = createHTTPRequest(VERSION_PATH, createVersionInfo);
-		versionRequest.send(null);
+		httpClient.getJson(VERSION_PATH)
+			.then(createVersionInfo)
+			.catch(console.error);
 
 		var title = textConverter().convertText(MAIN_TITLE, textConverter().fontColor["blueOnWhite"]);
 		var mainTitle = document.getElementById("mainTitle");
@@ -126,8 +128,9 @@ import {textConverter} from "./modules/text.js";
 		}
 		
 		//Get data via AJAX request
-		var request=createHTTPRequest(DATA_PATH, getWindowsTree);
-		request.send(null);
+		httpClient.getJson(DATA_PATH)
+			.then(getWindowsTree)
+			.catch(console.error);
 //console.debug(registry);
 	};
 	
@@ -1364,7 +1367,9 @@ import {textConverter} from "./modules/text.js";
 					}
 					//Fire request
 					changeCursor(true);
-					sendPOSTRequest(form,getRequestData);
+					httpClient.post(form)
+						.then(getRequestData)
+						.catch(console.error);
 				//Hide the form
 				case "buttonCancel":
 					var form=getFormElement(curSelection);
@@ -1866,33 +1871,10 @@ import {textConverter} from "./modules/text.js";
 			return event.srcElement;
 	};
 	
-	//Creates a new HTTPRequest instance.
-	var createHTTPRequest = (url,callbackFunc,method) =>
-	{
-		if(!method)
-			method="GET";
-		var request;
-		if (window.XMLHttpRequest)
-			request=new XMLHttpRequest();
-		else
-			request=new ActiveXObject("Microsoft.XMLHTTP");
-//console.debug("Method: %s, url: %s",method, url);
-		request.open(method, url, true);
-		request.onreadystatechange = callbackFunc;
-		if(method=="POST")
-			request.setRequestHeader("Content-Type", 
-				"application/x-www-form-urlencoded; charset=UTF-8");
-		return request;
-	};
-	
 	//Callback function for AJAX response
-	var getWindowsTree = (event) =>
+	var getWindowsTree = (data) =>
 	{
-		if(event.target.readyState != 4)
-			return;
-
 		//Register the windows, icons and the content
-		var data = JSON.parse(event.target.response)
 		addWindows(data.windows, 0);
 
 		// Create the main context menu	
@@ -1902,38 +1884,13 @@ import {textConverter} from "./modules/text.js";
 		//Change cursor to normal mode
 		changeCursor();
 	};
-	
-	//Sends an AJAX POST request.
-	var sendPOSTRequest = (form,callbackFunc) =>
-	{
-		var request=createHTTPRequest(form.action,callbackFunc,"POST",form);
-		var data=[];
-		for(var i=0;i<form.elements.length;i++)
-		{
-			var node=form.elements[i]
-			if((name=node.name)
-			&& (value=validate(node.value)))
-				data.push(name + "=" + encodeURIComponent(value));
-		}
-		request.send(data.join("&"));
-	};
-	
+		
 	//Returns the requested json object.
-	var getRequestData = () =>
+	var getRequestData = responseText =>
 	{
-		if(this.readyState!=4)
-			return;
 		if(cache.innerHTML)
-			cache.innerHTML=eval(this.responseText).join("");
+			cache.innerHTML=eval(responseText).join("");
 		changeCursor();
-	};
-	
-	//Validates a value before it will be transmitted.
-	var validate = value =>
-	{
-		if(value.match(/<.*>/))
-			return false;
-		return value;
 	};
 
 	//Changes between mouse cursors (Normal and wait)
@@ -1956,11 +1913,8 @@ import {textConverter} from "./modules/text.js";
 		element.style.KhtmlUserSelect=cssProperty;
 	};
 
-	var createVersionInfo = (event) => {
-		if(event.target.readyState != 4)
-			return;
-		
-		var versionInfo = JSON.parse(event.target.response)
+	var createVersionInfo = (versionInfo) => {
+		//var versionInfo = JSON.parse(response);
 
 		var text = "Renkbench version " + versionInfo.version + " Build " + versionInfo.build + " Release " + versionInfo.release;
 		var info = document.getElementById("info-bar");

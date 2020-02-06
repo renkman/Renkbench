@@ -1,4 +1,4 @@
-windowFactory = function() {
+windowFactory = (() => {
     function create(id, pid, title) {
         if(id === undefined || id === null)
            throw "Parameter id is not set";
@@ -25,6 +25,6 @@ windowFactory = function() {
     return {
         create : create
     };
-}();
+})();
 
 module.exports = windowFactory;

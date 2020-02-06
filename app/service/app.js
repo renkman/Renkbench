@@ -17,7 +17,6 @@ app.get('/data', (request, response) => {
 	var file = fs.readFileSync(filePath);
 	var data = JSON.parse(file);
 	
-	response.set('Access-Control-Allow-Origin', '*');
 	response.json(data);
 });
 
