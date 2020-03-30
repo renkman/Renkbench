@@ -31,6 +31,7 @@ stages:
           dockerComposeFileArgs: 'BUILDNUMBER=$(buildNumber)'
           action: 'Run a specific service'
           serviceName: test
+          detached: false
     - task: DockerCompose@0
       displayName: Push the images
       inputs:
