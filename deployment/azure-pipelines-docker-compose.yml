@@ -26,7 +26,7 @@ stages:
         action: 'Build services'    
     - task: DockerCompose@0
       displayName: Run tests
-        inputs:
+      inputs:
           dockerComposeFile: '**/docker-compose.yml'
           dockerComposeFileArgs: 'BUILDNUMBER=$(buildNumber)'
           action: 'Run a specific service'
