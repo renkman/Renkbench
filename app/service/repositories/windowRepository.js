@@ -2,7 +2,7 @@ const nano = require('nano')('http://localhost:5984');
 
 createWindowRepository = (() => {  
   let renkbench = nano.use('renkbench');
-
+  
   getWindow = name => {
     let result;    
     renkbench.get(name)

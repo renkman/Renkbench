@@ -1,8 +1,9 @@
-version: '3'
+version: '3.6'
 services:
     web:
         build:
             context: .
+            target: app
             args:
                 - BUILDNUMBER=${BUILDNUMBER}
         image: renkman/renkbench
@@ -10,10 +11,17 @@ services:
             - "80:8080"
         links:
             - storage
-        depends_on: 
+        depends_on:
             - storage
         environment:
             - DB_URL=http://storage:5984/
             - RELEASENUMBER=${RELEASENUMBER}
     storage:
         image: couchdb
+    test:
+        build:
+            context: .
+            target: test    
+            args:
+                - BUILDNUMBER=${BUILDNUMBER}
+        image: renkman/renkbench_test

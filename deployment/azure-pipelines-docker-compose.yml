@@ -25,6 +25,13 @@ stages:
         dockerComposeFileArgs: 'BUILDNUMBER=$(buildNumber)'
         action: 'Build services'    
     - task: DockerCompose@0
+      displayName: Run tests
+        inputs:
+          dockerComposeFile: '**/docker-compose.yml'
+          dockerComposeFileArgs: 'BUILDNUMBER=$(buildNumber)'
+          action: 'Run a specific service'
+          serviceName: test
+    - task: DockerCompose@0
       displayName: Push the images
       inputs:
         containerregistrytype: 'Container Registry'
