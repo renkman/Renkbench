@@ -1,4 +1,6 @@
-FROM node AS base
+FROM node:13 AS base
+
+RUN npm version
 
 ARG BUILDNUMBER=1
 
