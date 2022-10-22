@@ -9,7 +9,8 @@ import (
 func TestArticleContentSerialization(t *testing.T) {
 	expected := `{"title":"Foo","articles":[{"title":"Bar","text":"Baz"}]}
 `
-	content := &Content{"Foo", nil, &[]Article{Article{"Bar", "Baz"}}}
+	title := "Foo"
+	content := &Content{&title, &[]Article{Article{"Bar", "Baz"}}, nil}
 	var writer strings.Builder
 	json.NewEncoder(&writer).Encode(content)
 	result := writer.String()
@@ -22,7 +23,8 @@ func TestArticleContentSerialization(t *testing.T) {
 func TestWindowArticleContentSerialization(t *testing.T) {
 	expected := `{"id":1,"pid":0,"icons":[],"window":{"title":"Window"},"content":{"title":"Foo","articles":[{"title":"Bar","text":"Baz"}]}}
 `
-	content := &Content{"Foo", nil, &[]Article{Article{"Bar", "Baz"}}}
+	title := "Foo"
+	content := &Content{&title, &[]Article{Article{"Bar", "Baz"}}, nil}
 	window := &Window{nil, 1, 0, []Icon{}, WindowMetaInfo{"Window"}, content, nil}
 
 	var writer strings.Builder

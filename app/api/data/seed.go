@@ -18,7 +18,9 @@ func Seed(client *mongo.Client, ctx context.Context) {
 
 func seedWindows(client *mongo.Client, ctx context.Context) {
 	collection := client.Database("renkbench").Collection("windows")
-	result, err := collection.InsertOne(ctx, model.Window{nil, 1, 0, []model.Icon{}, model.WindowMetaInfo{"Renkbench"}, nil, nil})
+	result, err := collection.InsertOne(ctx, model.Window{nil, 1, 0, []model.Icon{
+		model.Icon{"Renkbench", model.Image{"workbench.png", 35, 30}, model.Image{"workbench_selected.png", 35, 30}}},
+		model.WindowMetaInfo{"Renkbench"}, nil, nil})
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -31,9 +33,12 @@ func seedWindows(client *mongo.Client, ctx context.Context) {
 	}
 
 	data := []interface{}{
-		model.Window{nil, 2, 0, []model.Icon{}, model.WindowMetaInfo{"Note!"}, &model.Content{"Hello again!", nil,
-			&[]model.Article{model.Article{"Renkbench relaunch", `Currently the Renkbench is just running with static content from a node.js service, since my webhost has updated the PHP version.<br/>I took advantage of the resulting downtime to refactor my Workbench Javascript code and added some missing features like window resizing, scrolling by arrow buttons and scrollbar and implementing the context menu.<br/>The new node.js backend is set up and hosted on Microsoft Azure. Accordingly, the build and deployment pipeline, feeded by the <a href="https://github.com/renkman/Renkbench" target="_blank">Github repository</a>, is setup on Azure Devops.<br/><br/>Now, I can go on with topaz style input possibilities and the content.`}}}, nil},
-		model.Window{&id, 3, 1, []model.Icon{}, model.WindowMetaInfo{"Edit"}, &model.Content{}, nil}}
+		model.Window{nil, 2, 0, []model.Icon{
+			model.Icon{"Double click me!", model.Image{"disk.png", 32, 32}, model.Image{"disk_selected.png", 32, 32}}},
+			model.WindowMetaInfo{"Note!"}, &model.Content{getRef("Hello again!"),
+				&[]model.Article{model.Article{"Renkbench relaunch", `Next release: During 2022 I had the idea of switching the backend from Node.js to Go. Since I started my <a href="https://github.com/renkman/mongotui" target="_blank">MongoTUI MongoDB client</a> in 2020, I felt like programming more stuff in Go. So - here it is. And with this move, I replaced the static file based JSON-content with a MongoDB.<br /><br />The source code of this web app is available on my <a href="https://github.com/renkman/Renkbench" target="_blank">Github repository</a>.`}}, nil}, nil},
+		model.Window{&id, 3, 0, []model.Icon{
+			model.Icon{"Edit", model.Image{"notepad.png", 32, 32}, model.Image{"notepad_selected.png", 32, 32}}}, model.WindowMetaInfo{"Edit"}, &model.Content{nil, nil, getRef(`<div class="textbox" tabindex="0"></div>`)}, nil}}
 
 	insertManyCollection(data, collection, client, ctx)
 }
@@ -71,4 +76,8 @@ func insertManyCollection(data []interface{}, collection *mongo.Collection, clie
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getRef(value string) *string {
+	return &value
 }

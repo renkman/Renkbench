@@ -1,5 +1,9 @@
 package model
 
+type MenuResponse struct {
+	Menu []Menu `json:menu`
+}
+
 type Menu struct {
 	Name    string      `json:"name"`
 	Entries []MenuEntry `json:"entries"`

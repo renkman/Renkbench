@@ -18,28 +18,28 @@ func CreateDbMenuRepository(client *mongo.Client) *dbMenuRepository {
 	return &dbMenuRepository{client}
 }
 
-func (dbMenuRepository *dbMenuRepository) GetMenu(ctx context.Context) *model.Menu {
+func (dbMenuRepository *dbMenuRepository) GetMenu(ctx context.Context) *model.MenuResponse {
 	menu := dbMenuRepository.readData(ctx)
 	return menu
 }
 
-func (dbMenuRepository *dbMenuRepository) readData(ctx context.Context) *model.Menu {
-	var menu *model.Menu
+func (dbMenuRepository *dbMenuRepository) readData(ctx context.Context) *model.MenuResponse {
+	var menuResponse model.MenuResponse
 
 	collection := dbMenuRepository.client.Database("renkbench").Collection("menu")
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
 		log.Fatal(err)
-		return menu
+		return &menuResponse
 	}
 	defer cursor.Close(ctx)
 
-	err = cursor.All(ctx, menu)
+	err = cursor.All(ctx, &menuResponse.Menu)
 	if err != nil {
 		log.Fatal(err)
-		return menu
+		return &menuResponse
 	}
 
-	log.Printf("Loaded menu: %v", menu)
-	return menu
+	log.Printf("Loaded menu: %v", &menuResponse)
+	return &menuResponse
 }

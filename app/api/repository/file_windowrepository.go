@@ -12,17 +12,17 @@ import (
 
 type FileWindowRepository struct{}
 
-func (windowRepository *FileWindowRepository) GetWindows(ctx context.Context) *model.Windows {
+func (windowRepository *FileWindowRepository) GetWindows(ctx context.Context) *model.WindowResponse {
 	windows := windowRepository.readData()
 	return windows
 }
 
-func (windowRepository *FileWindowRepository) GetWindowsByParentId(id int, ctx context.Context) *model.Windows {
+func (windowRepository *FileWindowRepository) GetWindowById(id int, ctx context.Context) *model.WindowResponse {
 	windows := windowRepository.readData()
 	return windows
 }
 
-func (windowRepository *FileWindowRepository) readData() *model.Windows {
+func (windowRepository *FileWindowRepository) readData() *model.WindowResponse {
 	jsonFile, err := os.Open("workbench.json")
 	if err != nil {
 		log.Println(err)
@@ -31,7 +31,7 @@ func (windowRepository *FileWindowRepository) readData() *model.Windows {
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var windows *model.Windows
+	var windows *model.WindowResponse
 	json.Unmarshal(byteValue, windows)
 	return windows
 }

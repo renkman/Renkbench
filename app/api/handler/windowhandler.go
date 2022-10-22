@@ -11,8 +11,8 @@ import (
 )
 
 type windowRepository interface {
-	GetWindows(ctx context.Context) *model.Windows
-	GetWindowsByParentId(id int, ctx context.Context) *model.Windows
+	GetWindows(ctx context.Context) *model.WindowResponse
+	GetWindowById(id int, ctx context.Context) *model.WindowResponse
 }
 
 type windowHandler struct {
@@ -26,10 +26,10 @@ func CreateWindowHandler(repository windowRepository, routePrefix string) *windo
 
 func (windowHandler *windowHandler) Handle(writer http.ResponseWriter, request *http.Request) {
 	id := windowHandler.getWindowId(request)
-	var windows *model.Windows
+	var windows *model.WindowResponse
 
 	if id != nil {
-		windows = windowHandler.repository.GetWindowsByParentId(*id, request.Context())
+		windows = windowHandler.repository.GetWindowById(*id, request.Context())
 	} else {
 		windows = windowHandler.repository.GetWindows(request.Context())
 	}

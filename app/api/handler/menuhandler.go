@@ -9,7 +9,7 @@ import (
 )
 
 type menuRepository interface {
-	GetMenu(ctx context.Context) *model.Menu
+	GetMenu(ctx context.Context) *model.MenuResponse
 }
 
 type menuHandler struct {

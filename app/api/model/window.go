@@ -4,7 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Windows struct {
+type WindowResponse struct {
 	Windows []Window `json:windows`
 }
 
@@ -30,6 +30,6 @@ type Icon struct {
 
 type Image struct {
 	File   string `json:"file"`
-	Width  string `json:"width"`
-	Height string `json:"height"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
 }

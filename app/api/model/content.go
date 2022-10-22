@@ -1,9 +1,9 @@
 package model
 
 type Content struct {
-	Title    string     `json:"title"`
-	Form     *string    `json:"form,omitempty"`
+	Title    *string    `json:"title"`
 	Articles *[]Article `json:"articles,omitempty"`
+	Form     *string    `json:"form,omitempty"`
 }
 
 type Article struct {

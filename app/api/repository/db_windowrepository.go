@@ -18,33 +18,54 @@ func CreateDbWindowRepository(client *mongo.Client) *dbWindowRepository {
 	return &dbWindowRepository{client}
 }
 
-func (windowRepository *dbWindowRepository) GetWindows(ctx context.Context) *model.Windows {
-	windows := windowRepository.readData(bson.D{}, ctx)
-	return windows
-}
+func (windowRepository *dbWindowRepository) GetWindows(ctx context.Context) *model.WindowResponse {
+	// db.windows.aggregate([{$match:{"parent":null}},{$graphLookup:{from:"windows",startWith:"$_id",connectFromField:"_id",connectToField:"parent",as:"children"}}])
+	match := bson.D{{Key: "$match", Value: bson.D{
+		{Key: "parent", Value: nil}}}}
+	graphLookup := bson.D{
+		{Key: "$graphLookup", Value: bson.D{
+			{Key: "from", Value: "windows"},
+			{Key: "startWith", Value: "$_id"},
+			{Key: "connectFromField", Value: "id"},
+			{Key: "connectToField", Value: "parent"},
+			{Key: "as", Value: "children"}}}}
 
-func (windowRepository *dbWindowRepository) GetWindowsByParentId(id int, ctx context.Context) *model.Windows {
-	windows := windowRepository.readData(bson.D{{Key: "pid", Value: id}}, ctx)
-	return windows
-}
-
-func (windowRepository *dbWindowRepository) readData(filter bson.D, ctx context.Context) *model.Windows {
-	var windows model.Windows
-
-	collection := windowRepository.client.Database("renkbench").Collection("windows")
-	cursor, err := collection.Find(ctx, filter)
+	cursor, err := windowRepository.getCollection().Aggregate(ctx, mongo.Pipeline{match, graphLookup})
 	if err != nil {
 		log.Fatal(err)
-		return &windows
+		return nil
 	}
+
+	windows := windowRepository.readData(cursor, ctx)
+	return windows
+}
+
+func (windowRepository *dbWindowRepository) GetWindowById(id int, ctx context.Context) *model.WindowResponse {
+	cursor, err := windowRepository.getCollection().Find(ctx, bson.D{{Key: "id", Value: id}})
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+
+	windows := windowRepository.readData(cursor, ctx)
+	return windows
+}
+
+func (windowRepository *dbWindowRepository) getCollection() *mongo.Collection {
+	return windowRepository.client.Database("renkbench").Collection("windows")
+}
+
+func (windowRepository *dbWindowRepository) readData(cursor *mongo.Cursor, ctx context.Context) *model.WindowResponse {
 	defer cursor.Close(ctx)
 
-	err = cursor.All(ctx, &windows.Windows)
+	var windowResponse model.WindowResponse
+
+	err := cursor.All(ctx, &windowResponse.Windows)
 	if err != nil {
 		log.Fatal(err)
-		return &windows
+		return &windowResponse
 	}
 
-	log.Printf("Loaded windows: %v", &windows)
-	return &windows
+	log.Printf("Loaded windows: %v", &windowResponse)
+	return &windowResponse
 }
