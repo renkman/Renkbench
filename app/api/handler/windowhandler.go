@@ -10,38 +10,38 @@ import (
 	"renkbench.de/api/model"
 )
 
-type repository interface {
+type windowRepository interface {
 	GetWindows(ctx context.Context) *model.Windows
 	GetWindowsByParentId(id int, ctx context.Context) *model.Windows
 }
 
 type windowHandler struct {
-	repository  repository
+	repository  windowRepository
 	RoutePrefix string
 }
 
-func CreateWindowHandler(repository repository, routePrefix string) *windowHandler {
+func CreateWindowHandler(repository windowRepository, routePrefix string) *windowHandler {
 	return &windowHandler{repository, routePrefix}
 }
 
-func (windowhandler *windowHandler) Handle(writer http.ResponseWriter, request *http.Request) {
-	id := windowhandler.getWindowId(request)
+func (windowHandler *windowHandler) Handle(writer http.ResponseWriter, request *http.Request) {
+	id := windowHandler.getWindowId(request)
 	var windows *model.Windows
 
 	if id != nil {
-		windows = windowhandler.repository.GetWindowsByParentId(*id, request.Context())
+		windows = windowHandler.repository.GetWindowsByParentId(*id, request.Context())
 	} else {
-		windows = windowhandler.repository.GetWindows(request.Context())
+		windows = windowHandler.repository.GetWindows(request.Context())
 	}
 	json.NewEncoder(writer).Encode(windows)
 }
 
-func (windowhandler *windowHandler) getWindowId(request *http.Request) *int {
+func (windowHandler *windowHandler) getWindowId(request *http.Request) *int {
 	var routeId string
-	if !strings.HasPrefix(request.URL.Path, windowhandler.RoutePrefix) {
+	if !strings.HasPrefix(request.URL.Path, windowHandler.RoutePrefix) {
 		return nil
 	}
-	routeId = request.URL.Path[len(windowhandler.RoutePrefix):]
+	routeId = request.URL.Path[len(windowHandler.RoutePrefix):]
 	id, err := strconv.Atoi(routeId)
 	if err != nil {
 		return nil

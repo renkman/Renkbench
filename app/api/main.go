@@ -20,9 +20,14 @@ func initRoutes(mux *http.ServeMux) {
 
 	mongoClient := mongodb.Connect(mongodb.Connection{Uri: "mongodb://localhost:27017", Timeout: 10}, ctx)
 	seed.Seed(mongoClient, ctx)
+
 	windowRepository := repository.CreateDbWindowRepository(mongoClient)
 	windowHandler := handler.CreateWindowHandler(windowRepository, "/api/windows/")
 	mux.HandleFunc(windowHandler.RoutePrefix, windowHandler.Handle)
+
+	menuRepository := repository.CreateDbMenuRepository(mongoClient)
+	menuHandler := handler.CreateMenuHandler(menuRepository)
+	mux.HandleFunc("/api/menu", menuHandler.Handle)
 }
 
 func main() {
