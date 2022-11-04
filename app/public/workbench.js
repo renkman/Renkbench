@@ -68,7 +68,9 @@ import {httpClient} from "./modules/httpClient.js";
 	
 	// The AJAX url paths
 	const DATA_PATH = "/data";
-	const VERSION_PATH = '/version';
+	const MENU_PATH = 'api/menu';
+	const VERSION_PATH = 'api/version';
+	const WINDOWS_PATH = 'api/windows/';
 	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
@@ -127,9 +129,14 @@ import {httpClient} from "./modules/httpClient.js";
 			element.attachEvent("onmouseup",deselect(element));
 		}
 		
-		//Get data via AJAX request
-		httpClient.getJson(DATA_PATH)
-			.then(getWindowsTree)
+		// Get menu via AJAX request
+		httpClient.getJson(MENU_PATH)
+		.then(initMenu)
+		.catch(console.error);
+
+		//Get windows via AJAX request
+		httpClient.getJson(WINDOWS_PATH)
+			.then(initWindows)
 			.catch(console.error);
 //console.debug(registry);
 	};
@@ -142,15 +149,18 @@ import {httpClient} from "./modules/httpClient.js";
 		{
 			var window=windows[i];
 			if(window.content)
+			{
 				registerWindow(window.window, window.icons, pid, window.menu, window.content);
-			if(window.children)
+				continue;
+			}
+			if(window.children && window.children.length)
 			{
 				var newPid=registerWindow(window.window,window.icons,pid);
 				addWindows(window.children,newPid);
 			}
 		}
 		//Arrange child icons and set size
-//console.debug("PID: %i",pid);
+// console.debug("PID: %i",pid);
 		registry[pid].window.arrangeIcons();
 		if(pid>0)
 			registry[pid].window.setPosition();
@@ -159,7 +169,7 @@ import {httpClient} from "./modules/httpClient.js";
 	//Adds a window and its icon to the registry
 	var registerWindow = (windowProperties, imageProperties, pid, menuProperties, content) =>
 	{
-//console.debug(windowProperties);
+// console.debug(windowProperties);
 		if(typeof pid !== "number")
 			pid=0;
 
@@ -1871,15 +1881,18 @@ import {httpClient} from "./modules/httpClient.js";
 			return event.srcElement;
 	};
 	
+	var initMenu = (menuResponse) => 
+	{
+		// Create the main context menu	
+		var menu = createMenu(menuResponse.menu, 0);
+		registry[0].menu = menu;
+	};
+
 	//Callback function for AJAX response
-	var getWindowsTree = (data) =>
+	var initWindows = (windowsResponse) =>
 	{
 		//Register the windows, icons and the content
-		addWindows(data.windows, 0);
-
-		// Create the main context menu	
-		var menu = createMenu(data.menu, 0);
-		registry[0].menu = menu;
+		addWindows(windowsResponse.windows, 0);
 
 		//Change cursor to normal mode
 		changeCursor();

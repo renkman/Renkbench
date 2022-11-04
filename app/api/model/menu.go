@@ -1,7 +1,7 @@
 package model
 
 type MenuResponse struct {
-	Menu []Menu `json:menu`
+	Menu []Menu `json:"menu"`
 }
 
 type Menu struct {

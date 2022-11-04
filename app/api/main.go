@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	seed "renkbench.de/api/data"
 	"renkbench.de/api/handler"
 	"renkbench.de/api/middleware"
 	"renkbench.de/api/mongodb"
@@ -19,7 +18,6 @@ func initRoutes(mux *http.ServeMux) {
 	defer cancel()
 
 	mongoClient := mongodb.Connect(mongodb.Connection{Uri: "mongodb://localhost:27017", Timeout: 10}, ctx)
-	seed.Seed(mongoClient, ctx)
 
 	windowRepository := repository.CreateDbWindowRepository(mongoClient)
 	windowHandler := handler.CreateWindowHandler(windowRepository, "/api/windows/")
@@ -28,6 +26,11 @@ func initRoutes(mux *http.ServeMux) {
 	menuRepository := repository.CreateDbMenuRepository(mongoClient)
 	menuHandler := handler.CreateMenuHandler(menuRepository)
 	mux.HandleFunc("/api/menu", menuHandler.Handle)
+
+	mux.HandleFunc("/api/version", handler.HandleVersion)
+
+	fileServer := http.FileServer(http.Dir("../public"))
+	mux.Handle("/", fileServer)
 }
 
 func main() {

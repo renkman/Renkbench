@@ -5,14 +5,14 @@ import (
 )
 
 type WindowResponse struct {
-	Windows []Window `json:windows`
+	Windows []Window `json:"windows"`
 }
 
 type Window struct {
 	Parent   *primitive.ObjectID `bson:"parent" json:"-"`
 	Id       int                 `json:"id"`
 	Pid      int                 `json:"pid"`
-	Icons    []Icon              `json:"icons"`
+	Icons    Icon                `json:"icons"`
 	Window   WindowMetaInfo      `json:"window"`
 	Content  *Content            `json:"content,omitempty"`
 	Children *[]Window           `json:"children,omitempty"`
