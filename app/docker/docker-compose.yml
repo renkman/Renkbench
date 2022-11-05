@@ -1,0 +1,63 @@
+version: '3.9'
+services:
+    app:
+        build:
+            context: ../
+            dockerfile: ./docker/server.Dockerfile
+            target: app              
+        image: renkman/renkbench
+        ports:
+            - "80:8080"
+        links:
+            - storage
+        depends_on:
+            - storage
+        environment:
+            - DB_HOST=storage:27017
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - BUILDNUMBER=${BUILDNUMBER}
+            - RELEASENUMBER=${RELEASENUMBER}
+    
+    init:
+        build:
+            context: ../
+            dockerfile: ./docker/init.Dockerfile
+            target: init
+        image: renkman/renkbench-init
+        links:
+            - storage
+        depends_on:
+            - storage
+        environment:
+            - DB_HOST=storage:27017
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASSWORD}
+    
+    storage:
+        image: mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - "./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro"
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+            - MONGO_INITDB_DATABASE=renkbench
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASSWORD}
+    
+    test-backend:
+        build:
+            context: ../
+            dockerfile: ./docker/server.Dockerfile
+            target: test    
+            args:
+                - BUILDNUMBER=${BUILDNUMBER}
+        image: renkman/renkbench-backend-test
+    
+    test-frontend:
+        build:
+            context: ../
+            dockerfile: ./docker/frontend.Dockerfile
+        image: renkman/renkbench-frontend-test
