@@ -21,4 +21,6 @@ ENTRYPOINT [ "/app/init" ]
 
 FROM build as test
 
-CMD [ "go test" ]
+WORKDIR /src/api
+
+CMD [ "go", "test", "-v", "./..." ]

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -30,6 +31,6 @@ func getDatabaseCredentials() (string, string, string) {
 func buildDatabaseUri() string {
 
 	host, username, password := getDatabaseCredentials()
-	uri := fmt.Sprintf("mongodb://%s:%s@%s", host, username, password)
+	uri := fmt.Sprintf("mongodb://%v:%v@%v", username, password, host)
 	return uri
 }

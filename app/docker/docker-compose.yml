@@ -39,6 +39,9 @@ services:
         volumes:
             - "./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro"
         environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+            - MONGO_INITDB_DATABASE=renkbench
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
     test:

@@ -25,7 +25,7 @@ func GetReleaseNumber() string {
 
 func BuildDatabaseUri() string {
 	host, username, password := getDatabaseCredentials()
-	uri := fmt.Sprintf("mongodb://%s:%s@%s", host, username, password)
+	uri := fmt.Sprintf("mongodb://%v:%v@%v", username, password, host)
 	return uri
 }
 

@@ -26,7 +26,4 @@ FROM build as test
 
 WORKDIR /src/api
 
-RUN pwd
-RUN ls -la
-
 CMD [ "go", "test", "-v", "./..." ]

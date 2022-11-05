@@ -1,8 +1,10 @@
 set -e
 
-echo "Create user $DB_USER"
+echo "Create user $DB_USER and database renkbench"
 
 mongo <<EOF
+use admin
+
 db.createUser(
     {
         user: "$DB_USER",
