@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Renkbench CI
 
 on:
   push:
@@ -14,7 +14,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
+    - name: Build the API
       run: |
         cd app
         docker-compose -f docker/docker-compose.yml build app
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: API unit tests
+      run: |
+        cd app
+        docker-compose -f docker/docker-compose.yml up test-backend
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Frontend unit tests
+      run: |
+        cd app
+        docker-compose -f docker/docker-compose.yml up test-frontend

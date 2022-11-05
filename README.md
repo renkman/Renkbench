@@ -1,5 +1,5 @@
 # Renkbench
-[![Docker Image CI](https://github.com/renkman/Renkbench/actions/workflows/build-pipeline.yml/badge.svg)](https://github.com/renkman/Renkbench/actions/workflows/build-pipeline.yml)
+[![Renkbench CI](https://github.com/renkman/Renkbench/actions/workflows/build-pipeline.yml/badge.svg)](https://github.com/renkman/Renkbench/actions/workflows/build-pipeline.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/lachsfilet/Renkbench/blob/master/LICENSE)
 
 ![Screenshot](renkbench.png)
