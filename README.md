@@ -4,10 +4,10 @@
 
 ![Screenshot](renkbench.png)
 
-A Javascript Amiga Workbench 1.3.3 look and feel clone.
+A JavaScript Amiga Workbench 1.3.3 look and feel clone with a Go and MongoDB backend.
 
 ## Goal
-For getting some Javascript practice, in the year 2009 I created an [Amiga Workbench](https://en.wikipedia.org/wiki/Workbench_(AmigaOS)#Workbench_1.x) clone and hosted it on [Lachsfilet.de](http://www.lachsfilet.de/).
+For getting some JavaScript practice, in the year 2009 I created an [Amiga Workbench](https://en.wikipedia.org/wiki/Workbench_(AmigaOS)#Workbench_1.x) clone and hosted it on [Lachsfilet.de](http://www.lachsfilet.de/).
 Since not all look and feel features of the orginal Workbench were implemented, in December of 2018 I started to refactor the code and added some missing features.
 
 In the meantime I put the whole page into a [Docker](https://www.docker.com/) container to simplify the deployment process.
