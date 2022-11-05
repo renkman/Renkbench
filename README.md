@@ -33,7 +33,7 @@ Currently, the Workbench clone contains the following features:
 * Continue splitting frontend code into multiple files
 
 ## Backend
-In 2022, I switched the whole backend to [Go](https://go.dev/) and replaced the single JSON-file for the content with a [Mongo](https://www.mongodb.com/) DB instance.
+In 2022, I switched the whole backend to [Go](https://go.dev/) and replaced the single JSON-file for the content with a [MongoDB](https://www.mongodb.com/) instance.
 
 For content seeding (windows, menu, etc.) I wrote an own Go application called init.
 
@@ -41,9 +41,9 @@ For content seeding (windows, menu, etc.) I wrote an own Go application called i
 The system is setup with [Docker Compose](https://docs.docker.com/compose/), consisting of two containers:
 
 * The renkbench app (Go and JavaScript ES6)
-* The MongoDb instance
+* The MongoDB instance
 
-Putting the application into a Docker image enhanced the delivery process and brought the advantage to run it locally without setting up a Mongo DB instance and the Node.js stuff for the JacaScript unit tests. For CI build and release I added the Azure DevOps pipelines as YAML code. I will replace them with GitHub Actions, which are also stored in the current repository.
+Putting the application into a Docker image enhanced the delivery process and brought the advantage to run it locally without setting up a MongoDB instance and the Node.js stuff for the JacaScript unit tests. For CI build and release I added the Azure DevOps pipelines as YAML code. I will replace them with GitHub Actions, which are also stored in the current repository.
 
 ## JavaScript unit tests
 I started with unit testing using [Jasmine](https://github.com/jasmine/jasmine) and [jsdom](https://github.com/jsdom/jsdom), after I cut the createNode builder out of the monolith.
