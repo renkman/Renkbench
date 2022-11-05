@@ -14,15 +14,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the API
-      run: |
-        cd app
-        docker-compose -f docker/docker-compose.yml build app
-
     - name: API unit tests
       run: |
         cd app
         docker-compose -f docker/docker-compose.yml up test-backend
+        docker cp test-backend:/src/api/coverage.out ./
+
+    - name: Upload Go code coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./app/coverage.out
 
     - name: Frontend unit tests
       run: |
@@ -33,3 +34,8 @@ jobs:
       run: |
         cd app
         docker-compose -f docker/docker-compose.yml down
+
+    - name: Build the API
+      run: |
+        cd app
+        docker-compose -f docker/docker-compose.yml build app

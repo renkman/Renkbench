@@ -55,6 +55,7 @@ services:
             args:
                 - BUILDNUMBER=${BUILDNUMBER}
         image: renkman/renkbench-backend-test
+        container_name: test-backend
     
     test-frontend:
         build:
