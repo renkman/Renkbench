@@ -18,6 +18,7 @@ services:
             - DB_PASSWORD=${DB_PASSWORD}
             - BUILDNUMBER=${BUILDNUMBER}
             - RELEASENUMBER=${RELEASENUMBER}
+    
     init:
         build:
             context: ../
@@ -32,6 +33,7 @@ services:
             - DB_HOST=storage:27017
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
+    
     storage:
         image: mongo
         ports:
@@ -44,11 +46,18 @@ services:
             - MONGO_INITDB_DATABASE=renkbench
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
-    test:
+    
+    test-backend:
         build:
             context: ../
             dockerfile: ./docker/server.Dockerfile
             target: test    
             args:
                 - BUILDNUMBER=${BUILDNUMBER}
-        image: renkman/renkbench_test
+        image: renkman/renkbench-backend-test
+    
+    test-frontend:
+        build:
+            context: ../
+            dockerfile: ./docker/frontend.Dockerfile
+        image: renkman/renkbench-frontend-test
