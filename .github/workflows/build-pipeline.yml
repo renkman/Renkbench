@@ -19,14 +19,12 @@ jobs:
         cd app
         docker-compose -f docker/docker-compose.yml build app
 
-    steps:
     - uses: actions/checkout@v3
     - name: API unit tests
       run: |
         cd app
         docker-compose -f docker/docker-compose.yml up test-backend
 
-    steps:
     - uses: actions/checkout@v3
     - name: Frontend unit tests
       run: |
