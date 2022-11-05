@@ -52,8 +52,6 @@ services:
             context: ../
             dockerfile: ./docker/server.Dockerfile
             target: test    
-            args:
-                - BUILDNUMBER=${BUILDNUMBER}
         image: renkman/renkbench-backend-test
         container_name: test-backend
     
