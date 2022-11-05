@@ -1,8 +1,8 @@
-[![Build Status](https://dev.azure.com/janrenken/Renkbench/_apis/build/status/lachsfilet.Renkbench?branchName=master)](https://dev.azure.com/janrenken/Renkbench/_build/latest?definitionId=1&branchName=master)
-[![Release Status](https://vsrm.dev.azure.com/janrenken/_apis/public/Release/badge/efce0c4b-a0fc-45d4-b52e-d8852f6bf714/2/3)](https://vsrm.dev.azure.com/janrenken/_apis/public/Release/badge/efce0c4b-a0fc-45d4-b52e-d8852f6bf714/2/3)
+# Renkbench
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/lachsfilet/Renkbench/blob/master/LICENSE)
 
-# Renkbench
+![Screenshot](renkbench.png)
+
 A Javascript Amiga Workbench 1.3.3 look and feel clone.
 
 ## Goal
@@ -30,19 +30,19 @@ Currently, the Workbench clone contains the following features:
 * Introduce applications
 * Further refactoring
 * Continue splitting frontend code into multiple files
-* Put the workbench.json data into the NoSQL database [CouchDB](https://couchdb.apache.org/) in an own container
-* Setup for setup and running Renkbench and database
 
 ## Backend
-The Node.js backend currently delivers the menu and windows tree as JSON. It has now success on the Couch DB container. The next task here is to migrate the content of the static workbench.json file into the database and change the whole data success and its application integration.
+In 2022, I switched the whole backend to [Go](https://go.dev/) and replaced the single JSON-file for the content with a [Mongo](https://www.mongodb.com/) DB instance.
+
+For content seeding (windows, menu, etc.) I wrote an own Go application called init.
 
 ## Docker
 The system is setup with [Docker Compose](https://docs.docker.com/compose/), consisting of two containers:
 
-* The renkbench app
-* The CouchDB instance
+* The renkbench app (Go and JavaScript ES6)
+* The MongoDb instance
 
-Putting the application into a Docker image enhanced the delivery process and brought the advantage to run it locally without setting up a Node.js deamon. For CI build and release I added the Azure DevOps pipelines as YAML code.
+Putting the application into a Docker image enhanced the delivery process and brought the advantage to run it locally without setting up a Mongo DB instance and the Node.js stuff for the JacaScript unit tests. For CI build and release I added the Azure DevOps pipelines as YAML code. I will replace them with GitHub Actions, which are also stored in the current repository.
 
-## Unit tests
-I started with unit testing using [Jasmine](https://github.com/jasmine/jasmine), [jasmine-es6](https://github.com/vinsonchuong/jasmine-es6) and [window](https://github.com/lukechilds/window), after I cut the createNode builder out of the monolith.
+## JavaScript unit tests
+I started with unit testing using [Jasmine](https://github.com/jasmine/jasmine) and [jsdom](https://github.com/jsdom/jsdom), after I cut the createNode builder out of the monolith.
