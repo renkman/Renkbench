@@ -31,4 +31,5 @@ jobs:
 
     - name: Docker cleanup
       run: |
-        docker-compose down
+        cd app
+        docker-compose -f docker/docker-compose.yml down
