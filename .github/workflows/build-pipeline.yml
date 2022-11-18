@@ -42,7 +42,7 @@ jobs:
 
     - name: Push docker images to Docker Hub
       run: |
-        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
         docker push renkman/renkbench
         docker push renkman/renkbench-init
 
@@ -53,14 +53,14 @@ jobs:
         scp -i key -o StrictHostKeyChecking=no src/docker/docker-compose.yml root@178.128.195.176:/root/deploy
         scp -i key -o StrictHostKeyChecking=no src/docker/mongo-init.sh root@178.128.195.176:/root/deploy
 
-        echo "MONGO_INITDB_ROOT_USERNAME ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" > .env
-        echo "MONGO_INITDB_ROOT_PASSWORD ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
-        echo "DB_USER ${{ secrets.DB_USER }}" >> .env
-        echo "DB_PASSWORD ${{ secrets.DB_PASSWORD }}" >> .env
-        echo "BUILDNUMBER ${{ github.run_number }}" >> .env
-        echo "RELEASENUMBER ${{ secrets.run_number }}" >> .env
+        echo "MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" > .env
+        echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
+        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "BUILDNUMBER=${{ github.run_number }}" >> .env
+        echo "RELEASENUMBER=${{ github.run_number }}" >> .env
 
         scp -i key -o StrictHostKeyChecking=no .env root@178.128.195.176:/root/deploy
-        
+
         rm key
         rm .env
