@@ -16,28 +16,28 @@ jobs:
     - uses: actions/checkout@v3
     - name: API unit tests
       run: |
-        cd app
+        cd src
         docker-compose -f docker/docker-compose.yml up test-backend
         docker cp test-backend:/src/api/coverage.out ./
 
     - name: Frontend unit tests
       run: |
-        cd app
+        cd src
         docker-compose -f docker/docker-compose.yml up test-frontend
 
     - name: Docker cleanup
       run: |
-        cd app
+        cd src
         docker-compose -f docker/docker-compose.yml down
 
     - name: Build the API
       run: |
-        cd app
+        cd src
         docker-compose -f docker/docker-compose.yml build app
 
     - name: Build the db init
       run: |
-        cd app
+        cd src
         docker-compose -f docker/docker-compose.yml build init
 
     - name: Log in to Docker Hub

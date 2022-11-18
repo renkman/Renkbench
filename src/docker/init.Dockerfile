@@ -7,7 +7,7 @@ COPY ./api ./api
 WORKDIR /src/api
 RUN go build cmd/init-db/init.go
 
-FROM gcr.io/distroless/base-debian11 as init
+FROM gcr.io/distroless/static-debian11 as init
 
 WORKDIR /app
 

@@ -8,7 +8,7 @@ COPY ./public ./public
 WORKDIR /src/api
 RUN go build cmd/server/server.go
 
-FROM gcr.io/distroless/base-debian11 as app
+FROM gcr.io/distroless/static-debian11 as app
 
 WORKDIR /public
 COPY --from=build /src/public .
