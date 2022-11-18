@@ -53,8 +53,19 @@ jobs:
 
     - name: Deploy to renkbench.de
       run: |
-        echo "${{ secrets.DOCKER_USERNAME }}" > key
+        echo "${{ secrets.DEPLOYMENT_KEY }}" > key
         chmod 600 key
         scp -i key src/docker/docker-compose.yml root@178.128.195.176:/root/deploy
         scp -i key src/docker/mongo-init.sh root@178.128.195.176:/root/deploy
+
+        echo "MONGO_INITDB_ROOT_USERNAME ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" > .env
+        echo "MONGO_INITDB_ROOT_PASSWORD ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
+        echo "DB_USER ${{ secrets.DB_USER }}" >> .env
+        echo "DB_PASSWORD ${{ secrets.DB_PASSWORD }}" >> .env
+        echo "BUILDNUMBER ${{ github.run_number }}" >> .env
+        echo "RELEASENUMBER ${{ secrets.run_number }}" >> .env
+
+        scp -i key .env root@178.128.195.176:/root/deploy
+        
         rm key
+        rm .env
