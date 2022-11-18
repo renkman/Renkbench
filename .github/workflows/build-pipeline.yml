@@ -50,3 +50,11 @@ jobs:
       run: |
         docker push renkman/renkbench
         docker push renkman/renkbench-init
+
+    - name: Deploy to renkbench.de
+      run |
+        echo "${{ secrets.DOCKER_USERNAME }}" > key
+        chmod 600 key
+        scp -i key src/docker/docker-compose.yml root@178.128.195.176:/root/deploy
+        scp -i key src/docker/mongo-init.sh root@178.128.195.176:/root/deploy
+        rm key
