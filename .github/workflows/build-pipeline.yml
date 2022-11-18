@@ -52,7 +52,7 @@ jobs:
         docker push renkman/renkbench-init
 
     - name: Deploy to renkbench.de
-      run |
+      run: |
         echo "${{ secrets.DOCKER_USERNAME }}" > key
         chmod 600 key
         scp -i key src/docker/docker-compose.yml root@178.128.195.176:/root/deploy
