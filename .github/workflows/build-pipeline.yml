@@ -62,10 +62,10 @@ jobs:
 
         scp -i key -o StrictHostKeyChecking=no .env root@178.128.195.176:/root/deploy
 
-        ssh -i key -o StrictHostKeyChecking=no "docker-compose -f /root/deploy/docker-compose.yml down"
-        ssh -i key -o StrictHostKeyChecking=no "docker-compose -f /root/deploy/docker-compose.yml up -d init"
-        ssh -i key -o StrictHostKeyChecking=no "docker-compose -f /root/deploy/docker-compose.yml up -d app"
-        ssh -i key -o StrictHostKeyChecking=no "docker-compose -f rm /root/deploy/.env"
+        ssh -i key -o StrictHostKeyChecking=no root@178.128.195.176 "docker-compose -f /root/deploy/docker-compose.yml down"
+        ssh -i key -o StrictHostKeyChecking=no root@178.128.195.176 "docker-compose -f /root/deploy/docker-compose.yml up -d init"
+        ssh -i key -o StrictHostKeyChecking=no root@178.128.195.176 "docker-compose -f /root/deploy/docker-compose.yml up -d app"
+        ssh -i key -o StrictHostKeyChecking=no root@178.128.195.176 "docker-compose -f rm /root/deploy/.env"
 
         rm key
         rm .env
