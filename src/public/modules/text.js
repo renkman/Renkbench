@@ -29,7 +29,7 @@ export var textConverter = () => {
     //Convert string text to amiga style font div-element-text
     var convertText = (text, color) =>
     {
-        //Replase some tags
+        //Replace some tags
         text=text//.replace(/<\/*(br|ul) *\/*>/g,'<div class="stop"></div>')
             .replace(/<br *\/*>/g, '<div class="stop"></div>')
             .replace(/<ul>/g,'<div class="stop"></div><div class="list">')

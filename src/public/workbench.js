@@ -79,7 +79,7 @@ import {httpClient} from "./modules/httpClient.js";
 	var init = () =>
 	{		
 		//Set cursor to wait mode
-		changeCursor(true);
+		switchCursor(true);
 		
 		// Set version and build numbers
 		httpClient.getJson(VERSION_PATH)
@@ -1376,7 +1376,7 @@ import {httpClient} from "./modules/httpClient.js";
 						}
 					}
 					//Fire request
-					changeCursor(true);
+					switchCursor(true);
 					httpClient.post(form)
 						.then(getRequestData)
 						.catch(console.error);
@@ -1895,7 +1895,7 @@ import {httpClient} from "./modules/httpClient.js";
 		addWindows(windowsResponse.windows, 0);
 
 		//Change cursor to normal mode
-		changeCursor();
+		switchCursor();
 	};
 		
 	//Returns the requested json object.
@@ -1903,11 +1903,11 @@ import {httpClient} from "./modules/httpClient.js";
 	{
 		if(cache.innerHTML)
 			cache.innerHTML=eval(responseText).join("");
-		changeCursor();
+		switchCursor();
 	};
 
 	//Changes between mouse cursors (Normal and wait)
-	var changeCursor = wait =>
+	var switchCursor = wait =>
 	{
 		var bodyElement=document.getElementsByTagName("body")[0];
 		bodyElement.style.cursor=wait?

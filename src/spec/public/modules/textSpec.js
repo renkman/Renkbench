@@ -1,7 +1,7 @@
 import {textConverter} from "../../../public/modules/text.js";
 
 describe("textConverter tests", function() {
-    it("createNode is not null", function() {
+    it("textConverter is not null", function() {
         expect(textConverter).not.toBe(null);
     });
 
