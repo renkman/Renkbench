@@ -1,35 +1,50 @@
 "use strict";
 
-
-export var iconFactory = (createNode, textConverter) => {
-    // The image path structure
-    const IMAGES = "images/";
-    const ICONS = IMAGES + "icons/";
-
+export var iconFactory = (createNode, textConverter, iconPath) => {
     var createNode = createNode;
     var textConverter = textConverter;
+    var iconPath = iconPath;
 
     //Creates an icon
-    var createIcon = (id, properties, parentWindow, iconStartPos, iconWidth, workBenchElement) => {
+    var createIcon = (id, properties, isDisk, initX) => {
         //Create new icon element
         var icon = {
             //The images of this icon
-            image: ICONS + properties.image.file,
-            imageSelected: ICONS + properties.imageSelected.file,
-            initX: 0,
-            disk: false,
+            image: iconPath + "/" + properties.image.file,
+            imageSelected: iconPath + "/" + properties.imageSelected.file,
+            initX: initX,
+            disk: isDisk,
             title: properties.title,
 
             //The DOM-element of this icon
-            element: {}
+            element: {},
+
+            setIconSize: function() {
+                var x = this.element.offsetWidth;
+                var y = this.element.offsetHeight;
+                this.element.style.width = x + "px";
+                this.element.style.height = y + "px";
+            },
+
+            setPositionLeft: function(x) {
+                this.element.style.left = x;
+            },
+
+            setPositionRight: function(x) {
+                this.element.style.right = x;
+            },
+
+            setPositionTop: function(y) {
+                this.element.style.top = y;
+            }
         };
 
-        init(id, icon, properties, parentWindow, iconStartPos, iconWidth, workBenchElement);
+        init(id, icon, properties);
 
         return icon;
     };
 
-    var init = (id, icon, properties, parentWindow, iconStartPos, iconWidth, workBenchElement) => {
+    var init = (id, icon, properties) => {
         // Image
         var image = createNode("div").class("iconElements").style({
             backgroundImage: "url(" + icon.image + ")",
@@ -49,7 +64,7 @@ export var iconFactory = (createNode, textConverter) => {
         //Create div element and set background source files
         icon.element = createNode("div")
             .class("icon")
-            .id("icon_")
+            .id("icon_" + id)
             .append(image)
             .append(textImage)
             .data({
@@ -57,45 +72,6 @@ export var iconFactory = (createNode, textConverter) => {
                 status: "closed"
             })
             .getNode();
-        //.style({width:(image.offsetWidth > text.offsetWidth)?image.style.width : text.style.width}).getNode();			
-
-        //Setup window containing icon
-        // var window = registry[pid]["window"];
-        parentWindow.addIcon(icon);
-
-        var x = icon.element.offsetWidth;
-        var y = icon.element.offsetHeight;
-        icon.element.style.width = x + "px";
-        icon.element.style.height = y + "px";
-
-        // Coordinates of the next icon are top and right, if it is
-        // a direct child of the workbench
-        //icon.element.style.top = registry[pid]["window"].iconStartPos.y;
-        icon.element.style.top = parentWindow.iconStartPos.y;
-
-        if (parentWindow.id == 0) {
-            // Set workbench icon with highest width
-            if (x > iconWidth)
-                iconWidth = x;
-
-            icon.disk = true;
-            icon.element.style.right = iconStartPos.x;
-            icon.initX = parseInt(iconStartPos.x);
-
-            // Setup coordinates for next icon
-            var nextPosY = parseInt(iconStartPos.y) + y + 20;
-            var borderBottom = workBenchElement.offsetTop + workBenchElement.offsetHeight;
-
-            // Just put the next icon under the current one.
-            if (nextPosY + y + 10 < borderBottom) {
-                iconStartPos.y = nextPosY + "px";
-                return;
-            }
-
-            // Set the next icon left to the current icon column.
-            iconStartPos.x = (parseInt(iconStartPos.x) + x + 10) + "px";
-            iconStartPos.y = "40px";
-        }
     };
 
     return {

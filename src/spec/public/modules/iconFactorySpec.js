@@ -13,6 +13,7 @@ describe("iconFactory tests", function () {
                     width: "0px",
                     top: "0px",
                     right: "0px"
+
                 },
                 children: [],
                 innerHTML: "",
@@ -71,11 +72,6 @@ describe("iconFactory tests", function () {
     });
 
     it("iconFactory creates a workbench icon", function () {
-        var workbenchElement = {
-            offsetTop: 0,
-            offsetHeight: 4000
-        };
-
         var properties = {
             title: "Workbench",
             image: {
@@ -90,19 +86,8 @@ describe("iconFactory tests", function () {
             }
         }
 
-        var passedIcon = {};
-        var parentWindow = {
-            id: 0,
-            iconStartPos: {
-                y: "10px"
-            },
-            addIcon: icon => passedIcon = icon
-        };
-
-        var iconStartPos = { x: "20px", y: "40px" };
-
-        var factory = iconFactory(domTreeMock, textConverter);
-        var icon = factory.createIcon(500, properties, parentWindow, iconStartPos, 0, workbenchElement);
+        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        var icon = factory.createIcon(500, properties, true, 20);
 
         expect(icon).not.toBe(null);
         expect(icon.title).toBe(properties.title);
@@ -110,11 +95,7 @@ describe("iconFactory tests", function () {
         expect(icon.image).toBe("images/icons/workbench.png");
         expect(icon.imageSelected).toBe("images/icons/workbench_selected.png");
         expect(icon.initX).toBe(20);
-        expect(icon.element.style.right).toBe("20px");
-        expect(icon.element.style.top).toBe("10px");
-        expect(icon.element.style.height).toBe("42px");
-        expect(icon.element.style.width).toBe("42px");
-        expect(icon).toBe(passedIcon);
+        expect(icon.element.id).toBe("icon_500");
     });
 
     it("iconFactory creates a window icon", function () {
@@ -132,19 +113,8 @@ describe("iconFactory tests", function () {
             }
         }
 
-        var passedIcon = {};
-        var parentWindow = {
-            id: 1000,
-            iconStartPos: {
-                y: "10px"
-            },
-            addIcon: icon => passedIcon = icon
-        };
-
-        var iconStartPos = { x: "20px", y: "40px" };
-
-        var factory = iconFactory(domTreeMock, textConverter);
-        var icon = factory.createIcon(500, properties, parentWindow, iconStartPos, 0, {});
+        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        var icon = factory.createIcon(1000, properties, false, 0);
 
         expect(icon).not.toBe(null);
         expect(icon.title).toBe(properties.title);
@@ -152,10 +122,105 @@ describe("iconFactory tests", function () {
         expect(icon.image).toBe("images/icons/shell.png");
         expect(icon.imageSelected).toBe("images/icons/shell_selected.png");
         expect(icon.initX).toBe(0);
-        expect(icon.element.style.right).toBe("0px");
-        expect(icon.element.style.top).toBe("10px");
+        expect(icon.element.id).toBe("icon_1000");
+    });
+
+    it("icon.setIconSize sets height and width", function () {
+        var properties = {
+            title: "Workbench",
+            image: {
+                file: "workbench.png",
+                height: 42,
+                width: 42
+            },
+            imageSelected: {
+                file: "workbench_selected.png",
+                height: 42,
+                width: 42
+            }
+        }
+
+        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        var icon = factory.createIcon(500, properties, true, 20);
+
+        icon.setIconSize();
+
         expect(icon.element.style.height).toBe("42px");
         expect(icon.element.style.width).toBe("42px");
-        expect(icon).toBe(passedIcon);
+    });
+
+    it("icon.setPositionLeft sets left x position", function () {
+        var properties = {
+            title: "Workbench",
+            image: {
+                file: "workbench.png",
+                height: 42,
+                width: 42
+            },
+            imageSelected: {
+                file: "workbench_selected.png",
+                height: 42,
+                width: 42
+            }
+        }
+
+        const left = "20px";
+
+        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        var icon = factory.createIcon(500, properties, true, 20);
+
+        icon.setPositionLeft(left);
+
+        expect(icon.element.style.left).toBe(left);
+    });
+
+    it("icon.setPositionRight sets right x position", function () {
+        var properties = {
+            title: "Workbench",
+            image: {
+                file: "workbench.png",
+                height: 42,
+                width: 42
+            },
+            imageSelected: {
+                file: "workbench_selected.png",
+                height: 42,
+                width: 42
+            }
+        }
+
+        const right = "20px";
+        
+        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        var icon = factory.createIcon(500, properties, true, 20);
+
+        icon.setPositionRight(right);
+
+        expect(icon.element.style.right).toBe(right);
+    });
+
+    it("icon.setPositionTop sets top y position", function () {
+        var properties = {
+            title: "Workbench",
+            image: {
+                file: "workbench.png",
+                height: 42,
+                width: 42
+            },
+            imageSelected: {
+                file: "workbench_selected.png",
+                height: 42,
+                width: 42
+            }
+        }
+
+        const top = "40px";
+
+        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        var icon = factory.createIcon(500, properties, true, 20);
+
+        icon.setPositionTop(top);
+
+        expect(icon.element.style.top).toBe(top);
     });
 });
