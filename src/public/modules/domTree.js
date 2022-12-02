@@ -1,6 +1,6 @@
 /*
 *	Just an Amiga Workbench look and feel clone, written in Javascript.
-*	Copyright 2019 by Jan Renken, Hamburg
+*	Copyright 2019,2022 by Jan Renken, Hamburg
 *	
 *	This software is licensed under the GNU General Public License Version 3.0.
 *

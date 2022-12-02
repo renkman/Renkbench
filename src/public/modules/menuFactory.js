@@ -1,3 +1,14 @@
+/*
+*	Just an Amiga Workbench look and feel clone, written in Javascript.
+*	Copyright 2022 by Jan Renken, Hamburg
+*	
+*	This software is licensed under the GNU General Public License Version 3.0.
+*
+*	So feel free to use, modify and distribute it.
+*
+*	Amiga for life...
+*/
+
 "use strict";
 
 // Creates workbench menu
