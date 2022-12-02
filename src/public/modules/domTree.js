@@ -13,8 +13,8 @@
 
 // Fluent node creation interface
 export var createNode = (name, doc) => {
-    var instance = ((name, doc) => {
-        var node = (doc || document).createElement(name);
+    let instance = ((name, doc) => {
+        let node = (doc || document).createElement(name);
         
         return {
             id : id => {
@@ -28,7 +28,7 @@ export var createNode = (name, doc) => {
             },
             
             style : style => {
-                for(var setting in style)
+                for(let setting in style)
                     node.style[setting]=style[setting];
                 return instance;
             },
@@ -54,7 +54,7 @@ export var createNode = (name, doc) => {
             },
             
             data : dataset => {
-                for(var record in dataset)
+                for(let record in dataset)
                     node.dataset[record]=dataset[record];
                 return instance;
             },

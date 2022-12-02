@@ -1,29 +1,27 @@
 "use strict";
 
-// Manages workbench windows
-export var windowFactory = createNode => {
-    var createNode = createNode;
-
-    var createMenu = (items, id) =>
+// Creates workbench menu
+export var menuFactory = (createNode, textConverter) => {
+    let createMenu = (items, id, openWindowsCount) =>
 	{
 		if(!items)
 			return null;
 
-		var create = (items, id) => {
-			var menu = createNode("div").id("menu-" + id).getNode();
-			for(var itemIndex in items)
+		let create = (items, id) => {
+			let menu = createNode("div").id("menu-" + id).getNode();
+			for(let itemIndex in items)
 			{
-				var item = items[itemIndex];
-				var dropdown = createNode("div").class("dropdown").appendTo(menu).getNode();
-				var title = textConverter().convertText(item.name, textConverter().fontColor.blueOnWhite);
+				let item = items[itemIndex];
+				let dropdown = createNode("div").class("dropdown").appendTo(menu).getNode();
+				let title = textConverter().convertText(item.name, textConverter().fontColor.blueOnWhite);
 				createNode("button").class("dropdown-title").appendTo(dropdown).innerHtml(title).getNode();
 				
-				var content = createNode("div").class("dropdown-content").appendTo(dropdown).getNode();
-				for(var entryId in item.entries)
+				let content = createNode("div").class("dropdown-content").appendTo(dropdown).getNode();
+				for(let entryId in item.entries)
 				{
-					var entry = item.entries[entryId];
-					var enabled = entry.conditions === "true";			
-					var text = textConverter().convertText(entry.name, enabled ? textConverter().fontColor.blueOnWhite : textConverter().fontColor.blueOnWhiteInactive);
+					let entry = item.entries[entryId];
+					let enabled = entry.conditions === "true";			
+					let text = textConverter().convertText(entry.name, enabled ? textConverter().fontColor.blueOnWhite : textConverter().fontColor.blueOnWhiteInactive);
 					createNode("div").class(enabled ? "dropdown-entry" : "dropdown-entry-disabled")
 						.appendTo(content)
 						.innerHtml(text)
@@ -38,10 +36,10 @@ export var windowFactory = createNode => {
 			return menu;
 		};
 		
-		var enableMenu = (node, enable) => {
-			for(var i=0; i < node.children.length; i++)
+		let enableMenu = (node, enable) => {
+			for(let i=0; i < node.children.length; i++)
 			{
-				var child = node.children[i];
+				let child = node.children[i];
 				enableMenu(child, enable);				
 	
 				if(!child.className.includes("dropdown-entry"))
@@ -50,20 +48,20 @@ export var windowFactory = createNode => {
 				if(child.dataset.conditions === "true")
 					continue;
 
-				var isEnabled = enabled && enable && checkConditions(child.dataset.conditions);
+				let isEnabled = enabled && enable && checkConditions(child.dataset.conditions);
 				child.className = isEnabled ? "dropdown-entry": "dropdown-entry-disabled";
 				setMenuEntryColor(child, isEnabled ? textConverter().fontColor.blueOnWhite : textConverter().fontColor.blueOnWhiteInactive);
 				child.dataset.isEnabled = isEnabled;
 			}
 		};
 
-		var checkConditions = conditionString => {
+		let checkConditions = conditionString => {
 			if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
 				return false;
 
-			var selectedId = oldSelectedElement.dataset.id;
-			var record = registry[selectedId];
-			var conditions = JSON.parse(conditionString);
+			let selectedId = oldSelectedElement.dataset.id;
+			let record = registry[selectedId];
+			let conditions = JSON.parse(conditionString);
 			return conditions.every(condition => {
 				if(condition.operand === "greaterThan")
 					return record[condition.property] > condition.value;
@@ -71,18 +69,18 @@ export var windowFactory = createNode => {
 			});
 		};
 		
-		var update = () => {		
+		let update = (openWindowsCount) => {		
 			menu.childNodes.forEach(node => {
-				node.childNodes[1].style.zIndex = openOrder.length + 2;
+				node.childNodes[1].style.zIndex = openWindowsCount + 2;
 			});
 
 			if(enabled)
 				enableMenu(menu, true);
 		};
 		
-		var enabled = false;
-		var menu = create(items, window);
-		update();
+		let enabled = false;
+		let menu = create(items, id);
+		update(openWindowsCount);
 		
 		return  {			
 			id : id,
@@ -100,7 +98,7 @@ export var windowFactory = createNode => {
 				enableMenu(menu, false)
 			},
 
-			updateMenu : () => update()
+			updateMenu : openWindowsCount => update(openWindowsCount)
 		};
 	};
     
