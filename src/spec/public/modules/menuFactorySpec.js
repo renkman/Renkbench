@@ -1,11 +1,12 @@
+"use strict";
+
 import { menuFactory } from "../../../public/modules/menuFactory.js";
 import { textConverter } from "../../../public/modules/text.js";
 
-
 describe("menuFactory tests", function () {
-    var domTreeMock = (name, doc) => {
-        var instance = (name => {
-            var node = {
+    let domTreeMock = (name, doc) => {
+        let instance = (name => {
+            let node = {
                 name: name,
                 id: null,
                 class: null,
@@ -39,7 +40,7 @@ describe("menuFactory tests", function () {
                 },
 
                 data: dataset => {
-                    for (var record in dataset)
+                    for (let record in dataset)
                         node.dataset[record] = dataset[record];
                     return instance;
                 },
@@ -50,7 +51,7 @@ describe("menuFactory tests", function () {
             };
         })(name, doc);
         return instance;
-    }
+    };
 
 
     it("menuFactory is not null", function () {
@@ -62,7 +63,7 @@ describe("menuFactory tests", function () {
     });
 
     it("menuFactory creates a workbench menu", function () {
-        var menuItems = [
+        let menuItems = [
             {
                 name: "Amiga",
                 entries: [
@@ -90,7 +91,7 @@ describe("menuFactory tests", function () {
             }
         ];
 
-        var expected = {
+        let expected = {
             name: "div",
             id: "menu-1",
             class: null,
@@ -222,8 +223,8 @@ describe("menuFactory tests", function () {
             dataset: {}
         };
 
-        var factory = menuFactory(domTreeMock, textConverter);
-        var menu = factory.createMenu(menuItems, 1, 3);
+        let factory = menuFactory(domTreeMock, textConverter);
+        let menu = factory.createMenu(menuItems, 1, 3);
      
         expect(menu).not.toBe(null);
         expect(menu.id).toBe(1);

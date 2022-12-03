@@ -1,11 +1,13 @@
+"use strict";
+
 import { iconFactory } from "../../../public/modules/iconFactory.js";
 import { textConverter } from "../../../public/modules/text.js";
 
-
 describe("iconFactory tests", function () {
-    var domTreeMock = (name, doc) => {
-        var instance = ((name, doc) => {
-            var node = {
+    let domTreeMock = (name, doc) => {
+        let instance = (name => {
+            let node = {
+                name: name,
                 id: "Id",
                 class: "Class",
                 style: {
@@ -15,7 +17,7 @@ describe("iconFactory tests", function () {
                     right: "0px"
 
                 },
-                children: [],
+                childNodes: [],
                 innerHTML: "",
                 dataset: {},
                 offsetWidth: 42,
@@ -39,7 +41,7 @@ describe("iconFactory tests", function () {
                 },
 
                 append: child => {
-                    node.children.push(child);
+                    node.childNodes.push(child);
                     return instance;
                 },
 
@@ -49,7 +51,7 @@ describe("iconFactory tests", function () {
                 },
 
                 data: dataset => {
-                    for (var record in dataset)
+                    for (let record in dataset)
                         node.dataset[record] = dataset[record];
                     return instance;
                 },
@@ -60,7 +62,7 @@ describe("iconFactory tests", function () {
             };
         })(name, doc);
         return instance;
-    }
+    };
 
 
     it("iconFactory is not null", function () {
@@ -72,7 +74,7 @@ describe("iconFactory tests", function () {
     });
 
     it("iconFactory creates a workbench icon", function () {
-        var properties = {
+        let properties = {
             title: "Workbench",
             image: {
                 file: "workbench.png",
@@ -84,10 +86,10 @@ describe("iconFactory tests", function () {
                 height: 42,
                 width: 42
             }
-        }
+        };
 
-        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
-        var icon = factory.createIcon(500, properties, true, 20);
+        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let icon = factory.createIcon(500, properties, true, 20);
 
         expect(icon).not.toBe(null);
         expect(icon.title).toBe(properties.title);
@@ -96,10 +98,11 @@ describe("iconFactory tests", function () {
         expect(icon.imageSelected).toBe("images/icons/workbench_selected.png");
         expect(icon.initX).toBe(20);
         expect(icon.element.id).toBe("icon_500");
+        expect(icon.element.name).toBe("div");
     });
 
     it("iconFactory creates a window icon", function () {
-        var properties = {
+        let properties = {
             title: "Shell",
             image: {
                 file: "shell.png",
@@ -111,10 +114,10 @@ describe("iconFactory tests", function () {
                 height: 42,
                 width: 42
             }
-        }
+        };
 
-        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
-        var icon = factory.createIcon(1000, properties, false, 0);
+        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let icon = factory.createIcon(1000, properties, false, 0);
 
         expect(icon).not.toBe(null);
         expect(icon.title).toBe(properties.title);
@@ -123,10 +126,11 @@ describe("iconFactory tests", function () {
         expect(icon.imageSelected).toBe("images/icons/shell_selected.png");
         expect(icon.initX).toBe(0);
         expect(icon.element.id).toBe("icon_1000");
+        expect(icon.element.name).toBe("div");
     });
 
     it("icon.setIconSize sets height and width", function () {
-        var properties = {
+        let properties = {
             title: "Workbench",
             image: {
                 file: "workbench.png",
@@ -138,10 +142,10 @@ describe("iconFactory tests", function () {
                 height: 42,
                 width: 42
             }
-        }
+        };
 
-        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
-        var icon = factory.createIcon(500, properties, true, 20);
+        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setIconSize();
 
@@ -150,7 +154,7 @@ describe("iconFactory tests", function () {
     });
 
     it("icon.setPositionLeft sets left x position", function () {
-        var properties = {
+        let properties = {
             title: "Workbench",
             image: {
                 file: "workbench.png",
@@ -162,12 +166,12 @@ describe("iconFactory tests", function () {
                 height: 42,
                 width: 42
             }
-        }
+        };
 
         const left = "20px";
 
-        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
-        var icon = factory.createIcon(500, properties, true, 20);
+        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setPositionLeft(left);
 
@@ -175,7 +179,7 @@ describe("iconFactory tests", function () {
     });
 
     it("icon.setPositionRight sets right x position", function () {
-        var properties = {
+        let properties = {
             title: "Workbench",
             image: {
                 file: "workbench.png",
@@ -187,12 +191,12 @@ describe("iconFactory tests", function () {
                 height: 42,
                 width: 42
             }
-        }
+        };
 
         const right = "20px";
         
-        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
-        var icon = factory.createIcon(500, properties, true, 20);
+        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setPositionRight(right);
 
@@ -200,7 +204,7 @@ describe("iconFactory tests", function () {
     });
 
     it("icon.setPositionTop sets top y position", function () {
-        var properties = {
+        let properties = {
             title: "Workbench",
             image: {
                 file: "workbench.png",
@@ -212,12 +216,12 @@ describe("iconFactory tests", function () {
                 height: 42,
                 width: 42
             }
-        }
+        };
 
         const top = "40px";
 
-        var factory = iconFactory(domTreeMock, textConverter, "images/icons");
-        var icon = factory.createIcon(500, properties, true, 20);
+        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setPositionTop(top);
 

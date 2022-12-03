@@ -1,3 +1,5 @@
+"use strict";
+
 import jsdom from "jsdom";
 import {createNode} from "../../../public/modules/domTree.js";
 

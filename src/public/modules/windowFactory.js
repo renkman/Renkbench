@@ -1,14 +1,13 @@
 "use strict";
 
 // Creates workbench windows
-export var windowFactory = (createNode, textConverter) => {
-    var createNode = createNode;
-    var textConverter = textConverter;
-
+export var windowFactory = (createNode, textConverter, workbenchElement) => {
     //Creates a window and its content
-    var createWindow = properties => {
-        return {
-            id: 0,
+    let createWindow = (id, properties) => {
+
+        let window = {
+            id: id,
+
             name: properties.title,
 
             //The DOM-element of this window
@@ -62,88 +61,6 @@ export var windowFactory = (createNode, textConverter) => {
 
             // Insert mode for form keyboard input
             insertMode: true,
-
-            init: function () {
-                // Create div element and set background source file
-                this.element = createNode("div").class("window").
-                    id("window_").
-                    style({ visibility: "hidden" }).
-                    // Set custom css properties if there are any.								
-                    style(properties.css).
-                    tabIndex(0).
-                    appendTo(element.parentNode).getNode();
-
-                // Create title bar
-                /*
-                * DOM-Structure:
-                *	<div class="titleBar">
-                *		<div class="fillerWhiteLeft" />
-                *		<div class="fillerBlueLeft" />
-                *		<div class="buttonClose" />
-                *		<div class="fillerBlueLeft" />
-                *		<div class="title" />
-                *		<div class="fillerWhiteRight" />
-                *		<div class="fillerBlueRight" />
-                *		<div class="buttonUp" />
-                *		<div class="fillerBlueRight" />
-                *		<div class="buttonDown" />
-                *		<div class="fillerBlueRight" />
-                *		<div class="fillerWhiteRight" />
-                *	</div>
-                */
-                var title = textConverter().convertText(this.name, textConverter().fontColor["blueOnWhite"]);
-                var titleInactive = textConverter().convertText(this.name, textConverter().fontColor["blueOnWhiteInactive"]);
-
-                var titleBar = createNode("div").class("titleBar").appendTo(this.element).getNode();
-                createNode("div").class("fillerWhiteLeft").appendTo(titleBar);
-                createNode("div").class("fillerBlueLeft").appendTo(titleBar);
-                createNode("div").class("buttonClose").appendTo(titleBar);
-                createNode("div").class("fillerBlueLeft").appendTo(titleBar);
-                this.title = createNode("div").class("title").appendTo(titleBar).innerHtml(title).getNode();
-                this.titleInactive = createNode("div").class("titleInactive").appendTo(titleBar).innerHtml(titleInactive).getNode();
-                createNode("div").class("fillerWhiteRight_1").appendTo(titleBar);
-                createNode("div").class("fillerBlueRight").appendTo(titleBar);
-                createNode("div").class("buttonUp").appendTo(titleBar);
-                createNode("div").class("fillerBlueRight").appendTo(titleBar);
-                createNode("div").class("buttonDown").appendTo(titleBar);
-                createNode("div").class("fillerBlueRight").appendTo(titleBar);
-                createNode("div").class("fillerWhiteRight").appendTo(titleBar);
-
-                // Foreach titlebar child node: this.minWidth+=parseInt(element.style.width?element.style.width:0);
-                // this.element.style.width=this.minWidth+"px";
-
-                // Create vertical scrollbar
-                var scrollbarVertical = createNode("div").class("scrollbarVertical").appendTo(this.element).getNode();
-                createNode("div").class("scrollButtonUp").appendTo(scrollbarVertical).getNode();
-                var scrollSpaceVertical = createNode("div").class("scrollSpaceVertical").appendTo(scrollbarVertical).getNode();
-                createNode("div").class("scrollButtonVertical").appendTo(scrollSpaceVertical).getNode();
-                createNode("div").class("scrollButtonDown").appendTo(scrollbarVertical).getNode();
-
-                this.scrollbar.vertical = scrollbarVertical;
-
-                //Create horizontal scrollbar
-                var scrollbarHorizontal = createNode("div").class("scrollbarHorizontal").appendTo(this.element).getNode();
-                createNode("div").class("scrollButtonLeft").appendTo(scrollbarHorizontal).getNode();
-                var scrollSpaceHorizontal = createNode("div").class("scrollSpaceHorizontal").appendTo(scrollbarHorizontal).getNode();
-                createNode("div").class("scrollButtonHorizontal").appendTo(scrollSpaceHorizontal).getNode();
-                createNode("div").class("scrollButtonRight").appendTo(scrollbarHorizontal).getNode();
-
-                this.scrollbar.horizontal = scrollbarHorizontal;
-
-                // Add resize button the window
-                this.buttonResize = createNode("div").class("buttonResize").appendTo(this.element).getNode();
-
-                // Add viewport
-                this.viewport = createNode("div").class("viewport").appendTo(this.element).getNode();
-                //console.debug("Id: %i, minWidth: %i",this.id,this.minWidth);
-            },
-
-            // Sets the registry id of the current window
-            setId: function (id) {
-                this.id = id;
-                this.element.id += id;
-                this.element.dataset["id"] = id;
-            },
 
             //Sets the start position of the window
             setPosition: function () {
@@ -648,6 +565,85 @@ export var windowFactory = (createNode, textConverter) => {
                     this.activeForm.removeChild(character[0]);
             }
         };
+        init(window, properties);
+
+        return window;
+    };
+
+    let init = function(window, properties) {
+        // Create div element and set background source file
+        window.element = createNode("div").class("window").
+            id("window_" + window.id).
+            style({ visibility: "hidden" }).
+            // Set custom css properties if there are any.								
+            style(properties.css).
+            tabIndex(0).
+            appendTo(workbenchElement.parentNode).
+            data({id:window.id}).getNode();
+
+        // Create title bar
+        /*
+        * DOM-Structure:
+        *	<div class="titleBar">
+        *		<div class="fillerWhiteLeft" />
+        *		<div class="fillerBlueLeft" />
+        *		<div class="buttonClose" />
+        *		<div class="fillerBlueLeft" />
+        *		<div class="title" />
+        *		<div class="fillerWhiteRight" />
+        *		<div class="fillerBlueRight" />
+        *		<div class="buttonUp" />
+        *		<div class="fillerBlueRight" />
+        *		<div class="buttonDown" />
+        *		<div class="fillerBlueRight" />
+        *		<div class="fillerWhiteRight" />
+        *	</div>
+        */
+        var title = textConverter().convertText(window.name, textConverter().fontColor["blueOnWhite"]);
+        var titleInactive = textConverter().convertText(window.name, textConverter().fontColor["blueOnWhiteInactive"]);
+
+        var titleBar = createNode("div").class("titleBar").appendTo(window.element).getNode();
+        createNode("div").class("fillerWhiteLeft").appendTo(titleBar);
+        createNode("div").class("fillerBlueLeft").appendTo(titleBar);
+        createNode("div").class("buttonClose").appendTo(titleBar);
+        createNode("div").class("fillerBlueLeft").appendTo(titleBar);
+        window.title = createNode("div").class("title").appendTo(titleBar).innerHtml(title).getNode();
+        window.titleInactive = createNode("div").class("titleInactive").appendTo(titleBar).innerHtml(titleInactive).getNode();
+        createNode("div").class("fillerWhiteRight_1").appendTo(titleBar);
+        createNode("div").class("fillerBlueRight").appendTo(titleBar);
+        createNode("div").class("buttonUp").appendTo(titleBar);
+        createNode("div").class("fillerBlueRight").appendTo(titleBar);
+        createNode("div").class("buttonDown").appendTo(titleBar);
+        createNode("div").class("fillerBlueRight").appendTo(titleBar);
+        createNode("div").class("fillerWhiteRight").appendTo(titleBar);
+
+        // Foreach titlebar child node: window.minWidth+=parseInt(element.style.width?element.style.width:0);
+        // window.element.style.width=window.minWidth+"px";
+
+        // Create vertical scrollbar
+        var scrollbarVertical = createNode("div").class("scrollbarVertical").appendTo(window.element).getNode();
+        createNode("div").class("scrollButtonUp").appendTo(scrollbarVertical).getNode();
+        var scrollSpaceVertical = createNode("div").class("scrollSpaceVertical").appendTo(scrollbarVertical).getNode();
+        createNode("div").class("scrollButtonVertical").appendTo(scrollSpaceVertical).getNode();
+        createNode("div").class("scrollButtonDown").appendTo(scrollbarVertical).getNode();
+
+        window.scrollbar.vertical = scrollbarVertical;
+
+        //Create horizontal scrollbar
+        var scrollbarHorizontal = createNode("div").class("scrollbarHorizontal").appendTo(window.element).getNode();
+        createNode("div").class("scrollButtonLeft").appendTo(scrollbarHorizontal).getNode();
+        var scrollSpaceHorizontal = createNode("div").class("scrollSpaceHorizontal").appendTo(scrollbarHorizontal).getNode();
+        createNode("div").class("scrollButtonHorizontal").appendTo(scrollSpaceHorizontal).getNode();
+        createNode("div").class("scrollButtonRight").appendTo(scrollbarHorizontal).getNode();
+
+        window.scrollbar.horizontal = scrollbarHorizontal;
+
+        // Add resize button the window
+        window.buttonResize = createNode("div").class("buttonResize").appendTo(window.element).getNode();
+
+        // Add viewport
+        window.viewport = createNode("div").class("viewport").appendTo(window.element).getNode();
+        //console.debug("Id: %i, minWidth: %i",this.id,this.minWidth);      
     };
 
     return {

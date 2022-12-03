@@ -1,21 +1,17 @@
 "use strict";
 
 // Manages workbench windows
-export var windowsRegistry = ((httpClient, windowFactory, menuFactory, iconFactory) => {
-    var registry = [];
-    var httpClient = httpClient;
-    var windowFactory = windowFactory;
-    var menuFactory = menuFactory;
-    var iconFactory = iconFactory;
+export var windowsRegistry = (httpClient, windowFactory, menuFactory, iconFactory) => {
+    let registry = [];
 
-    var loadWindow = (url, id) => {
-        var id = id || 0;
+    let loadWindow = (url, id) => {
+        let id = id || 0;
         httpClient.getJson(url + "/" + id)
             .then(addWindow)
             .catch(console.error);
     };
 
-    var addWindow = window => {
+    let addWindow = window => {
         if(registry.filter(w => w.id == window.id).length > 0)
             return;
 
@@ -24,7 +20,7 @@ export var windowsRegistry = ((httpClient, windowFactory, menuFactory, iconFacto
             registerWindow(window.window, window.icons, pid, window.menu, window.content);
         }
         else if (window.children && window.children.length) {
-            var newPid = registerWindow(window.window, window.icons, pid);
+            let newPid = registerWindow(window.window, window.icons, pid);
             addWindow(window.children, newPid);
         }
 
@@ -36,13 +32,13 @@ export var windowsRegistry = ((httpClient, windowFactory, menuFactory, iconFacto
     };
 
     //Adds a window and its icon to the registry
-    var registerWindow = (windowProperties, imageProperties, pid, menuProperties, content) => {
+    let registerWindow = (windowProperties, imageProperties, pid, menuProperties, openWindowsCount, content, isDisk, initX) => {
         // console.debug(windowProperties);
         if (typeof pid !== "number")
             pid = 0;
 
         //Create items
-        var window = windowFactory.createWindow(windowProperties);
+        let window = windowFactory.createWindow(windowProperties);
         window.init();
 
         //Fill the window with content
@@ -56,15 +52,13 @@ export var windowsRegistry = ((httpClient, windowFactory, menuFactory, iconFacto
             window.setIconArea();
 
         //Set window id and add items to registry
-        var id = registry.length;
+        let id = registry.length;
         window.setId(id);
 
         // Create the window related context menu	
-        var menu = menuFactory.createMenu(menuProperties, id);
+        let menu = menuFactory.createMenu(menuProperties, id, openWindowsCount);
 
-        var icon = iconFactory.createIcon(imageProperties);
-        icon.init(id, pid);
-        icon.element.id += id;
+        let icon = iconFactory.createIcon(id, imageProperties, isDisk, initX);
 
         registry.push({
             id: id,
@@ -85,4 +79,4 @@ export var windowsRegistry = ((httpClient, windowFactory, menuFactory, iconFacto
     return {
         loadWindow: loadWindow
     };
-})();
+};
