@@ -1077,7 +1077,7 @@ import {httpClient} from "./modules/httpClient.js";
 		};
 		
 		var enabled = false;
-		var menu = create(items, window);
+		var menu = create(items, id);
 		update();
 		
 		return  {			
