@@ -18,7 +18,7 @@ jobs:
       run: |
         cd src
         docker-compose -f docker/docker-compose.yml up test-backend
-        # docker cp test-backend:/src/api/coverage.out ./
+        docker cp test-backend:/src/api/coverage.out ./
 
     - name: Frontend unit tests
       run: |

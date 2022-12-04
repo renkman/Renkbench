@@ -26,4 +26,4 @@ FROM build as test
 
 WORKDIR /src/api
 
-CMD [ "go", "test", "-v", "-coverprofile=coverage.out", "-covermode=count", "./..." ]
+CMD [ "go", "test", "-v", "-coverprofile=coverage.out", "-covermode=atomic", "./..." ]
