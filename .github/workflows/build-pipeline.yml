@@ -27,7 +27,7 @@ jobs:
 
     - name: Copy frontend coverage results
       run: |
-        docker container cp docker_test-frontend_1:/src/coverage/ ../converage
+        docker container cp docker_test-frontend_1:/src/coverage/ ../coverage
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
