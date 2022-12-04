@@ -25,6 +25,13 @@ jobs:
         cd src
         docker-compose -f docker/docker-compose.yml up test-frontend
 
+    - name: Copy frontend coverage results
+      run: |
+        docker container cp docker_test-frontend_1:/src/coverage/ ../converage
+
+    - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v2
+
     - name: Docker cleanup
       run: |
         cd src
