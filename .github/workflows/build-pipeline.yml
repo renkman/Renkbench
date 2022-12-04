@@ -30,7 +30,7 @@ jobs:
         docker container cp docker_test-frontend_1:/src/coverage/ ../converage
 
     - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v2
 
     - name: Docker cleanup
       run: |
