@@ -5,7 +5,7 @@
   "main": "./public/workbench.js",
   "type":"module",
   "scripts": {
-    "test": "c8 --all -r -reporter=text-lcov jasmine"
+    "test": "c8 --all --reporter=lcov jasmine"
   },
   "repository": {
     "type": "git",
