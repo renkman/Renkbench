@@ -1,5 +1,6 @@
 # Renkbench
 [![Renkbench CI](https://github.com/renkman/Renkbench/actions/workflows/build-pipeline.yml/badge.svg)](https://github.com/renkman/Renkbench/actions/workflows/build-pipeline.yml)
+[![codecov](https://codecov.io/gh/renkman/Renkbench/branch/master/graph/badge.svg?token=0F0MCE7J21)](https://codecov.io/gh/renkman/Renkbench)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/lachsfilet/Renkbench/blob/master/LICENSE)
 
 ![Screenshot](renkbench.png)
