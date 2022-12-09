@@ -19,7 +19,7 @@ describe("windowFactory tests", function () {
         expect(windowFactory).toEqual(jasmine.any(Function));
     });
 
-    it("windowFactory creates a window icon", function () {
+    it("windowFactory.createWindow creates a window", function () {
         const id = 4000;
 
         let properties = {

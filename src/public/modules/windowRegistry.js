@@ -9,16 +9,16 @@
 
 
 // Manages workbench windows
-export var windowsRegistry = (windowFactory, menuFactory, iconFactory) => {
+export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
     let openWindowsCount = 0;
 
-    let addIcon = iconContract => {
+    let addIcon = (iconContract, pid, initX) => {
         let icon = getIcon(iconContract.id);
         if(icon)
             return;
-        
-        icon = createIcon(iconContract, initX);        
+        let isDisk = pid === 0;
+        icon = createIcon(iconContract, initX, isDisk);
         registerIcon(iconContract.id, icon, pid);
     };
 
@@ -41,8 +41,8 @@ export var windowsRegistry = (windowFactory, menuFactory, iconFactory) => {
         registerWindow(id, window, menu);
 
         for (let child of windowContract.children) {
-            let icon = createIcon(child, initX);
-            registerIcon(child.id, icon, pid);
+            let icon = createIcon(child.icons, initX);
+            registerIcon(child.id, icon, windowContract.pid);
             window.addIcon(icon);
         }
 
@@ -50,7 +50,7 @@ export var windowsRegistry = (windowFactory, menuFactory, iconFactory) => {
         // console.debug("PID: %i",pid);
         let parent = get(window.pid);
         parent.window.arrangeIcons();
-        if (window.pid > 0)
+        if (windowContract.pid > 0)
             parent.window.setPosition();
     };
 
@@ -83,20 +83,18 @@ export var windowsRegistry = (windowFactory, menuFactory, iconFactory) => {
         return window;
     };
 
-    let createIcon = (windowContract, initX) => {
-        let isDisk = pid === 0;
-        let icon = iconFactory.createIcon(windowContract.id, windowContract.icons, isDisk, initX);
+    let createIcon = (iconContract, initX, isDisk) => {
+        let icon = iconFactory.createIcon(iconContract.id, iconContract, isDisk, initX);
         return icon;
     };
 
     // Create the window related context menu	
-    let createMenu = (id, menu) => {
-        let menu = menuFactory.createMenu(menu, id, openWindowsCount);
+    let createMenu = (id, menuContract) => {
+        let menu = menuFactory.createMenu(menuContract, id, openWindowsCount);
         return menu;
     };
 
     let registerIcon = (id, icon, pid) => {
-        // console.debug(windowProperties);
         if (typeof pid !== "number")
             pid = 0;
 
@@ -110,9 +108,6 @@ export var windowsRegistry = (windowFactory, menuFactory, iconFactory) => {
             isTrashcan: false,
             isOpened: false
         });
-        //console.dir(this.registry);
-        //console.debug("Id: %i",window.id);
-        //this.arrangeIcons();
     };
 
     let registerWindow = (id, window, menu) => {

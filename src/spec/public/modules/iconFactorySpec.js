@@ -73,7 +73,7 @@ describe("iconFactory tests", function () {
         expect(iconFactory).toEqual(jasmine.any(Function));
     });
 
-    it("iconFactory creates a workbench icon", function () {
+    it("iconFactory.createIcon creates a workbench icon", function () {
         let properties = {
             title: "Workbench",
             image: {
@@ -101,7 +101,7 @@ describe("iconFactory tests", function () {
         expect(icon.element.name).toBe("div");
     });
 
-    it("iconFactory creates a window icon", function () {
+    it("iconFactory.createIcon creates a window icon", function () {
         let properties = {
             title: "Shell",
             image: {
