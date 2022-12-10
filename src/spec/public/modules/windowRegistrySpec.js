@@ -153,16 +153,19 @@ describe("windowRegistry tests", function () {
             "window": {
                 "title": "Homecomputers"
             },
-            "menu":["Amiga 500", "CPC 464"],
+            "menu": ["Amiga 500", "CPC 464"],
             "children": []
         };
 
+        let called = false;
         let windowFactory = {
             createWindow: (id, properties) => {
                 return {
                     id: id,
                     title: properties.title,
-                    setIconArea: () => { }
+                    setIconArea: () => {
+                        called = true;
+                    }
                 };
             }
         };
@@ -191,5 +194,94 @@ describe("windowRegistry tests", function () {
 
         expect(menu).not.toBe(null);
         expect(menu.items).toBe(windowContract.menu);
+        expect(called).toBe(true);
+    });
+
+    it("windowRegistry.addWindow adds and gets a window with content", function () {
+        let windowContract = {
+            "id": 4000,
+            "pid": 0,
+            "window": {
+                "title": "Amiga"
+            },
+            "content": {},
+            "children": []
+        };
+
+        let called = false;
+        let windowFactory = {
+            createWindow: (id, properties) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setContent: () => {
+                        called = true;
+                    }
+                };
+            }
+        };
+
+        let menuFactory = {};
+        let iconFactory = {
+            createIcon: (id, iconContract, isDisk, initX) => {
+                return {};
+            }
+        };
+
+        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon(windowContract.id, {}, 0, 12);
+
+        registry.addWindow(windowContract, 12);
+        let window = registry.getWindow(windowContract.id);
+        let menu = registry.getMenu(windowContract.id);
+
+        expect(window).not.toBe(null);
+        expect(window.id).toBe(windowContract.id);
+        expect(called).toBe(true);
+    });
+
+    it("windowRegistry.addWindow adds and gets a window with file content", function () {
+        let windowContract = {
+            "id": 4000,
+            "pid": 0,
+            "window": {
+                "title": "Amiga"
+            },
+            "content": {
+                "type": "file"
+            },
+            "children": []
+        };
+
+        let called = false;
+        let windowFactory = {
+            createWindow: (id, properties) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setDownload: () => {
+                        called = true;
+                    }
+                };
+            }
+        };
+
+        let menuFactory = {};
+        let iconFactory = {
+            createIcon: (id, iconContract, isDisk, initX) => {
+                return {};
+            }
+        };
+
+        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon(windowContract.id, {}, 0, 12);
+
+        registry.addWindow(windowContract, 12);
+        let window = registry.getWindow(windowContract.id);
+        let menu = registry.getMenu(windowContract.id);
+
+        expect(window).not.toBe(null);
+        expect(window.id).toBe(windowContract.id);
+        expect(called).toBe(true);
     });
 });
