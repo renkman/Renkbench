@@ -15,9 +15,8 @@ describe("windowRegistry tests", function () {
         const id = 1000;
 
         let iconContract = {
-            id: id,
-            title: "Renkbench", 
-            image: { 
+            title: "Renkbench",
+            image: {
                 file: "workbench.png",
                 width: 35,
                 height: 30
@@ -32,25 +31,165 @@ describe("windowRegistry tests", function () {
         let windowFactory = {};
         let menuFactory = {};
         let iconFactory = {
-            createIcon(id, iconContract, isDisk, initX) {
+            createIcon: (id, iconContract, isDisk, initX) => {
                 return {
-                    id : id,
-                    fileNames : [ iconContract.image.file, iconContract.imageSelected.file ],
-                    isDisk : isDisk,
+                    id: id,
+                    fileNames: [iconContract.image.file, iconContract.imageSelected.file],
+                    isDisk: isDisk,
                     initX: initX
-                }
+                };
             }
         };
 
-
         let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon(iconContract, 0, 12);
-        var icon = registry.getIcon(id);
+        registry.addIcon(id, iconContract, 0, 12);
+        let icon = registry.getIcon(id);
 
         expect(icon).not.toBe(null);
         expect(icon.id).toBe(id);
         expect(icon.isDisk).toBe(true);
         expect(icon.initX).toBe(12);
         expect(icon.fileNames).toEqual(["workbench.png", "workbench_selected.png"]);
+    });
+
+    it("windowRegistry.addIcon adds same icon only once", function () {
+        const id = 1000;
+
+        let iconContract = {
+            title: "Renkbench",
+            image: {
+                file: "workbench.png",
+                width: 35,
+                height: 30
+            },
+            imageSelected: {
+                file: "workbench_selected.png",
+                width: 35,
+                height: 30
+            }
+        };
+
+        let windowFactory = {};
+        let menuFactory = {};
+
+        let callCount = 0;
+        let iconFactory = {
+            createIcon: (id, iconContract, isDisk, initX) => {
+                callCount++;
+                return {
+                    id: id,
+                    fileNames: [iconContract.image.file, iconContract.imageSelected.file],
+                    isDisk: isDisk,
+                    initX: initX
+                };
+            }
+        };
+
+        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon(id, iconContract, 0, 12);
+        let icon = registry.getIcon(id);
+        registry.addIcon(id, iconContract, 0, 12);
+        icon = registry.getIcon(id);
+
+        expect(icon).not.toBe(null);
+        expect(icon.id).toBe(id);
+        expect(callCount).toBe(1);
+        expect(icon.isDisk).toBe(true);
+        expect(icon.initX).toBe(12);
+        expect(icon.fileNames).toEqual(["workbench.png", "workbench_selected.png"]);
+    });
+
+    it("windowRegistry.addWindow adds and gets a window without child icons", function () {
+        let windowContract = {
+            "id": 2,
+            "pid": 0,
+            "window": {
+                "title": "Amiga"
+            },
+            "children": []
+        };
+
+        let windowFactory = {
+            createWindow: (id, properties) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setIconArea: () => { }
+                };
+            }
+        };
+
+        let called = false;
+        let menuFactory = {
+            createMenu: (items, id, openWindowsCount) => {
+                called = true;
+                return {};
+            }
+        };
+
+        let iconFactory = {
+            createIcon: (id, iconContract, isDisk, initX) => {
+                return {};
+            }
+        };
+
+        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon(windowContract.id, {}, 0, 12);
+
+        registry.addWindow(windowContract, 12);
+        let window = registry.getWindow(windowContract.id);
+        let menu = registry.getMenu(windowContract.id);
+
+        expect(window).not.toBe(null);
+        expect(window.id).toBe(windowContract.id);
+        expect(called).toBe(false);
+        expect(menu).toBe(null);
+    });
+
+    it("windowRegistry.addWindow adds a window and gets a menu", function () {
+        let windowContract = {
+            "id": 2,
+            "pid": 0,
+            "window": {
+                "title": "Homecomputers"
+            },
+            "menu":["Amiga 500", "CPC 464"],
+            "children": []
+        };
+
+        let windowFactory = {
+            createWindow: (id, properties) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setIconArea: () => { }
+                };
+            }
+        };
+
+        let menuFactory = {
+            createMenu: (items, id, openWindowsCount) => {
+                return {
+                    items: items,
+                    id: id,
+                    openWindowsCount: openWindowsCount
+                }
+            }
+        };
+
+        let iconFactory = {
+            createIcon: (id, iconContract, isDisk, initX) => {
+                return {};
+            }
+        };
+
+        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon(windowContract.id, {}, 0, 12);
+
+        registry.addWindow(windowContract, 12);
+        let menu = registry.getMenu(windowContract.id);
+
+        expect(menu).not.toBe(null);
+        expect(menu.items).toBe(windowContract.menu);
     });
 });
