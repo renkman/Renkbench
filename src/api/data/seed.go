@@ -18,9 +18,10 @@ func Seed(client *mongo.Client, ctx context.Context) {
 
 func seedWindows(client *mongo.Client, ctx context.Context) {
 	collection := client.Database("renkbench").Collection("windows")
-	result, err := collection.InsertOne(ctx, model.Window{nil, 1, 0,
-		model.Icon{"Renkbench", model.Image{"workbench.png", 35, 30}, model.Image{"workbench_selected.png", 35, 30}},
-		model.WindowMetaInfo{"Renkbench"}, nil, nil})
+
+	result, err := collection.InsertOne(ctx, model.Window{nil, 0, -1, model.WindowMetaInfo{"Renkbench"}, nil, &[]model.Icon{
+		model.Icon{1, "Renkbench", model.Image{"workbench.png", 35, 30}, model.Image{"workbench_selected.png", 35, 30}},
+		model.Icon{2, "Double click me!", model.Image{"disk.png", 32, 32}, model.Image{"disk_selected.png", 32, 32}}}})
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -33,14 +34,33 @@ func seedWindows(client *mongo.Client, ctx context.Context) {
 	}
 
 	data := []interface{}{
-		model.Window{nil, 2, 0,
-			model.Icon{"Double click me!", model.Image{"disk.png", 32, 32}, model.Image{"disk_selected.png", 32, 32}},
-			model.WindowMetaInfo{"Note!"}, &model.Content{getRef("Hello again!"),
-				&[]model.Article{model.Article{"Renkbench relaunch", `Next release: During 2022 I had the idea of switching the backend from Node.js to Go. Since I started my <a href="https://github.com/renkman/mongotui" target="_blank">MongoTUI MongoDB client</a> in 2020, I felt like programming more stuff in Go. So - here it is. And with this move, I replaced the static file based JSON-content with a MongoDB.<br /><br />The source code of this web app is available on my <a href="https://github.com/renkman/Renkbench" target="_blank">Github repository</a>.`}}, nil}, nil},
-		model.Window{&id, 3, 0,
-			model.Icon{"Edit", model.Image{"notepad.png", 32, 32}, model.Image{"notepad_selected.png", 32, 32}}, model.WindowMetaInfo{"Edit"}, &model.Content{nil, nil, getRef(`<div class="textbox" tabindex="0"></div>`)}, nil}}
+		model.Window{&id, 1, 0, model.WindowMetaInfo{"Renkbench"}, nil, &[]model.Icon{
+			model.Icon{3, "Edit", model.Image{"notepad.png", 32, 32}, model.Image{"notepad_selected.png", 32, 32}},
+			model.Icon{4, "Drawer", model.Image{"drawer.png", 31, 71}, model.Image{"drawer_selected.png", 34, 73}}}},
+		model.Window{&id, 2, 0, model.WindowMetaInfo{"Note!"}, &model.Content{getRef("Hello again!"),
+			&[]model.Article{model.Article{"Renkbench relaunch", `Next release: During 2022 I had the idea of switching the backend from Node.js to Go. Since I started my <a href="https://github.com/renkman/mongotui" target="_blank">MongoTUI MongoDB client</a> in 2020, I felt like programming more stuff in Go. So - here it is. And with this move, I replaced the static file based JSON-content with a MongoDB.<br /><br />The source code of this web app is available on my <a href="https://github.com/renkman/Renkbench" target="_blank">Github repository</a>.`}}, nil}, nil}}
+	manyResult := insertManyCollection(data, collection, client, ctx)
 
-	insertManyCollection(data, collection, client, ctx)
+	id, ok = manyResult.InsertedIDs[0].(primitive.ObjectID)
+	if !ok {
+		log.Fatalf("result.InsertedIDs[0] with value %v is not of type primitive.ObjectID", manyResult.InsertedIDs[0])
+		return
+	}
+
+	data = []interface{}{
+		model.Window{&id, 3, 1, model.WindowMetaInfo{"Edit"}, &model.Content{nil, nil, getRef(`<div class="textbox" tabindex="0"></div>`)}, nil},
+		model.Window{&id, 4, 1, model.WindowMetaInfo{"Drawer"}, nil, &[]model.Icon{
+			model.Icon{5, "Document", model.Image{"document.png", 40, 40}, model.Image{"document_selected.png", 40, 40}}}}}
+	manyResult = insertManyCollection(data, collection, client, ctx)
+
+	id, ok = manyResult.InsertedIDs[0].(primitive.ObjectID)
+	if !ok {
+		log.Fatalf("result.InsertedIDs[0] with value %v is not of type primitive.ObjectID", manyResult.InsertedIDs[0])
+		return
+	}
+
+	result, err = collection.InsertOne(ctx, model.Window{&id, 5, 4, model.WindowMetaInfo{"Document"}, &model.Content{getRef("Hello again!"),
+		&[]model.Article{model.Article{"Document", `This is just a document containing this text.`}}, nil}, nil})
 }
 
 func seedMenu(client *mongo.Client, ctx context.Context) {
@@ -66,16 +86,17 @@ func seedMenu(client *mongo.Client, ctx context.Context) {
 	insertManyName(data, "menu", client, ctx)
 }
 
-func insertManyName(data []interface{}, collectionName string, client *mongo.Client, ctx context.Context) {
+func insertManyName(data []interface{}, collectionName string, client *mongo.Client, ctx context.Context) *mongo.InsertManyResult {
 	collection := client.Database("renkbench").Collection(collectionName)
-	insertManyCollection(data, collection, client, ctx)
+	return insertManyCollection(data, collection, client, ctx)
 }
 
-func insertManyCollection(data []interface{}, collection *mongo.Collection, client *mongo.Client, ctx context.Context) {
-	_, err := collection.InsertMany(ctx, data)
+func insertManyCollection(data []interface{}, collection *mongo.Collection, client *mongo.Client, ctx context.Context) *mongo.InsertManyResult {
+	result, err := collection.InsertMany(ctx, data)
 	if err != nil {
 		log.Fatal(err)
 	}
+	return result
 }
 
 func getRef(value string) *string {

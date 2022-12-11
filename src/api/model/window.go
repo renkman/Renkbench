@@ -9,13 +9,12 @@ type WindowResponse struct {
 }
 
 type Window struct {
-	Parent   *primitive.ObjectID `bson:"parent" json:"-"`
-	Id       int                 `json:"id"`
-	Pid      int                 `json:"pid"`
-	Icons    Icon                `json:"icons"`
-	Window   WindowMetaInfo      `json:"window"`
-	Content  *Content            `json:"content,omitempty"`
-	Children *[]Window           `json:"children,omitempty"`
+	Parent     *primitive.ObjectID `bson:"parent" json:"-"`
+	Id         int                 `json:"id"`
+	Pid        int                 `json:"pid"`
+	Window     WindowMetaInfo      `json:"window"`
+	Content    *Content            `json:"content,omitempty"`
+	ChildIcons *[]Icon             `json:"ChildIcons,omitempty"`
 }
 
 type WindowMetaInfo struct {
@@ -23,6 +22,7 @@ type WindowMetaInfo struct {
 }
 
 type Icon struct {
+	Id            int    `json:"id"`
 	Title         string `json:"title"`
 	Image         Image  `json:"image"`
 	ImageSelected Image  `json:"imageSelected"`

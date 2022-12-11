@@ -15,6 +15,7 @@ describe("windowRegistry tests", function () {
         const id = 1000;
 
         let iconContract = {
+            id: id,
             title: "Renkbench",
             image: {
                 file: "workbench.png",
@@ -42,7 +43,7 @@ describe("windowRegistry tests", function () {
         };
 
         let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon(id, iconContract, 0, 12);
+        registry.addIcon(iconContract, 0, 12);
         let icon = registry.getIcon(id);
 
         expect(icon).not.toBe(null);
@@ -56,6 +57,7 @@ describe("windowRegistry tests", function () {
         const id = 1000;
 
         let iconContract = {
+            id: id,
             title: "Renkbench",
             image: {
                 file: "workbench.png",
@@ -86,9 +88,9 @@ describe("windowRegistry tests", function () {
         };
 
         let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon(id, iconContract, 0, 12);
+        registry.addIcon(iconContract, 0, 12);
         let icon = registry.getIcon(id);
-        registry.addIcon(id, iconContract, 0, 12);
+        registry.addIcon(iconContract, 0, 12);
         icon = registry.getIcon(id);
 
         expect(icon).not.toBe(null);
@@ -106,7 +108,7 @@ describe("windowRegistry tests", function () {
             "window": {
                 "title": "Amiga"
             },
-            "children": []
+            "childIcons": []
         };
 
         let windowFactory = {
@@ -134,7 +136,7 @@ describe("windowRegistry tests", function () {
         };
 
         let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon(windowContract.id, {}, 0, 12);
+        registry.addIcon({id:windowContract.id}, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let window = registry.getWindow(windowContract.id);
@@ -154,7 +156,7 @@ describe("windowRegistry tests", function () {
                 "title": "Homecomputers"
             },
             "menu": ["Amiga 500", "CPC 464"],
-            "children": []
+            "childIcons": []
         };
 
         let called = false;
@@ -187,7 +189,7 @@ describe("windowRegistry tests", function () {
         };
 
         let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon(windowContract.id, {}, 0, 12);
+        registry.addIcon({id:windowContract.id}, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let menu = registry.getMenu(windowContract.id);
@@ -205,7 +207,7 @@ describe("windowRegistry tests", function () {
                 "title": "Amiga"
             },
             "content": {},
-            "children": []
+            "childIcons": []
         };
 
         let called = false;
@@ -229,11 +231,10 @@ describe("windowRegistry tests", function () {
         };
 
         let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon(windowContract.id, {}, 0, 12);
+        registry.addIcon({id:windowContract.id}, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let window = registry.getWindow(windowContract.id);
-        let menu = registry.getMenu(windowContract.id);
 
         expect(window).not.toBe(null);
         expect(window.id).toBe(windowContract.id);
@@ -250,7 +251,7 @@ describe("windowRegistry tests", function () {
             "content": {
                 "type": "file"
             },
-            "children": []
+            "childIcons": []
         };
 
         let called = false;
@@ -274,11 +275,10 @@ describe("windowRegistry tests", function () {
         };
 
         let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon(windowContract.id, {}, 0, 12);
+        registry.addIcon({id:windowContract.id}, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let window = registry.getWindow(windowContract.id);
-        let menu = registry.getMenu(windowContract.id);
 
         expect(window).not.toBe(null);
         expect(window.id).toBe(windowContract.id);

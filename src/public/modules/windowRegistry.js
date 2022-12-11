@@ -13,13 +13,13 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
     let openWindowsCount = 0;
 
-    let addIcon = (id, iconContract, pid, initX) => {
-        let icon = getIcon(id);
+    let addIcon = (iconContract, pid, initX) => {
+        let icon = getIcon(iconContract.id);
         if(icon)
             return;
         let isDisk = pid === 0;
-        icon = createIcon(id, iconContract, initX, isDisk);
-        registerIcon(id, icon, pid);
+        icon = createIcon(iconContract, initX, isDisk);
+        registerIcon(iconContract.id, icon, pid);
     };
 
     let getIcon = id => {
@@ -40,8 +40,8 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
         registerWindow(windowContract.id, window, menu);
 
-        for (let child of windowContract.children) {
-            let icon = createIcon(child.id, child.icons, false, initX);
+        for (let child of windowContract.childIcons) {
+            let icon = createIcon(child, false, initX);
             registerIcon(child.id, icon, windowContract.pid);
             window.addIcon(icon);
         }
@@ -86,8 +86,8 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return window;
     };
 
-    let createIcon = (id, iconContract, initX, isDisk) => {
-        let icon = iconFactory.createIcon(id, iconContract, isDisk, initX);
+    let createIcon = (iconContract, initX, isDisk) => {
+        let icon = iconFactory.createIcon(iconContract.id, iconContract, isDisk, initX);
         return icon;
     };
 
