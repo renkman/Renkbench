@@ -1,13 +1,5 @@
 "use strict";
 
-// let loadWindow = (url, id) => {
-//     let id = id || 0;
-//     httpClient.getJson(url + "/" + id)
-//         .then(addWindow)
-//         .catch(console.error);
-// };
-
-
 // Manages workbench windows
 export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
