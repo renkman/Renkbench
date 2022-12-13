@@ -12,7 +12,7 @@ import (
 
 type windowRepository interface {
 	GetWindows(ctx context.Context) *model.WindowResponse
-	GetWindowById(id int, ctx context.Context) *model.WindowResponse
+	GetWindowById(id int, ctx context.Context) *model.Window
 }
 
 type windowHandler struct {
@@ -26,13 +26,14 @@ func CreateWindowHandler(repository windowRepository, routePrefix string) *windo
 
 func (windowHandler *windowHandler) Handle(writer http.ResponseWriter, request *http.Request) {
 	id := windowHandler.getWindowId(request)
-	var windows *model.WindowResponse
 
 	if id != nil {
-		windows = windowHandler.repository.GetWindowById(*id, request.Context())
-	} else {
-		windows = windowHandler.repository.GetWindows(request.Context())
+		window := windowHandler.repository.GetWindowById(*id, request.Context())
+		json.NewEncoder(writer).Encode(window)
+		return
 	}
+
+	windows := windowHandler.repository.GetWindows(request.Context())
 	json.NewEncoder(writer).Encode(windows)
 }
 

@@ -17,9 +17,9 @@ func (windowRepository *FileWindowRepository) GetWindows(ctx context.Context) *m
 	return windows
 }
 
-func (windowRepository *FileWindowRepository) GetWindowById(id int, ctx context.Context) *model.WindowResponse {
+func (windowRepository *FileWindowRepository) GetWindowById(id int, ctx context.Context) *model.Window {
 	windows := windowRepository.readData()
-	return windows
+	return &windows.Windows[0]
 }
 
 func (windowRepository *FileWindowRepository) readData() *model.WindowResponse {
