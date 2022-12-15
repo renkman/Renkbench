@@ -12,7 +12,7 @@
 "use strict";
 
 // Creates workbench menu
-export var menuFactory = (createNode, textConverter) => {
+export var createMenuFactory = (createNode, textConverter) => {
     let createMenu = (items, id, openWindowsCount) =>
 	{
 		if(!items)

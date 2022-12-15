@@ -1,6 +1,6 @@
 "use strict";
 
-import { menuFactory } from "../../../public/modules/menuFactory.js";
+import { createMenuFactory } from "../../../public/modules/menuFactory.js";
 import { textConverter } from "../../../public/modules/text.js";
 
 describe("menuFactory tests", function () {
@@ -55,11 +55,11 @@ describe("menuFactory tests", function () {
 
 
     it("menuFactory is not null", function () {
-        expect(menuFactory).not.toBe(null);
+        expect(createMenuFactory).not.toBe(null);
     });
 
     it("menuFactory is a function", function () {
-        expect(menuFactory).toEqual(jasmine.any(Function));
+        expect(createMenuFactory).toEqual(jasmine.any(Function));
     });
 
     it("menuFactory creates a workbench menu", function () {
@@ -223,7 +223,7 @@ describe("menuFactory tests", function () {
             dataset: {}
         };
 
-        let factory = menuFactory(domTreeMock, textConverter);
+        let factory = createMenuFactory(domTreeMock, textConverter);
         let menu = factory.createMenu(menuItems, 1, 3);
      
         expect(menu).not.toBe(null);

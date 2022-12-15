@@ -1,6 +1,6 @@
 "use strict";
 
-export var iconManager = (offsetTop, offsetHeight) => {
+export var createIconManager = (offsetTop, offsetHeight) => {
     //The creation coordinates of the next icon.
 	var iconStartPos = {x:"20px",y:"40px"};
     var iconWidth = 0;

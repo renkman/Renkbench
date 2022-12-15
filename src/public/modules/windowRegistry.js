@@ -1,13 +1,13 @@
 "use strict";
 
 // Manages workbench windows
-export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
+export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
     let openWindowsCount = 0;
 
     let addIcon = (iconContract, pid, initX) => {
         let icon = getIcon(iconContract.id);
-        if(icon)
+        if (icon)
             return;
         let isDisk = pid === 0;
         icon = createIcon(iconContract, initX, isDisk);
@@ -16,14 +16,32 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
     let getIcon = id => {
         let entry = get(id);
-        if(entry && entry.icon)
+        if (entry && entry.icon)
             return entry.icon;
         return null;
     };
 
+    let addWorkbench = (windowContract, element, menuContract, iconStartPos, openWindowsCount) => {
+        let workbench = getWindow(windowContract.id);
+        if (workbench)
+            return;
+
+        workbench = windowFactory.createWorkbench(windowContract.id, element, iconStartPos);
+        let menu = menuFactory.createMenu(menuContract, windowContract.id, openWindowsCount);
+
+        registry.push({
+            icon: null,
+            pid: windowContract.pid,
+            window: workbench,
+            menu: menu
+        });
+
+        registerChildIcons(windowContract.childIcons, windowContract.pid, 0);
+    };
+
     let addWindow = (windowContract, initX) => {
         let window = getWindow(windowContract.id);
-        if(window)
+        if (window)
             return;
 
         window = createWindow(windowContract);
@@ -31,17 +49,15 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
         let menu = createMenu(windowContract.id, windowContract.menu);
 
         registerWindow(windowContract.id, window, menu);
+        let icon = getIcon(windowContract.id);
+        window.addIcon(icon);
 
-        for (let child of windowContract.childIcons) {
-            let icon = createIcon(child, false, initX);
-            registerIcon(child.id, icon, windowContract.pid);
-            window.addIcon(icon);
-        }
+        registerChildIcons(windowContract.childIcons, windowContract.pid, initX);
 
         // Arrange child icons and set size
         // console.debug("PID: %i",pid);
         let parent = getWindow(window.pid);
-        if(!parent)
+        if (!parent)
             return;
 
         parent.arrangeIcons();
@@ -51,14 +67,14 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
     let getWindow = id => {
         let entry = get(id);
-        if(entry && entry.window)
+        if (entry && entry.window)
             return entry.window;
         return null;
     };
 
     let getMenu = id => {
         let entry = get(id);
-        if(entry && entry.menu)
+        if (entry && entry.menu)
             return entry.menu;
         return null;
     };
@@ -91,6 +107,13 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return menu;
     };
 
+    let registerChildIcons = (childIcons, pid, initX) => {
+        for (let child of childIcons) {
+            let icon = createIcon(child, false, initX);
+            registerIcon(child.id, icon, pid);
+        }
+    };
+
     let registerIcon = (id, icon, pid) => {
         if (typeof pid !== "number")
             pid = 0;
@@ -110,7 +133,7 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registerWindow = (id, window, menu) => {
         // console.debug(windowProperties);
         let entry = get(id);
-        if(!entry)
+        if (!entry)
             throw "Missing registry entry with id " + id;
 
         entry.window = window;
@@ -119,12 +142,13 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
     let get = id => {
         let result = registry.filter(w => w.id == id);
-        if(result.length === 1)
+        if (result.length === 1)
             return result[0];
         return null;
     };
 
     return {
+        addWorkbench: addWorkbench,
         addIcon: addIcon,
         getIcon: getIcon,
         addWindow: addWindow,

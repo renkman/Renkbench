@@ -1,14 +1,14 @@
 "use strict";
 
-import { windowRegistry } from "../../../public/modules/windowRegistry.js";
+import { createWindowRegistry } from "../../../public/modules/windowRegistry.js";
 
 describe("windowRegistry tests", function () {
     it("windowRegistry is not null", function () {
-        expect(windowRegistry).not.toBe(null);
+        expect(createWindowRegistry).not.toBe(null);
     });
 
     it("windowRegistry is a function", function () {
-        expect(windowRegistry).toEqual(jasmine.any(Function));
+        expect(createWindowRegistry).toEqual(jasmine.any(Function));
     });
 
     it("windowRegistry.addIcon adds and gets an icon", function () {
@@ -42,7 +42,7 @@ describe("windowRegistry tests", function () {
             }
         };
 
-        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
+        let registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
         registry.addIcon(iconContract, 0, 12);
         let icon = registry.getIcon(id);
 
@@ -87,7 +87,7 @@ describe("windowRegistry tests", function () {
             }
         };
 
-        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
+        let registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
         registry.addIcon(iconContract, 0, 12);
         let icon = registry.getIcon(id);
         registry.addIcon(iconContract, 0, 12);
@@ -116,7 +116,8 @@ describe("windowRegistry tests", function () {
                 return {
                     id: id,
                     title: properties.title,
-                    setIconArea: () => { }
+                    setIconArea: () => { },
+                    addIcon: icon => { }
                 };
             }
         };
@@ -135,8 +136,8 @@ describe("windowRegistry tests", function () {
             }
         };
 
-        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon({id:windowContract.id}, 0, 12);
+        let registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon({ id: windowContract.id }, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let window = registry.getWindow(windowContract.id);
@@ -167,7 +168,8 @@ describe("windowRegistry tests", function () {
                     title: properties.title,
                     setIconArea: () => {
                         called = true;
-                    }
+                    },
+                    addIcon: icon => { }
                 };
             }
         };
@@ -188,8 +190,8 @@ describe("windowRegistry tests", function () {
             }
         };
 
-        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon({id:windowContract.id}, 0, 12);
+        let registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon({ id: windowContract.id }, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let menu = registry.getMenu(windowContract.id);
@@ -218,7 +220,8 @@ describe("windowRegistry tests", function () {
                     title: properties.title,
                     setContent: () => {
                         called = true;
-                    }
+                    },
+                    addIcon: icon => { }
                 };
             }
         };
@@ -230,8 +233,8 @@ describe("windowRegistry tests", function () {
             }
         };
 
-        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon({id:windowContract.id}, 0, 12);
+        let registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon({ id: windowContract.id }, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let window = registry.getWindow(windowContract.id);
@@ -262,7 +265,8 @@ describe("windowRegistry tests", function () {
                     title: properties.title,
                     setDownload: () => {
                         called = true;
-                    }
+                    },
+                    addIcon: icon => { }
                 };
             }
         };
@@ -274,8 +278,8 @@ describe("windowRegistry tests", function () {
             }
         };
 
-        let registry = windowRegistry(windowFactory, menuFactory, iconFactory);
-        registry.addIcon({id:windowContract.id}, 0, 12);
+        let registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addIcon({ id: windowContract.id }, 0, 12);
 
         registry.addWindow(windowContract, 12);
         let window = registry.getWindow(windowContract.id);

@@ -1,7 +1,7 @@
 "use strict";
 
 import jsdom from "jsdom";
-import { windowFactory } from "../../../public/modules/windowFactory.js";
+import { createWindowFactory } from "../../../public/modules/windowFactory.js";
 import { textConverter } from "../../../public/modules/text.js";
 import { createNode } from "../../../public/modules/domTree.js";
 
@@ -12,11 +12,11 @@ describe("windowFactory tests", function () {
     };
 
     it("windowFactory is not null", function () {
-        expect(windowFactory).not.toBe(null);
+        expect(createWindowFactory).not.toBe(null);
     });
 
     it("windowFactory is a function", function () {
-        expect(windowFactory).toEqual(jasmine.any(Function));
+        expect(createWindowFactory).toEqual(jasmine.any(Function));
     });
 
     it("windowFactory.createWindow creates a window", function () {
@@ -30,7 +30,7 @@ describe("windowFactory tests", function () {
             createNodeWrapper("div").getNode()
         ).getNode();
 
-        let factory = windowFactory(createNodeWrapper, textConverter, workbench);
+        let factory = createWindowFactory(createNodeWrapper, textConverter, workbench);
         let window = factory.createWindow(id, properties);
 
         expect(window).not.toBe(null);

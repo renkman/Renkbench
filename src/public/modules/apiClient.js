@@ -1,7 +1,7 @@
 "use strict";
 
 // Renkbench API client
-export var apiClient = httpClient => {
+export var createApiClient = httpClient => {
     const WINDOWS_URI = 'api/windows/';
     const MENU_URI = 'api/menu';
     const VERSION_URI = 'api/version';
@@ -10,7 +10,7 @@ export var apiClient = httpClient => {
 
     let getWindow = id => getResult(WINDOWS_URI + id);
 
-    let getMenu = id => getResult(MENU_URI + id);
+    let getMenu = () => getResult(MENU_URI);
 
     let getVersion = () => getResult(VERSION_URI);
 

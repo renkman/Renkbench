@@ -1,7 +1,32 @@
 "use strict";
 
 // Creates workbench windows
-export var windowFactory = (createNode, textConverter, workbenchElement) => {
+export var createWindowFactory = (createNode, textConverter, workbenchElement) => {
+    let createWorkbench = (id, element, iconStartPos) => {
+        element.dataset["id"]=id;
+
+        let workbench = {
+            element: element,
+            iconStartPos: iconStartPos,
+            arrangeIcons: () => {
+                for(var i=0;i<registry.length;i++)
+                {
+                    if(registry[i].pid!=0)
+                        continue;
+                    
+                    var temp=registry[i]["icon"];
+                    var right=Math.floor((iconWidth-parseInt(temp.element.style.width))/2);
+        //console.debug("temp.id: %s, %i+%i=%i",temp.id,temp.initX,right,temp.initX+right);
+                    temp.element.style.right=(temp.initX+right)+"px";
+                }
+            },
+            addIcon : icon =>{
+                element.appendChild(icon.element);
+            }
+        };
+        return workbench;
+    };
+
     //Creates a window and its content
     let createWindow = (id, properties) => {
 
@@ -647,6 +672,7 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
     };
 
     return {
+        createWorkbench: createWorkbench,
         createWindow: createWindow
     };
 };
