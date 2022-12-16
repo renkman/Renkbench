@@ -11,7 +11,7 @@
 
 "use strict";
 
-export var iconFactory = (createNode, textConverter, iconPath) => {
+export var createIconFactory = (createNode, textConverter, iconPath) => {
     //Creates an icon
     let createIcon = (id, properties, isDisk, initX) => {
         //Create new icon element

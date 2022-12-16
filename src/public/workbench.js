@@ -19,7 +19,7 @@ import { createApiClient, createApiClient } from "./modules/apiClient.js";
 import { createWindowRegistry } from "./modules/windowRegistry.js";
 import { createWindowFactory } from "./modules/windowFactory.js";
 import { createMenuFactory } from "./modules/menuFactory.js";
-import { iconFactory } from "./modules/iconFactory.js";
+import { createIconFactory } from "./modules/iconFactory.js";
 
 //The workbench main object
 (() => {
@@ -32,7 +32,7 @@ import { iconFactory } from "./modules/iconFactory.js";
 	
 	let windowFactory = createWindowFactory(createNode, textConverter, element);
 	let menuFactory = createMenuFactory(createNode, textConverter);
-	let iconFactory = iconFactory(createNode, textConverter, ICONS);
+	let iconFactory = createIconFactory(createNode, textConverter, ICONS);
 
 	//The windows/icons registry	
 	var registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
@@ -76,8 +76,7 @@ import { iconFactory } from "./modules/iconFactory.js";
 	// The image path structure
 	const IMAGES = "images/";
 	
-	const WINDOW = IMAGES+"window/";
-	
+	const WINDOW = IMAGES+"window/";	
 
 	// The AJAX url paths
 	const VERSION_PATH = 'api/version';
@@ -133,6 +132,7 @@ import { iconFactory } from "./modules/iconFactory.js";
 		)
 		.then(results => {
 			createWindowRegistry.addWorkbench(results[0], element, results[1], iconStartPos, openOrder.length);
+			switchCursor();
 		});
 //console.debug(registry.getWindow(0));
 	};
@@ -990,16 +990,6 @@ import { iconFactory } from "./modules/iconFactory.js";
 		//MS IE 7
 		else
 			return event.srcElement;
-	};
-	
-	//Callback function for AJAX response
-	var initWindows = (windowsResponse) =>
-	{
-		//Register the windows, icons and the content
-		addWindows(windowsResponse.windows, 0);
-
-		//Change cursor to normal mode
-		switchCursor();
 	};
 		
 	//Returns the requested json object.

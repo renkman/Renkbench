@@ -1,6 +1,6 @@
 "use strict";
 
-import { iconFactory } from "../../../public/modules/iconFactory.js";
+import { createIconFactory } from "../../../public/modules/iconFactory.js";
 import { textConverter } from "../../../public/modules/text.js";
 
 describe("iconFactory tests", function () {
@@ -66,11 +66,11 @@ describe("iconFactory tests", function () {
 
 
     it("iconFactory is not null", function () {
-        expect(iconFactory).not.toBe(null);
+        expect(createIconFactory).not.toBe(null);
     });
 
     it("iconFactory is a function", function () {
-        expect(iconFactory).toEqual(jasmine.any(Function));
+        expect(createIconFactory).toEqual(jasmine.any(Function));
     });
 
     it("iconFactory.createIcon creates a workbench icon", function () {
@@ -88,7 +88,7 @@ describe("iconFactory tests", function () {
             }
         };
 
-        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let factory = createIconFactory(domTreeMock, textConverter, "images/icons");
         let icon = factory.createIcon(500, properties, true, 20);
 
         expect(icon).not.toBe(null);
@@ -116,7 +116,7 @@ describe("iconFactory tests", function () {
             }
         };
 
-        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let factory = createIconFactory(domTreeMock, textConverter, "images/icons");
         let icon = factory.createIcon(1000, properties, false, 0);
 
         expect(icon).not.toBe(null);
@@ -144,7 +144,7 @@ describe("iconFactory tests", function () {
             }
         };
 
-        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let factory = createIconFactory(domTreeMock, textConverter, "images/icons");
         let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setIconSize();
@@ -170,7 +170,7 @@ describe("iconFactory tests", function () {
 
         const left = "20px";
 
-        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let factory = createIconFactory(domTreeMock, textConverter, "images/icons");
         let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setPositionLeft(left);
@@ -195,7 +195,7 @@ describe("iconFactory tests", function () {
 
         const right = "20px";
         
-        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let factory = createIconFactory(domTreeMock, textConverter, "images/icons");
         let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setPositionRight(right);
@@ -220,7 +220,7 @@ describe("iconFactory tests", function () {
 
         const top = "40px";
 
-        let factory = iconFactory(domTreeMock, textConverter, "images/icons");
+        let factory = createIconFactory(domTreeMock, textConverter, "images/icons");
         let icon = factory.createIcon(500, properties, true, 20);
 
         icon.setPositionTop(top);

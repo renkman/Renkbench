@@ -407,7 +407,11 @@ export var createWindowFactory = (createNode, textConverter, workbenchElement) =
                 this.activeForm = this.formElements[0];
             },
 
-            open: function () {
+            open: function (loadWindow) {
+
+                loadWindow();
+
+                // TODO: Move content to the loadWindow()-function
                 registry[this.id].isOpened = true;
 
                 //Download file
