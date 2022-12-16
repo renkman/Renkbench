@@ -63,6 +63,8 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         parent.arrangeIcons();
         if (windowContract.pid > 0)
             parent.setPosition();
+        
+        return window;
     };
 
     let getWindow = id => {
@@ -72,6 +74,13 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return null;
     };
 
+    let getParentWindow = id => {
+        let entry = getParent(id);
+        if(entry && entry.window)
+            return entry.window;
+        return null;
+    };
+    
     let getMenu = id => {
         let entry = get(id);
         if (entry && entry.menu)
@@ -125,8 +134,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
             pid: pid,
             menu: null,
             isSelected: false,
-            isTrashcan: false,
-            isOpened: false
+            isTrashcan: false
         });
     };
 
@@ -141,11 +149,18 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     };
 
     let get = id => {
-        let result = registry.filter(w => w.id == id);
+        let result = registry.filter(e => e.id == id);
         if (result.length === 1)
             return result[0];
         return null;
     };
+
+    let getParent = id => {
+        let result = registry.filter(e => e.pid == id);
+        if (result.length === 1)
+            return result[0];
+        return null;
+    }
 
     return {
         addWorkbench: addWorkbench,
@@ -153,6 +168,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         getIcon: getIcon,
         addWindow: addWindow,
         getWindow: getWindow,
+        getParentWindow: getParentWindow,
         getMenu: getMenu
     };
 };

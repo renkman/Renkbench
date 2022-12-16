@@ -1,0 +1,89 @@
+"use strict";
+
+// Manages workbench windows
+export var createWindowService = (windowRegistry, apiClient, workbenchElement) => {
+    // The height in of the window title bar in pixels
+    const TITLE_BAR_HEIGHT = 21;
+
+    //The order of the opened windows
+    let openOrder = [];
+
+    let openWindow = async id => {
+        let window = windowRegistry.getWindow(id);
+        if (window == null) {
+            let windowProperties = await apiClient.getWindow(id);
+            window = windowRegistry.addWindow(windowProperties, 0);
+        }
+
+        window.arrangeIcons();
+        let parent = windowRegistry.getParentWindow(id);
+        if (parent.id > 0)
+            parent.setPosition();
+
+        let menu = windowRegistry.getMenu(id);
+        if (!menu)
+            menu = windowRegistry.getMenu(0);
+        menu.updateMenu();
+        openOrder.push(window.id);
+
+        return window.open(workbenchElement, openOrder.length);
+    };
+
+    let closeWindow = id => {
+        let menu = windowRegistry.getMenu(id);
+        if (!menu)
+            menu = windowRegistry.getMenu(0);
+        menu.updateMenu();
+
+        let newOrder = [];
+        let curOrder = openOrder;
+
+        //let id = this.element.dataset.id;
+
+        //Delete closed window from open order.
+        for (let i = 0; i < curOrder.length; i++) {
+            if (curOrder[i] != this.id)
+                newOrder.push(curOrder[i]);
+        }
+        openOrder = newOrder;
+
+        let window = windowRegistry.getWindow(id);
+        window.close(workbenchElement);
+    };
+
+    let moveWindow = (event, selection) => {
+        //Calculate new window position
+        let newPosX = event.clientX - offset.x;
+        let newPosY = event.clientY - offset.y;
+        //console.debug("x: %i, y: %i",newPosX,newPosY);
+
+        //Set drag element to foreground
+        selection.style.zIndex = openOrder.length + 2;
+        //console.debug(selection.style.zIndex);
+
+        //Check if the item will only be dragged in the workbench div
+        let sizeX = selection.offsetWidth;
+        let sizeY = selection.offsetHeight;
+        let borderLeft = workbenchElement.offsetLeft;
+        let borderRight = workbenchElement.offsetLeft + workbenchElement.offsetWidth;
+        let borderTop = workbenchElement.offsetTop;
+        let borderBottom = workbenchElement.offsetTop + workbenchElement.offsetHeight;
+        //console.debug("borderLeft: %i, borderRight: %i, borderTop: %i, borderBottom: %i",borderLeft,borderRight,borderTop,borderBottom);
+        //console.debug("newPosX: %i, newPosX+sizeX: %i, newPosY: %i, newPosY+sizeY: %i",newPosX,newPosX+sizeX,newPosY,newPosY+sizeY);
+        if (borderLeft >= newPosX || borderRight <= newPosX + sizeX
+            || borderTop >= newPosY - TITLE_BAR_HEIGHT)// || borderBottom <= newPosY+sizeY)
+            return false;
+
+        //Move item
+        selection.style.top = newPosY + "px";
+        selection.style.left = newPosX + "px";
+        //console.debug("x: %s, y: %s",selection.style.top,selection.style.left);
+        return false;
+    };
+
+    return {
+        openWindow: openWindow,
+        closeWindow: closeWindow,
+        moveWindow: moveWindow
+    };
+};

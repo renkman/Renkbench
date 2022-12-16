@@ -20,6 +20,7 @@ import { createWindowRegistry } from "./modules/windowRegistry.js";
 import { createWindowFactory } from "./modules/windowFactory.js";
 import { createMenuFactory } from "./modules/menuFactory.js";
 import { createIconFactory } from "./modules/iconFactory.js";
+import { createWindowService } from "./modules/windowService.js";
 
 //The workbench main object
 (() => {
@@ -36,6 +37,7 @@ import { createIconFactory } from "./modules/iconFactory.js";
 
 	//The windows/icons registry	
 	var registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+	var windowService = createWindowService(registry, apiClient, element);
 	
 	//The element currently selected by the user
 	var selectedElement = {};
@@ -70,9 +72,6 @@ import { createIconFactory } from "./modules/iconFactory.js";
 	var menuOpenend = null;	
 	var dropdownFocus = null;
 	
-	// The height in of the window title bar in pixels
-	const TITLE_BAR_HEIGHT = 21;
-	
 	// The image path structure
 	const IMAGES = "images/";
 	
@@ -85,7 +84,7 @@ import { createIconFactory } from "./modules/iconFactory.js";
 	const MAIN_TITLE = "Renkbench release.";
 	
 	//The initialization method.
-	var init = () =>
+	var init = async () =>
 	{		
 		//Set cursor to wait mode
 		switchCursor(true);
@@ -126,89 +125,18 @@ import { createIconFactory } from "./modules/iconFactory.js";
 		}
 		
 		// Get and register workbench and menu
-		Promise.all(
+		var results = await Promise.all(
 			apiClient.getWorkbench(),
 			apiClient.getMenu()
-		)
-		.then(results => {
-			createWindowRegistry.addWorkbench(results[0], element, results[1], iconStartPos, openOrder.length);
-			switchCursor();
-		});
+		);
+		createWindowRegistry.addWorkbench(results[0], element, results[1], iconStartPos, 0);
+		switchCursor();
+
+		// .then(results => {
+		// 	createWindowRegistry.addWorkbench(results[0], element, results[1], iconStartPos, 0);
+		// 	switchCursor();
+		// });
 //console.debug(registry.getWindow(0));
-	};
-	
-	//Recursive addition to the window registry of a windows object
-	var addWindows = (windows,pid) =>
-	{
-//console.debug(windows);
-		for(var i=0;i<windows.length;i++)
-		{
-			var window=windows[i];
-			if(window.content)
-			{
-				registerWindow(window.window, window.icons, pid, window.menu, window.content);
-				continue;
-			}
-			if(window.children && window.children.length)
-			{
-				var newPid=registerWindow(window.window,window.icons,pid);
-				addWindows(window.children,newPid);
-			}
-		}
-		//Arrange child icons and set size
-// console.debug("PID: %i",pid);
-		registry[pid].window.arrangeIcons();
-		if(pid>0)
-			registry[pid].window.setPosition();
-	};
-	
-	//Adds a window and its icon to the registry
-	var registerWindow = (windowProperties, imageProperties, pid, menuProperties, content) =>
-	{
-// console.debug(windowProperties);
-		if(typeof pid !== "number")
-			pid=0;
-
-		//Create items
-		var window = createWindow(windowProperties);
-		window.init();
-		
-		//Fill the window with content
-		if(typeof content=="object")
-		{
-			if(content.type=="file")
-				window.setDownload(content);
-			else
-				window.setContent(content);
-		}
-		else
-			window.setIconArea();
-		
-		//Set window id and add items to registry
-		var id = registry.length;
-		window.setId(id);
-		
-		// Create the window related context menu	
-		var menu = createMenu(menuProperties, id);
-
-		var icon = createIcon(imageProperties);
-		icon.init(id, pid);
-		icon.element.id += id;
-		
-		registry.push({
-				id: id,
-				icon : icon,
-				window : window,
-				pid : pid,
-				menu : menu,
-				isSelected : false,
-				isTrashcan : false,
-				isOpened : false
-		});
-//console.dir(this.registry);
-//console.debug("Id: %i",window.id);
-		//this.arrangeIcons();
-		return window.id;
 	};
 	
 	// Event listener functions
@@ -235,8 +163,9 @@ import { createIconFactory } from "./modules/iconFactory.js";
 				var image = getIconElement(selection);
 				if(image == null)
 					return false;
-				var window = registry[image.dataset.id].window;
-				return window.open();
+
+				let id = image.dataset.id;
+				return windowService.openWindow(id);
 			}
 			lastClickedElement=selection.parentNode;
 			
@@ -459,9 +388,8 @@ import { createIconFactory } from "./modules/iconFactory.js";
 				//belonging window.
 				case "buttonClose":
 					//var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
-					var id = getWindowElement(selection).dataset.id;
-					var window=registry[id]["window"];
-					window.close();
+					let id = getWindowElement(selection).dataset.id;
+					windowService.closeWindow(id);
 					break;
 				case "scrollButtonLeft":
 				case "scrollButtonUp":
@@ -479,7 +407,7 @@ import { createIconFactory } from "./modules/iconFactory.js";
 					var window=getWindowElement(form);
 					for(var i=0;i<window.childNodes.length;i++)
 					{
-						var element=window.childNodes[i];
+						let element=window.childNodes[i];
 						if(element.className=="content")
 						{
 							cache=element;
@@ -575,7 +503,7 @@ import { createIconFactory } from "./modules/iconFactory.js";
 		if(selection.dataset.mode==="resize")
 			return resize(event, selection); // resize(event, selection);
 		else if(selection.dataset.mode==="move")
-			return move(event, selection);
+			return windowService.moveWindow(event, selection);
 
 		// Scroll button moving
 		var windowElement = getWindowElement(selection);
@@ -583,36 +511,6 @@ import { createIconFactory } from "./modules/iconFactory.js";
 		var window=registry[id]["window"];
 		
 		window.moveScrollButton(event, selection);	
-	};
-	
-	var move = (event, selection) => {		
-		//Calculate new window position
-		var newPosX=event.clientX-offset.x;
-		var newPosY=event.clientY-offset.y;
-//console.debug("x: %i, y: %i",newPosX,newPosY);
-			
-		//Set drag element to foreground
-		selection.style.zIndex=openOrder.length+2;		
-//console.debug(selection.style.zIndex);
-		
-		//Check if the item will only be dragged in the workbench div
-		var sizeX=selection.offsetWidth;
-		var sizeY=selection.offsetHeight;
-		var borderLeft=element.offsetLeft;
-		var borderRight=element.offsetLeft+element.offsetWidth;
-		var borderTop=element.offsetTop;
-		var borderBottom=element.offsetTop+element.offsetHeight;
-//console.debug("borderLeft: %i, borderRight: %i, borderTop: %i, borderBottom: %i",borderLeft,borderRight,borderTop,borderBottom);
-//console.debug("newPosX: %i, newPosX+sizeX: %i, newPosY: %i, newPosY+sizeY: %i",newPosX,newPosX+sizeX,newPosY,newPosY+sizeY);
-		if(borderLeft >= newPosX || borderRight <= newPosX+sizeX
-		|| borderTop >= newPosY-TITLE_BAR_HEIGHT)// || borderBottom <= newPosY+sizeY)
-			return false;
-		
-		//Move item
-		selection.style.top=newPosY+"px";
-		selection.style.left=newPosX+"px";
-//console.debug("x: %s, y: %s",selection.style.top,selection.style.left);
-		return false;
 	};
 	
 	var eventHandler = element => {

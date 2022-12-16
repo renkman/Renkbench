@@ -51,6 +51,9 @@ export var createWindowFactory = (createNode, textConverter, workbenchElement) =
             // The icons contained by the window
             icons: [],
 
+            // States whether a window is opened
+            isOpened: false,
+
             // A content window does not show any icons.
             hasContent: false,
 
@@ -407,51 +410,29 @@ export var createWindowFactory = (createNode, textConverter, workbenchElement) =
                 this.activeForm = this.formElements[0];
             },
 
-            open: function (loadWindow) {
-
-                loadWindow();
-
-                // TODO: Move content to the loadWindow()-function
-                registry[this.id].isOpened = true;
+            open: function (workbenchElement, openWindowsCount) {
+                this.isOpened = true;
 
                 //Download file
-                if (this.type == "file") {
-                    var temp = open(DATA_PATH + "/file/get/" + this.fileId, "Download");
-                    return true;
-                }
+                // if (this.type == "file") {
+                //     var temp = open(DATA_PATH + "/file/get/" + this.fileId, "Download");
+                //     return true;
+                // }
 
                 if (this.element.style.zIndex > 0)
                     return;
 
-                element.appendChild(this.element);
-                openOrder.push(this.id);
-                this.element.style.zIndex = openOrder.length + 1;
+                workbenchElement.appendChild(this.element);
+                this.element.style.zIndex = openWindowsCount + 1;
                 this.element.style.visibility = "visible";
-
-                var menu = registry[this.id].menu ? registry[this.id].menu : registry[0].menu;
-                menu.updateMenu();
             },
 
-            close: function () {
+            close: function (element) {
+                this.isOpened = false;
+
                 element.parentNode.appendChild(this.element);
                 this.element.style.zIndex = -1;
                 this.element.style.visibility = "hidden";
-
-                var newOrder = [];
-                var curOrder = openOrder;
-
-                //var id = this.element.dataset.id;
-                registry[this.id].isOpened = false;
-
-                //Delete closed window from open order.
-                for (var i = 0; i < curOrder.length; i++) {
-                    if (curOrder[i] != this.id)
-                        newOrder.push(curOrder[i]);
-                }
-                openOrder = newOrder;
-
-                var menu = registry[this.id].menu ? registry[this.id].menu : registry[0].menu;
-                menu.updateMenu();
             },
 
             enterText: function (event) {
