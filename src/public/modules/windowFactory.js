@@ -4,11 +4,13 @@
 export var createWindowFactory = (createNode, textConverter, workbenchElement) => {
     let createWorkbench = (id, element, iconStartPos) => {
         element.dataset["id"]=id;
+		element.style.zIndex=1;
 
         let workbench = {
             element: element,
             iconStartPos: iconStartPos,
             arrangeIcons: () => {
+                // TODO: registry is unknown here - move it to registry or an own service               
                 for(var i=0;i<registry.length;i++)
                 {
                     if(registry[i].pid!=0)

@@ -15,7 +15,7 @@ import {createNode} from "./modules/domTree.js";
 import {textConverter} from "./modules/text.js";
 import {httpClient} from "./modules/httpClient.js";
 
-import { createApiClient, createApiClient } from "./modules/apiClient.js";
+import { createApiClient } from "./modules/apiClient.js";
 import { createWindowRegistry } from "./modules/windowRegistry.js";
 import { createWindowFactory } from "./modules/windowFactory.js";
 import { createMenuFactory } from "./modules/menuFactory.js";
@@ -27,6 +27,9 @@ import { createWindowService } from "./modules/windowService.js";
 	//The DOM-element of the workbench (<div>)
 	var element = {};
 
+	// The image path structure
+	const IMAGES = "images/";	
+	const WINDOW = IMAGES+"window/";	
 	const ICONS = IMAGES+"icons/";
 
 	let apiClient = createApiClient(httpClient);
@@ -72,14 +75,6 @@ import { createWindowService } from "./modules/windowService.js";
 	var menuOpenend = null;	
 	var dropdownFocus = null;
 	
-	// The image path structure
-	const IMAGES = "images/";
-	
-	const WINDOW = IMAGES+"window/";	
-
-	// The AJAX url paths
-	const VERSION_PATH = 'api/version';
-	
 	// The workbench main title text
 	const MAIN_TITLE = "Renkbench release.";
 	
@@ -90,7 +85,7 @@ import { createWindowService } from "./modules/windowService.js";
 		switchCursor(true);
 		
 		// Set version and build numbers
-		httpClient.getJson(VERSION_PATH)
+		apiClient.getVersion()
 			.then(createVersionInfo)
 			.catch(console.error);
 
@@ -99,9 +94,9 @@ import { createWindowService } from "./modules/windowService.js";
 		createNode("div").style({
 				marginTop:"2px",
 			}).innerHtml(title)
-			.appendTo(mainTitle);
-		
-		element.style.zIndex=1;
+			.appendTo(mainTitle);	
+	
+		element = document.getElementById("workbench");
 
 		// Disable browser context menu
 		element.oncontextmenu = () => false;
@@ -123,7 +118,7 @@ import { createWindowService } from "./modules/windowService.js";
 			element.attachEvent("onmousemove",drag);
 			element.attachEvent("onmouseup",deselect(element));
 		}
-		
+
 		// Get and register workbench and menu
 		var results = await Promise.all(
 			apiClient.getWorkbench(),
@@ -388,7 +383,7 @@ import { createWindowService } from "./modules/windowService.js";
 				//belonging window.
 				case "buttonClose":
 					//var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
-					let id = getWindowElement(selection).dataset.id;
+					var id = getWindowElement(selection).dataset.id;
 					windowService.closeWindow(id);
 					break;
 				case "scrollButtonLeft":

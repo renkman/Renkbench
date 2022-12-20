@@ -212,4 +212,70 @@ describe("windowService tests", function () {
         expect(menuUpdated).toBe(true);
         expect(iconsArranged).toBe(true);
     });
+
+    it("windowService.closeWindow closes the window with the passed id", async function () {
+        const id = 2000;
+
+        let windowClosed = false;
+        let menuUpdated = false;
+
+        let windowRegistryMock = {
+            getWindow: id => {
+                return {
+                    id: id,
+                    close: element => windowClosed = true
+                };
+            },
+            getMenu: id => {
+                return { updateMenu: () => menuUpdated = true }
+            }
+        };
+
+        let apiClientMock = createApiClientMock(null);
+
+        let workbenchElement = {};
+
+        let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
+        service.closeWindow(id);
+
+        expect(windowClosed).toBe(true);
+        expect(menuUpdated).toBe(true);
+    });
+
+    it("windowService.closeWindow closes the window with the passed id", async function () {
+        const id = 4000;
+
+        let windowClosed = false;
+        let menuUpdated = false;
+
+        let windowRegistryMock = {
+            getWindow: id => {
+                return {
+                    id: id,
+                    close: element => windowClosed = true
+                };
+            },
+            getMenu: windowId => {
+                if (windowId === id)
+                    return null;
+
+                if (windowId === 0)
+                    return {
+                        updateMenu: () => menuUpdated = true
+                    };
+
+                throw "Unexpected id " + windowId;
+            }
+        };
+
+        let apiClientMock = createApiClientMock(null);
+
+        let workbenchElement = {};
+
+        let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
+        service.closeWindow(id);
+
+        expect(windowClosed).toBe(true);
+        expect(menuUpdated).toBe(true);
+    });
 });
