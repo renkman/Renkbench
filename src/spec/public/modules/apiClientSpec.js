@@ -46,4 +46,26 @@ describe("apiClient tests", function () {
         expect(window).not.toBe(null);
         expect(window).toBe(expected);
     });
+
+    it("apiClient.getMenu gets a menu", async function () {
+        let expected = { type: "menu" };
+        let httpClientMock = createHttpClientMock('api/menu', expected)
+
+        let client = createApiClient(httpClientMock);
+        let menu = await client.getMenu();
+
+        expect(menu).not.toBe(null);
+        expect(menu).toBe(expected);
+    });
+
+    it("apiClient.getVersion gets the version", async function () {
+        let expected = { version: "1.3.3" };
+        let httpClientMock = createHttpClientMock('api/version', expected)
+
+        let client = createApiClient(httpClientMock);
+        let version = await client.getVersion();
+
+        expect(version).not.toBe(null);
+        expect(version).toBe(expected);
+    });
 });
