@@ -1,0 +1,45 @@
+name: Renkbench CI
+
+on:
+  push:
+    branches-ignore: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: API unit tests
+      run: |
+        cd src
+        docker-compose -f docker/docker-compose.yml up test-backend
+        docker cp test-backend:/src/api/coverage.out ./
+
+    - name: Frontend unit tests
+      run: |
+        cd src
+        docker-compose -f docker/docker-compose.yml up test-frontend
+        docker cp docker_test-frontend_1:/src/coverage/ ./
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Docker cleanup
+      run: |
+        cd src
+        docker-compose -f docker/docker-compose.yml down
+
+    - name: Build the API
+      run: |
+        cd src
+        docker-compose -f docker/docker-compose.yml build app
+
+    - name: Build the db init
+      run: |
+        cd src
+        docker-compose -f docker/docker-compose.yml build init

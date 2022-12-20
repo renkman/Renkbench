@@ -1,4 +1,4 @@
-name: Renkbench CI
+name: Renkbench CD
 
 on:
   push:
