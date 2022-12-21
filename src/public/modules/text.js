@@ -15,102 +15,54 @@
 export var textConverter = () => {
     //Text, charset and font properties and methods
     let fontColor = {
-        whiteOnBlue : 0,
-        blueOnWhite : 16,
-        whiteOnOrange : 32,
-        blackOnBlue : 48,
-        blackOnWhite : 64,
-        whiteOnBlack : 80,
-        blueOnWhiteInactive : 96,
-        orangeOnBlack : 112,
-        blackOnOrange : 128
+        whiteOnBlue: 0,
+        blueOnWhite: 16,
+        whiteOnOrange: 32,
+        blackOnBlue: 48,
+        blackOnWhite: 64,
+        whiteOnBlack: 80,
+        blueOnWhiteInactive: 96,
+        orangeOnBlack: 112,
+        blackOnOrange: 128
     };
 
     //Convert string text to amiga style font div-element-text
-    let convertText = (text, color) =>
-    {
-        //Replace some tags
-        text=text//.replace(/<\/*(br|ul) *\/*>/g,'<div class="stop"></div>')
-            .replace(/<br *\/*>/g, '<div class="stop"></div>')
-            .replace(/<ul>/g,'<div class="stop"></div><div class="list">')
-            .replace(/<\/ul>/g,'<div class="stop"></div></div>')
-            .replace(/<li>/g,'- ')
-            .replace(/<\/li>/g,'<div class="stop"></div>')
-            .replace(/<table>/g, '<div class="stop"></div><table>');
-        
-    
-        let result="";
-        let tagMode=false;
-        let word='<div class="word">';
-        let tableHeadColor=fontColor.blackOnWhite;
-        let linkColor=fontColor.whiteOnOrange;
-        let curColor=color;
-        for(let i=0; i<text.length; i++)
-        {
-            let character=text.slice(i,i+1);
-            //Check whether an html tag begins
-            tagMode=tagMode || character=="<";
-            if(tagMode)
-            {
-                if(character=="<")
-                    result=result+word+"</div>";
-                //Add tag to result without converting it
-                result=result+character;
-                //Do not convert the text until the tag stops
-                tagMode=character!=">";
-                if(tagMode)
-                    word='<div class="word">';
-                continue;
-            }
-            //Check font color to use
-            let tableHead=result.search(/<th\s+colspan="[0-9]*">/)!=-1
-            && result.search(/<\/th>/)==-1;
-            let link=result.search(/<a\s+href=".*">/)!=-1
-            && result.search(/<\/a>/)==-1;
-            if(tableHead)
-                curColor=tableHeadColor;
-            else if(link)
-                curColor=linkColor;
-            else
-                curColor=color;
-            //Get Amiga font div element equivalent to the passed character
-            let element=parseChar(character, curColor, "text");
-            //Add the element to the current word
-            if(element)
-                word=word+element;
-            //Add current word to resultset and create a new word in 
-            //case of a space character
-            if(character==" ")
-            {
-                result=result+word+"</div>";
-                word='<div class="word">';			  
-            }		
-        }
-        result=result+word+'</div><div class="stop"></div>';
-    //console.debug(result);		
-        return result;
+    let convertText = (text, color) => {
+        // TODO: Add parser functions for these replacements
+        // text = text//.replace(/<\/*(br|ul) *\/*>/g,'<div class="stop"></div>')
+        //     .replace(/<br *\/*>/g, '<div class="stop"></div>')
+        //     .replace(/<ul>/g, '<div class="stop"></div><div class="list">')
+        //     .replace(/<\/ul>/g, '<div class="stop"></div></div>')
+        //     .replace(/<li>/g, '- ')
+        //     .replace(/<\/li>/g, '<div class="stop"></div>')
+        //     .replace(/<table>/g, '<div class="stop"></div><table>');
+
+        let tokens = tokenize(text);
+
+        let result = [];
+        parse(tokens, result, color);
+       		
+        return result.join('');
     };
 
     //Test method for string -> charset image conversion
-    let parseChar = (character, color, mode) =>
-    {
-        let xCoord=getCharIndex(character);
-    //console.debug("Char: %s, Mapping: %i", character, xCoord);
-        if(typeof xCoord!=="number")
+    let parseChar = (character, color, mode) => {
+        let xCoord = getCharIndex(character);
+        //console.debug("Char: %s, Mapping: %i", character, xCoord);
+        if (typeof xCoord !== "number")
             return null;
-        if(typeof color!=="number")
+        if (typeof color !== "number")
             return null;
-        if(mode==="text")
-            return '<div class="char" data-char="'+ character +
-                '" style="background-position: -'+xCoord+'px -'
-                +color+'px"></div>';
+        if (mode === "text")
+            return '<div class="char" data-char="' + character +
+                '" style="background-position: -' + xCoord + 'px -'
+                + color + 'px"></div>';
     };
 
     //Charset mapping for topaz font
-    let getCharIndex = character =>
-    {
-        let charsetMapping = [
-            " ", "0", "1", "2", "3", "4", "5", "6",	"7", "8", "9",
+    let getCharIndex = character => {
+        const charsetMapping = [
+            " ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
             "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
             "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
             "w", "x", "y", "z", "\u00e4", "\u00f6", "\u00fc", "\u00df", "\u00e1", "\u00e0", "\u00e2",
@@ -123,26 +75,87 @@ export var textConverter = () => {
             "-", "_", ".", ":", ",", ";", "\u00b5", "<", ">", "|", "[",
             "]", "@", "\u00b2", "\u00b3", "\\", "{", "}"
         ];
-        
-        for(let index in charsetMapping)
-        {
-            if(character===charsetMapping[index])
-            return index*8;
+
+        for (let index in charsetMapping) {
+            if (character === charsetMapping[index])
+                return index * 8;
         }
         return 0;
     };
 
     let tokenize = text => {
-        
+        const regex = /((?:<[^>]+>)|(?:\w+))/;
+        let tokens = text.split(regex).filter(s => s !== "");
+        return tokens;
+    }
+
+    let parse = (tokens, result, color) => {
+        parseText(tokens, result, color);
+        result.push('<div class="stop"></div>');
     };
 
-    let parseTag = () => {
+    let parseText = (tokens, result, color) => {
+        while (tokens.length > 0) {
+            let token = tokens.shift();
 
+            if (tryParseTag(token, tokens, result))
+                continue;
+
+            if (tryParseCloseTag(token, result))
+                return;
+
+            parseWord(token, result, color);
+        }
     };
 
+    let tryParseTag = (token, tokens, result) => {
+        if (parseLink(token, tokens, result))
+            return true;
+
+        if (parseTableHeader(token, tokens, result))
+            return true;
+
+        return false;
+    };
+
+    let parseLink = (token, tokens, result) => {
+        if (!token.startsWith('<a'))
+            return false;
+
+        result.push(token);
+
+        parseText(tokens, result, fontColor.whiteOnOrange);
+        return true;
+    };
+
+    let parseTableHeader = (token, tokens, result) => {
+        if (!token.startsWith('<th'))
+            return false;
+
+        result.push(token);
+
+        parseText(tokens, result, fontColor.blackOnWhite);
+        return true;
+    };
+
+    let parseWord = (token, result, color) => {
+        let word = token.split('')
+            .map(c => parseChar(c, color, "text"))
+            .join('');
+
+        result.push('<div class="word">' + word + '</div>');
+    };
+
+    let tryParseCloseTag = (token, result) => {
+        if (!token.startsWith('</'))
+            return false;
+
+        result.push(token);
+        return true;
+    };
     return {
-        fontColor : fontColor,
-        convertText : convertText,
+        fontColor: fontColor,
+        convertText: convertText,
         parseChar, parseChar
     };
 };

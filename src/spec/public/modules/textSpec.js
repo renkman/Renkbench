@@ -36,6 +36,8 @@ describe("textConverter tests", function() {
             '<div class="char" data-char="i" style="background-position: -152px -80px"></div>' +
             '<div class="char" data-char="g" style="background-position: -136px -80px"></div>' +
             '<div class="char" data-char="a" style="background-position: -88px -80px"></div>' +
+            '</div>' +
+            '<div class="word">' +
             '<div class="char" data-char=" " style="background-position: -0px -80px"></div>' +
             '</div>' +
             '<div class="word">' +
@@ -48,7 +50,7 @@ describe("textConverter tests", function() {
     });
 
     it("convertText with links returns a div markup with links", function() {
-        var result = textConverter().convertText('Amiga <a href="renkbench.de">500</a> <a href="renkbench.de">500</a>', textConverter().fontColor.whiteOnBlack);
+        let result = textConverter().convertText('Amiga <a href="renkbench.de">500</a> <a href="renkbench.de">500</a>', textConverter().fontColor.whiteOnBlack);
         expect(result).toBe(
             '<div class="word">' +
             '<div class="char" data-char="A" style="background-position: -408px -80px"></div>' +
@@ -56,36 +58,28 @@ describe("textConverter tests", function() {
             '<div class="char" data-char="i" style="background-position: -152px -80px"></div>' +
             '<div class="char" data-char="g" style="background-position: -136px -80px"></div>' +
             '<div class="char" data-char="a" style="background-position: -88px -80px"></div>' +
+            '</div>' +
+            '<div class="word">' +
             '<div class="char" data-char=" " style="background-position: -0px -80px"></div>' +
             '</div>' +
-            '<div class="word"></div><a href="renkbench.de">' +
+            '<a href="renkbench.de">' +
             '<div class="word">' +
             '<div class="char" data-char="5" style="background-position: -48px -32px"></div>' +
             '<div class="char" data-char="0" style="background-position: -8px -32px"></div>' +
             '<div class="char" data-char="0" style="background-position: -8px -32px"></div>' +
             '</div>' +
-            '</a><div class="word">'+
+            '</a>'+
+            '<div class="word">'+
             '<div class="char" data-char=" " style="background-position: -0px -80px"></div>' +
             '</div>' +    
-            '<div class="word"></div><a href="renkbench.de">' +
+            '<a href="renkbench.de">' +
             '<div class="word">' +
             '<div class="char" data-char="5" style="background-position: -48px -32px"></div>' +
             '<div class="char" data-char="0" style="background-position: -8px -32px"></div>' +
             '<div class="char" data-char="0" style="background-position: -8px -32px"></div>' +
             '</div>' +
-            '</a><div class="word"></div>' +    
+            '</a>' +    
             '<div class="stop"></div>'
         );
-        console.log(result);
     });
-    // <div class="word">
-    // <div class="char" data-char="A" style="background-position: -408px -80px"></div><div class="char" data-char="m" style="background-position: -184px -80px"></div><div class="char" data-char="i" style="background-position: -152px -80px"></div><div class="char" data-char="g" style="background-position: -136px -80px"></div><div class="char" data-char="a" style="background-position: -88px -80px"></div>
-    // <div class="char" data-char=" " style="background-position: -0px -80px"></div>
-    // </div>
-    // <div class="word"></div><a href="renkbench.de">
-    // <div class="word"><div class="char" data-char="5" style="background-position: -48px -32px"></div>
-    // <div class="char" data-char="0" style="background-position: -8px -32px"></div>
-    // <div class="char" data-char="0" style="background-position: -8px -32px"></div>
-    // </div>
-    // </a><div class="word"></div><div class="stop"></div>
 });
