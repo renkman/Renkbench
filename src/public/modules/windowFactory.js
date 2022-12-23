@@ -3,26 +3,22 @@
 // Creates workbench windows
 export var createWindowFactory = (createNode, textConverter, workbenchElement) => {
     let createWorkbench = (id, element) => {
-        element.dataset["id"]=id;
-		element.style.zIndex=1;
+        element.dataset["id"] = id;
+        element.style.zIndex = 1;
 
         let workbench = {
             element: element,
-            iconStartPos: {x:"20px",y:"40px"},
-            arrangeIcons: () => {
-                // TODO: registry is unknown here - move it to registry or an own service               
-                for(var i=0;i<registry.length;i++)
-                {
-                    if(registry[i].pid!=0)
-                        continue;
-                    
-                    var temp=registry[i]["icon"];
-                    var right=Math.floor((iconWidth-parseInt(temp.element.style.width))/2);
-        //console.debug("temp.id: %s, %i+%i=%i",temp.id,temp.initX,right,temp.initX+right);
-                    temp.element.style.right=(temp.initX+right)+"px";
+            iconStartPos: { x: "20px", y: "40px" },
+            arrangeIcons: windowRegistry => {
+                let childIcons = windowRegistry.getChildIcons(id);
+                for (let childIcon of childIcons) {
+                    let icon = childIcon;
+                    let right = Math.floor((iconWidth - parseInt(icon.element.style.width)) / 2);
+                    //console.debug("icon.id: %s, %i+%i=%i",icon.id,icon.initX,right,icon.initX+right);
+                    icon.element.style.right = (icon.initX + right) + "px";
                 }
             },
-            addIcon : icon =>{
+            addIcon: icon => {
                 element.appendChild(icon.element);
             }
         };
@@ -582,7 +578,7 @@ export var createWindowFactory = (createNode, textConverter, workbenchElement) =
         return window;
     };
 
-    let init = function(window, properties) {
+    let init = function (window, properties) {
         // Create div element and set background source file
         window.element = createNode("div").class("window").
             id("window_" + window.id).
@@ -591,7 +587,7 @@ export var createWindowFactory = (createNode, textConverter, workbenchElement) =
             style(properties.css).
             tabIndex(0).
             appendTo(workbenchElement.parentNode).
-            data({id:window.id}).getNode();
+            data({ id: window.id }).getNode();
 
         // Create title bar
         /*

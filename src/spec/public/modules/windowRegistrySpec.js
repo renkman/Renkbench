@@ -417,7 +417,7 @@ describe("windowRegistry tests", function () {
 
         const element = {};
 
-        const menuContract = ["Workbench"];
+        const menuContract = {menu:["Workbench"]};
 
         const windowFactory = {
             createWorkbench: (id, element) => {
@@ -452,7 +452,7 @@ describe("windowRegistry tests", function () {
         const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
 
         registry.addWorkbench(workbenchContract, element, menuContract);
-        
+
         let workbench = registry.getWindow(workbenchContract.id);
         let childIcon = registry.getIcon(childIconId);
         let menu = registry.getMenu(workbenchContract.id);
@@ -467,5 +467,81 @@ describe("windowRegistry tests", function () {
         expect(menu).not.toBe(null);
         expect(menu.items).toBe(menuContract);
         expect(menu.openWindowsCount).toBe(0);
+    });
+
+    it("windowRegistry.addWorkbench adds the workbench and getChildIcons gets the icons", function () {
+        const workbenchContract = {
+            "id": 0,
+            "pid": -1,
+            "window": {
+                "title": "Renkbench"
+            },
+            "childIcons": [
+                {
+                    id: 1,
+                    title: "Workbench",
+                    image: {
+                        file: "workbench.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "workbench_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                },
+                {
+                    id: 2,
+                    title: "Death Metal",
+                    image: {
+                        file: "deathmetal.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "deathmetal_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                }
+            ]
+        };
+
+        const element = {};
+
+        const windowFactory = {
+            createWorkbench: (id, element) => {
+                return {
+                    id: id,
+                    element: element
+                };
+            }
+        };
+
+        const menuFactory = {
+            createMenu: (items, id, openWindowsCount) => { }
+        };
+
+        const iconFactory = {
+            createIcon: (iconContract, window, initX) => {
+                return {
+                    id: iconContract.id,
+                    fileNames: [iconContract.image.file, iconContract.imageSelected.file],
+                    isDisk: window.id === 0,
+                    initX: initX
+                };
+            }
+        };
+
+        const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+
+        registry.addWorkbench(workbenchContract, element, {});
+
+        let childIcons = registry.getChildIcons(workbenchContract.id);
+
+        expect(childIcons).not.toBe(null);
+        expect(childIcons.length).toBe(2);
+        expect(childIcons.map(i => i.id)).toEqual([1, 2]);
     });
 });

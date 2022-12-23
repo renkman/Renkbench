@@ -63,33 +63,35 @@ describe("menuFactory tests", function () {
     });
 
     it("menuFactory creates a workbench menu", function () {
-        let menuItems = [
-            {
-                name: "Amiga",
-                entries: [
-                    {
-                        name: "Amiga 500",
-                        command: "play",
-                        conditions: [{ property: "isSelected", value: true }]
-                    },
-                    {
-                        name: "Amiga 1000",
-                        command: "work",
-                        conditions: "true"
-                    }
-                ]
-            },
-            {
-                name: "8 bit",
-                entries: [
-                    {
-                        name: "VIC 20",
-                        command: "load",
-                        conditions: "true"
-                    }
-                ]
-            }
-        ];
+        let menuItems = {
+            menu: [
+                {
+                    name: "Amiga",
+                    entries: [
+                        {
+                            name: "Amiga 500",
+                            command: "play",
+                            conditions: [{ property: "isSelected", value: true }]
+                        },
+                        {
+                            name: "Amiga 1000",
+                            command: "work",
+                            conditions: "true"
+                        }
+                    ]
+                },
+                {
+                    name: "8 bit",
+                    entries: [
+                        {
+                            name: "VIC 20",
+                            command: "load",
+                            conditions: "true"
+                        }
+                    ]
+                }
+            ]
+        };
 
         let expected = {
             name: "div",
@@ -224,7 +226,7 @@ describe("menuFactory tests", function () {
 
         let factory = createMenuFactory(domTreeMock, textConverter);
         let menu = factory.createMenu(menuItems, 1, 3);
-     
+
         expect(menu).not.toBe(null);
         expect(menu.id).toBe(1);
         expect(menu.element).toEqual(expected);

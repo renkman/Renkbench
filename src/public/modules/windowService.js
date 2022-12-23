@@ -16,9 +16,7 @@ export var createWindowService = (windowRegistry, apiClient, workbenchElement) =
         }
 
         window.arrangeIcons();
-        let parent = windowRegistry.getParentWindow(id);
-        if (parent.id > 0)
-            parent.setPosition();
+        window.setPosition();
 
         let menu = windowRegistry.getMenu(id);
         if (!menu)

@@ -13,16 +13,17 @@
 
 // Creates workbench menu
 export var createMenuFactory = (createNode, textConverter) => {
-    let createMenu = (items, id, openWindowsCount) =>
+    let createMenu = (menuContract, id, openWindowsCount) =>
 	{
-		if(!items)
+		if(!menuContract)
 			return null;
 
-		let create = (items, id) => {
+		let create = (menuContract, id) => {
 			let menu = createNode("div").id("menu-" + id).getNode();
-			for(let itemIndex in items)
+
+			let items = menuContract.menu;
+			for(let item of items)
 			{
-				let item = items[itemIndex];
 				let dropdown = createNode("div").class("dropdown").appendTo(menu).getNode();
 				let title = textConverter().convertText(item.name, textConverter().fontColor.blueOnWhite);
 				createNode("button").class("dropdown-title").appendTo(dropdown).innerHtml(title).getNode();
@@ -90,7 +91,7 @@ export var createMenuFactory = (createNode, textConverter) => {
 		};
 		
 		let enabled = false;
-		let menu = create(items, id);
+		let menu = create(menuContract, id);
 		update(openWindowsCount);
 		
 		return  {			

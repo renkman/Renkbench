@@ -14,7 +14,7 @@ type Window struct {
 	Pid        int                 `json:"pid"`
 	Window     WindowMetaInfo      `json:"window"`
 	Content    *Content            `json:"content,omitempty"`
-	ChildIcons *[]Icon             `json:"ChildIcons,omitempty"`
+	ChildIcons *[]Icon             `json:"childIcons,omitempty"`
 }
 
 type WindowMetaInfo struct {

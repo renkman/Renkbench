@@ -29,7 +29,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         let menu = menuFactory.createMenu(menuContract, windowContract.id, openWindowsCount);
 
         registerWorkbench(windowContract.id, workbench, menu);
-        
+
         registry.push({
             icon: null,
             pid: windowContract.pid,
@@ -64,7 +64,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         parent.arrangeIcons();
         if (windowContract.pid > 0)
             parent.setPosition();
-        
+
         return window;
     };
 
@@ -77,17 +77,22 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
     let getParentWindow = id => {
         let entry = getParent(id);
-        if(entry && entry.window)
+        if (entry && entry.window)
             return entry.window;
         return null;
     };
-    
+
     let getMenu = id => {
         let entry = get(id);
         if (entry && entry.menu)
             return entry.menu;
         return null;
     };
+
+    let getChildIcons = parentId => {
+        let children = getChildren(parentId);
+        return children.map(c => c.icon);
+    }
 
     let createWindow = (windowContract) => {
         let window = windowFactory.createWindow(windowContract.id, windowContract.window);
@@ -127,11 +132,11 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registerWorkbench = (id, workbench, menu) => {
         registry.push({
             id: id,
-			icon:null,
-			pid:-1,
-			window: workbench,
+            icon: null,
+            pid: -1,
+            window: workbench,
             menu: menu
-		});
+        });
     };
 
     let registerIcon = (id, icon, pid) => {
@@ -166,11 +171,14 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     };
 
     let getParent = id => {
-        let result = registry.filter(e => e.pid == id);
+        let entry = registry.filter(e => e.id == id);
+        let result = registry.filter(e => e.id == entry.pid);
         if (result.length === 1)
             return result[0];
         return null;
     }
+
+    const getChildren = parentId => registry.filter(e => e.pid == parentId);
 
     return {
         addWorkbench: addWorkbench,
@@ -179,6 +187,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         addWindow: addWindow,
         getWindow: getWindow,
         getParentWindow: getParentWindow,
-        getMenu: getMenu
+        getMenu: getMenu,
+        getChildIcons: getChildIcons
     };
 };

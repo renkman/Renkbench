@@ -25,7 +25,7 @@ describe("windowService tests", function () {
 
         let windowOpened = false;
         let menuUpdated = false;
-        let parentPositionSet = false;
+        let positionSet = false;
         let iconsArranged = false;
 
         let windowRegistryMock = {
@@ -33,13 +33,8 @@ describe("windowService tests", function () {
                 return {
                     id: id,
                     open: (element, openWindowsCount) => windowOpened = true,
-                    arrangeIcons: () => iconsArranged = true
-                };
-            },
-            getParentWindow: id => {
-                return {
-                    id: 1000,
-                    setPosition: () => parentPositionSet = true
+                    arrangeIcons: () => iconsArranged = true,
+                    setPosition: () => positionSet = true
                 };
             },
             getMenu: id => {
@@ -55,7 +50,7 @@ describe("windowService tests", function () {
         await service.openWindow(id);
 
         expect(windowOpened).toBe(true);
-        expect(parentPositionSet).toBe(true);
+        expect(positionSet).toBe(true);
         expect(menuUpdated).toBe(true);
         expect(iconsArranged).toBe(true);
     });
@@ -75,7 +70,8 @@ describe("windowService tests", function () {
                 let window = {
                     id: properties.id,
                     open: (element, openWindowsCount) => { },
-                    arrangeIcons: () => { }
+                    arrangeIcons: () => { },
+                    setPosition: () => { }
                 };
                 windows.push(window);
                 return window;
@@ -89,12 +85,6 @@ describe("windowService tests", function () {
                 return null;
             };
 
-            let getParentWindow = id => {
-                return {
-                    id: 0
-                };
-            };
-
             let getMenu = id => {
                 return { updateMenu: () => { } }
             };
@@ -102,7 +92,6 @@ describe("windowService tests", function () {
             return {
                 addWindow: addWindow,
                 getWindow: getWindow,
-                getParentWindow: getParentWindow,
                 getMenu: getMenu,
                 getAddWindowCalls: () => addWindowCalls,
                 getGetWindowCalls: () => getWindowCalls
@@ -128,7 +117,7 @@ describe("windowService tests", function () {
 
         let windowOpened = false;
         let menuUpdated = false;
-        let parentPositionSet = false;
+        let positionSet = false;
         let iconsArranged = false;
 
         let windowRegistryMock = {
@@ -136,13 +125,8 @@ describe("windowService tests", function () {
                 return {
                     id: id,
                     open: (element, openWindowsCount) => windowOpened = true,
-                    arrangeIcons: () => iconsArranged = true
-                };
-            },
-            getParentWindow: id => {
-                return {
-                    id: 1000,
-                    setPosition: () => parentPositionSet = true
+                    arrangeIcons: () => iconsArranged = true,
+                    setPosition: () => positionSet = true
                 };
             },
             getMenu: windowId => {
@@ -166,49 +150,7 @@ describe("windowService tests", function () {
         await service.openWindow(id);
 
         expect(windowOpened).toBe(true);
-        expect(parentPositionSet).toBe(true);
-        expect(menuUpdated).toBe(true);
-        expect(iconsArranged).toBe(true);
-    });
-
-    it("windowService.openWindow with window with workbench parent does not call parent.parentPositionSet", async function () {
-        const id = 500;
-
-        let windowOpened = false;
-        let menuUpdated = false;
-        let parentPositionSet = false;
-        let iconsArranged = false;
-
-        let windowRegistryMock = {
-            getWindow: id => {
-                return {
-                    id: id,
-                    open: (element, openWindowsCount) => windowOpened = true,
-                    arrangeIcons: () => iconsArranged = true
-                };
-            },
-            getParentWindow: id => {
-                return {
-                    id: 0,
-                    setPosition: () => parentPositionSet = true
-                };
-            },
-            getMenu: windowId => {
-                return {
-                    updateMenu: () => menuUpdated = true
-                };
-            }
-        };
-
-        let apiClientMock = createApiClientMock(null);
-
-        let workbenchElement = {};
-
-        let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
-        await service.openWindow(id);
-
-        expect(windowOpened).toBe(true);
-        expect(parentPositionSet).toBe(false);
+        expect(positionSet).toBe(true);
         expect(menuUpdated).toBe(true);
         expect(iconsArranged).toBe(true);
     });

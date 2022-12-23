@@ -120,15 +120,15 @@ import { createWindowService } from "./modules/windowService.js";
 		}
 
 		// Get and register workbench and menu
-		var results = await Promise.all(
+		var results = await Promise.all([
 			apiClient.getWorkbench(),
 			apiClient.getMenu()
-		);
-		createWindowRegistry.addWorkbench(results[0], element, results[1]);
+		]);
+		registry.addWorkbench(results[0], element, results[1]);
 		switchCursor();
 
 		// .then(results => {
-		// 	createWindowRegistry.addWorkbench(results[0], element, results[1]);
+		// 	registry.addWorkbench(results[0], element, results[1]);
 		// 	switchCursor();
 		// });
 //console.debug(registry.getWindow(0));
