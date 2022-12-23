@@ -3,6 +3,8 @@ name: Renkbench CI
 on:
   push:
     branches-ignore: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
 
