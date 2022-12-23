@@ -5,13 +5,12 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
     let openWindowsCount = 0;
 
-    let addIcon = (iconContract, pid, initX) => {
+    let addIcon = (iconContract, window, initX) => {
         let icon = getIcon(iconContract.id);
         if (icon)
             return;
-        let isDisk = pid === 0;
-        icon = createIcon(iconContract, initX, isDisk);
-        registerIcon(iconContract.id, icon, pid);
+        icon = createIcon(iconContract, window, initX);
+        registerIcon(iconContract.id, icon, window.id);
     };
 
     let getIcon = id => {
@@ -21,14 +20,16 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return null;
     };
 
-    let addWorkbench = (windowContract, element, menuContract, iconStartPos, openWindowsCount) => {
+    let addWorkbench = (windowContract, element, menuContract) => {
         let workbench = getWindow(windowContract.id);
         if (workbench)
             return;
 
-        workbench = windowFactory.createWorkbench(windowContract.id, element, iconStartPos);
+        workbench = windowFactory.createWorkbench(windowContract.id, element);
         let menu = menuFactory.createMenu(menuContract, windowContract.id, openWindowsCount);
 
+        registerWorkbench(windowContract.id, workbench, menu);
+        
         registry.push({
             icon: null,
             pid: windowContract.pid,
@@ -36,10 +37,10 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
             menu: menu
         });
 
-        registerChildIcons(windowContract.childIcons, windowContract.pid, 0);
+        registerChildIcons(windowContract.childIcons, workbench, 0);
     };
 
-    let addWindow = (windowContract, initX) => {
+    let addWindow = windowContract => {
         let window = getWindow(windowContract.id);
         if (window)
             return;
@@ -52,7 +53,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         let icon = getIcon(windowContract.id);
         window.addIcon(icon);
 
-        registerChildIcons(windowContract.childIcons, windowContract.pid, initX);
+        registerChildIcons(windowContract.childIcons, window, 0);
 
         // Arrange child icons and set size
         // console.debug("PID: %i",pid);
@@ -103,8 +104,8 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return window;
     };
 
-    let createIcon = (iconContract, initX, isDisk) => {
-        let icon = iconFactory.createIcon(iconContract.id, iconContract, isDisk, initX);
+    let createIcon = (iconContract, window, initX) => {
+        let icon = iconFactory.createIcon(iconContract, window, initX);
         return icon;
     };
 
@@ -116,11 +117,21 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return menu;
     };
 
-    let registerChildIcons = (childIcons, pid, initX) => {
+    let registerChildIcons = (childIcons, parent, initX) => {
         for (let child of childIcons) {
-            let icon = createIcon(child, false, initX);
-            registerIcon(child.id, icon, pid);
+            let icon = createIcon(child, parent, initX);
+            registerIcon(child.id, icon, parent.id);
         }
+    };
+
+    let registerWorkbench = (id, workbench, menu) => {
+        registry.push({
+            id: id,
+			icon:null,
+			pid:-1,
+			window: workbench,
+            menu: menu
+		});
     };
 
     let registerIcon = (id, icon, pid) => {
@@ -139,7 +150,6 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     };
 
     let registerWindow = (id, window, menu) => {
-        // console.debug(windowProperties);
         let entry = get(id);
         if (!entry)
             throw "Missing registry entry with id " + id;

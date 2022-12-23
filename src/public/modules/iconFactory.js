@@ -13,45 +13,45 @@
 
 export var createIconFactory = (createNode, textConverter, iconPath) => {
     //Creates an icon
-    let createIcon = (id, properties, isDisk, initX) => {
+    const createIcon = (properties, window, initX) => {
         //Create new icon element
         let icon = {
-            //The images of this icon
+            //The images of icon icon
             image: iconPath + "/" + properties.image.file,
             imageSelected: iconPath + "/" + properties.imageSelected.file,
             initX: initX,
-            disk: isDisk,
+            disk: window.id === 0,
             title: properties.title,
 
-            //The DOM-element of this icon
+            //The DOM-element of icon icon
             element: {},
 
             setIconSize: function () {
-                let x = this.element.offsetWidth;
-                let y = this.element.offsetHeight;
-                this.element.style.width = x + "px";
-                this.element.style.height = y + "px";
+                let x = icon.element.offsetWidth;
+                let y = icon.element.offsetHeight;
+                icon.element.style.width = x + "px";
+                icon.element.style.height = y + "px";
             },
 
             setPositionLeft: function (x) {
-                this.element.style.left = x;
+                icon.element.style.left = x;
             },
 
             setPositionRight: function (x) {
-                this.element.style.right = x;
+                icon.element.style.right = x;
             },
 
             setPositionTop: function (y) {
-                this.element.style.top = y;
+                icon.element.style.top = y;
             }
         };
 
-        init(id, icon, properties);
+        init(icon, properties, window);
 
         return icon;
     };
 
-    let init = (id, icon, properties) => {
+    const init = (icon, properties, window) => {
         // Image
         let image = createNode("div").class("iconElements").style({
             backgroundImage: "url(" + icon.image + ")",
@@ -71,14 +71,16 @@ export var createIconFactory = (createNode, textConverter, iconPath) => {
         //Create div element and set background source files
         icon.element = createNode("div")
             .class("icon")
-            .id("icon_" + id)
+            .id("icon_" + properties.id)
             .append(image)
             .append(textImage)
             .data({
-                id: id,
+                id: properties.id,
                 status: "closed"
             })
             .getNode();
+
+        window.addIcon(icon);
     };
 
     return {

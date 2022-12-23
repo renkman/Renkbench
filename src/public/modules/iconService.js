@@ -8,6 +8,10 @@ export var createIconManager = (offsetTop, offsetHeight) => {
     var offsetTop = offsetTop;
     var offsetHeight = offsetHeight;
 
+    let createElement = () => {
+
+    };
+
     // Arranges the workbench icons
     var arrangeIcons = () => {
         // Set workbench icon with highest width
@@ -30,6 +34,7 @@ export var createIconManager = (offsetTop, offsetHeight) => {
     };
 
     return {
+        createElement : createElement,
         arrangeIcons: arrangeIcons
     };
 };

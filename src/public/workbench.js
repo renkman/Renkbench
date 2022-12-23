@@ -124,11 +124,11 @@ import { createWindowService } from "./modules/windowService.js";
 			apiClient.getWorkbench(),
 			apiClient.getMenu()
 		);
-		createWindowRegistry.addWorkbench(results[0], element, results[1], iconStartPos, 0);
+		createWindowRegistry.addWorkbench(results[0], element, results[1]);
 		switchCursor();
 
 		// .then(results => {
-		// 	createWindowRegistry.addWorkbench(results[0], element, results[1], iconStartPos, 0);
+		// 	createWindowRegistry.addWorkbench(results[0], element, results[1]);
 		// 	switchCursor();
 		// });
 //console.debug(registry.getWindow(0));
