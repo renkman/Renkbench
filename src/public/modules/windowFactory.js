@@ -6,22 +6,54 @@ export var createWindowFactory = (createNode, textConverter, workbenchElement) =
         element.dataset["id"] = id;
         element.style.zIndex = 1;
 
+        let iconStartPos = { x: "20px", y: "40px" };
+        let iconWidth = 0;
+        let icons = [];
+
         let workbench = {
             element: element,
-            iconStartPos: { x: "20px", y: "40px" },
-            arrangeIcons: windowRegistry => {
-                let childIcons = windowRegistry.getChildIcons(id);
-                for (let childIcon of childIcons) {
-                    let icon = childIcon;
-                    let right = Math.floor((iconWidth - parseInt(icon.element.style.width)) / 2);
-                    //console.debug("icon.id: %s, %i+%i=%i",icon.id,icon.initX,right,icon.initX+right);
+
+            arrangeIcons: () => {
+                for (let icon of icons) {
+                    let right = Math.floor((iconWidth - icon.getWidth()) / 2);
                     icon.element.style.right = (icon.initX + right) + "px";
                 }
             },
+
             addIcon: icon => {
+                icons.push(icon);
                 element.appendChild(icon.element);
-            }
+
+                icon.setIconSize();
+                icon.setPositionTop(iconStartPos.y);
+
+                let width = icon.getWidth();
+                let height = icon.getHeight();
+
+                // Set workbench icon with highest width
+                if (width > iconWidth)
+                    iconWidth = width;
+
+                // Setup coordinates for next icon
+                let nextPosY = parseInt(iconStartPos.y) + height + 20;
+                let borderBottom = element.offsetTop + element.offsetHeight;
+
+                // Just put the next icon under the current one.
+                if (nextPosY + height + 10 < borderBottom) {
+                    iconStartPos.y = nextPosY + "px";
+                    return;
+                }
+
+                // Set the next icon left to the current icon column.
+                iconStartPos.x = (parseInt(iconStartPos.x) + width + 10) + "px";
+                iconStartPos.y = "40px";
+            },
+
+            getIconStartPos: () => iconStartPos,
+
+            getIconWidth: () => iconWidth
         };
+
         return workbench;
     };
 
@@ -117,7 +149,6 @@ export var createWindowFactory = (createNode, textConverter, workbenchElement) =
 
                 //Add icon
                 this.icons.push(icon);
-
             },
 
             //Arranges the child icons of the window and resizes it.

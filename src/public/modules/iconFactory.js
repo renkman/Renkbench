@@ -16,6 +16,7 @@ export var createIconFactory = (createNode, textConverter, iconPath) => {
     const createIcon = (properties, window, initX) => {
         //Create new icon element
         let icon = {
+            id: properties.id,
             //The images of icon icon
             image: iconPath + "/" + properties.image.file,
             imageSelected: iconPath + "/" + properties.imageSelected.file,
@@ -27,22 +28,30 @@ export var createIconFactory = (createNode, textConverter, iconPath) => {
             element: {},
 
             setIconSize: function () {
-                let x = icon.element.offsetWidth;
-                let y = icon.element.offsetHeight;
-                icon.element.style.width = x + "px";
-                icon.element.style.height = y + "px";
+                let x = this.element.offsetWidth;
+                let y = this.element.offsetHeight;
+                this.element.style.width = x + "px";
+                this.element.style.height = y + "px";
             },
 
             setPositionLeft: function (x) {
-                icon.element.style.left = x;
+                this.element.style.left = x;
             },
 
             setPositionRight: function (x) {
-                icon.element.style.right = x;
+                this.element.style.right = x;
             },
 
             setPositionTop: function (y) {
-                icon.element.style.top = y;
+                this.element.style.top = y;
+            },
+
+            getHeight: function() {
+                return this.element.offsetHeight;
+            },
+
+            getWidth: function() {
+                return this.element.offsetWidth;
             }
         };
 

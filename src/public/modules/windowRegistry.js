@@ -5,14 +5,6 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
     let openWindowsCount = 0;
 
-    let addIcon = (iconContract, window, initX) => {
-        let icon = getIcon(iconContract.id);
-        if (icon)
-            return;
-        icon = createIcon(iconContract, window, initX);
-        registerIcon(iconContract.id, icon, window.id);
-    };
-
     let getIcon = id => {
         let entry = get(id);
         if (entry && entry.icon)
@@ -37,7 +29,10 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
             menu: menu
         });
 
-        registerChildIcons(windowContract.childIcons, workbench, 0);
+        registerChildIcons(windowContract.childIcons, workbench);
+        workbench.arrangeIcons();
+
+        return workbench;
     };
 
     let addWindow = windowContract => {
@@ -53,7 +48,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         let icon = getIcon(windowContract.id);
         window.addIcon(icon);
 
-        registerChildIcons(windowContract.childIcons, window, 0);
+        registerChildIcons(windowContract.childIcons, window);
 
         // Arrange child icons and set size
         // console.debug("PID: %i",pid);
@@ -109,7 +104,8 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return window;
     };
 
-    let createIcon = (iconContract, window, initX) => {
+    let createIcon = (iconContract, window) => {
+        let initX = parseInt(window.getIconStartPos().x);
         let icon = iconFactory.createIcon(iconContract, window, initX);
         return icon;
     };
@@ -122,9 +118,9 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return menu;
     };
 
-    let registerChildIcons = (childIcons, parent, initX) => {
+    let registerChildIcons = (childIcons, parent) => {
         for (let child of childIcons) {
-            let icon = createIcon(child, parent, initX);
+            let icon = createIcon(child, parent);
             registerIcon(child.id, icon, parent.id);
         }
     };
@@ -182,7 +178,6 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
     return {
         addWorkbench: addWorkbench,
-        addIcon: addIcon,
         getIcon: getIcon,
         addWindow: addWindow,
         getWindow: getWindow,

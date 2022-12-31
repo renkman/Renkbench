@@ -50,12 +50,6 @@ import { createWindowService } from "./modules/windowService.js";
 	//The mouse offset
 	var offset = {x:0,y:0};
 	
-	//The creation coordinates of the next icon.
-	var iconStartPos = {x:"20px",y:"40px"};
-	
-	//The highest icon width for rearrangement
-	var iconWidth = 0;
-	
 	// The minimum window size
 	var windowMinSize = {x:84,y:78};
 	
@@ -125,13 +119,8 @@ import { createWindowService } from "./modules/windowService.js";
 			apiClient.getMenu()
 		]);
 		registry.addWorkbench(results[0], element, results[1]);
-		switchCursor();
 
-		// .then(results => {
-		// 	registry.addWorkbench(results[0], element, results[1]);
-		// 	switchCursor();
-		// });
-//console.debug(registry.getWindow(0));
+		switchCursor();
 	};
 	
 	// Event listener functions
@@ -222,7 +211,8 @@ import { createWindowService } from "./modules/windowService.js";
 					selection=copyImage(selection);
 					element.appendChild(selection);
 					selection.zIndex=-1;
-					registry[oldSelectedElement.dataset.id].isSelected = true;
+					var window = registry.getWindow(oldSelectedElement.dataset.id);
+					window.isSelected = true;
 					break;
 				//If the element is a window button, change button image
 				case "buttonClose":
@@ -319,7 +309,7 @@ import { createWindowService } from "./modules/windowService.js";
 					selection.className=selection.className.replace("Selected","");
 					var windowElement = getWindowElement(curSelection);
 					var id = windowElement.dataset["id"];
-					var window=registry[id]["window"];
+					var window=registry.getWindow(id);
 					window.moveContentByScrollbar();
 					break;	
 				//Move the icon to the current dummy position and delete the dummy
@@ -330,9 +320,9 @@ import { createWindowService } from "./modules/windowService.js";
 					var parentElement=getDropzone();
 				
 					var id=/^icon_([0-9]+)$/.exec(icon.id)[1];
-					if(!registry[id]["icon"].disk
-					|| (registry[id]["icon"].disk
-					&& parentElement.id==="workbench"))
+					var window = registry.getWindow(id);
+					if(!window.disk
+						|| (window.disk && parentElement.id==="workbench"))
 					{
 						// Get position
 						var posX=parseInt(selection.style.left)-(parseInt(icon.style.width)-parseInt(selection.style.width))/2;
@@ -358,7 +348,7 @@ import { createWindowService } from "./modules/windowService.js";
 				case "frame":
 					var windowElement=oldSelectedElement;
 					var id=/^window_([0-9]+)$/.exec(windowElement.id)[1];
-					var window=registry[id]["window"];
+					var window=registry.getWindow(id);
 					if(selection.dataset.mode==="resize")
 						window.resize(selection.style.width, selection.style.height, curSelection);
 					else
@@ -392,7 +382,7 @@ import { createWindowService } from "./modules/windowService.js";
 				case "scrollButtonDown":
 					var windowElement = getWindowElement(curSelection);
 					var id = windowElement.dataset["id"];
-					var window=registry[id]["window"];
+					var window=registry.getWindow(id);
 					window.moveContentByButton(curSelection.className);
 					break;
 				case "buttonOk":
@@ -429,7 +419,7 @@ import { createWindowService } from "./modules/windowService.js";
 			{
 				var id = getWindowElement(selection).dataset["id"];
 				var order=openOrder;
-				var window=registry[id]["window"].element;
+				var window=registry.getWindow(id).element;
 //console.debug(curSelection.className);
 				var change=false;
 //console.dir(order);
@@ -444,7 +434,7 @@ import { createWindowService } from "./modules/windowService.js";
 						
 //console.debug("order[%i]: %i, order[%i]: %i",i,order[i],i+1,order[i+1]);
 						order[i]=order[i+1];
-						var temp=registry[order[i]]["window"].element;
+						var temp=registry.getWindow(order[i]).element;
 						temp.style.zIndex=i+2;
 					}
 					window.style.zIndex=order.length+1;
@@ -461,7 +451,7 @@ import { createWindowService } from "./modules/windowService.js";
 
 //console.debug("order[%i]: %i, order[%i]: %i",i,order[i],i-1,order[i-1]);
 						order[i]=order[i-1];
-						var temp=registry[order[i]]["window"].element;
+						var temp=registry.getWindow(order[i]).element;
 						temp.style.zIndex=i+2;
 					}
 					window.style.zIndex=1;
@@ -470,8 +460,9 @@ import { createWindowService } from "./modules/windowService.js";
 //console.dir(order);
 			}
 
-			if(oldSelectedElement != selection && oldSelectedElement.dataset && oldSelectedElement.dataset.id)
-				registry[oldSelectedElement.dataset.id].isEnabled = false;
+			// TODO: A registry entry has no isEnabled property
+			// if(oldSelectedElement != selection && oldSelectedElement.dataset && oldSelectedElement.dataset.id)
+			// 	registry[oldSelectedElement.dataset.id].isEnabled = false;
 
 			oldSelectedElement=selection;
 			selectedElement={};
@@ -503,7 +494,7 @@ import { createWindowService } from "./modules/windowService.js";
 		// Scroll button moving
 		var windowElement = getWindowElement(selection);
 		var id = windowElement.dataset["id"];
-		var window=registry[id]["window"];
+		var window=registry.getWindow(id);
 		
 		window.moveScrollButton(event, selection);	
 	};
@@ -551,7 +542,10 @@ import { createWindowService } from "./modules/windowService.js";
 		var id = oldSelectedElement.dataset !== undefined && oldSelectedElement.dataset["id"] !== undefined  ? oldSelectedElement.dataset["id"] : 0;
 		
 		// Get main menu as default menu
-		var currentMenu = registry[id].menu ? registry[id].menu : registry[0].menu;
+		let currentMenu = registry.getMenu(id);
+		if(!currentMenu)
+			registry.getMenu(0);
+
 		if(oldSelectedElement.className === "icon")
 			currentMenu.enableMenu();
 		else
@@ -592,7 +586,7 @@ import { createWindowService } from "./modules/windowService.js";
 			return;
 
 		var id = oldSelectedElement.dataset.id;
-		var window = registry[id].window;
+		var window = registry.getWindow(id);
 		if(window[command])
 			window[command]();
 	};	
@@ -691,7 +685,7 @@ import { createWindowService } from "./modules/windowService.js";
 	var selectWindow = element =>
 	{
 		for(var i=1;i<registry.length;i++)
-			registry[i].window.deselect();			
+			registry.getWindow(i).deselect();
 		
 		//If the worbench is clicked, only deleselect the windows
 		//and then return
@@ -704,7 +698,7 @@ import { createWindowService } from "./modules/windowService.js";
 		if(id < 1)
 			return;
 
-		var window = registry[id].window;
+		var window = registry.getWindow(id);
 		window.select();
 		//if(element.id!=="workbench")
 		//	changeImage(element.firstChild,"window",WINDOW+"titlebar_background.png");
@@ -784,14 +778,14 @@ import { createWindowService } from "./modules/windowService.js";
 				if(id < 0)
 					item=Workbench;
 				else
-					item=registry[id][type];
+					item=registry.getWindow(id);
 				file=image;
 				break;
 			case "icon":
 				id=getIconElement(element).id;
 				element=(element.className=="icon")?element.firstChild:element;
 				id=/^icon_([0-9]+)$/.exec(id)[1];
-				item=registry[id][type];
+				item=registry.getIcon(id);
 				file=item[image];
 				break;
 		}
@@ -865,7 +859,7 @@ import { createWindowService } from "./modules/windowService.js";
 		if(node.id === "workbench")
 			return node;
 
-		var window = registry[node.dataset.id].window;
+		var window = registry.getWindow(node.dataset.id);
 		return window.viewport.childNodes[0];
 	};
 	
