@@ -1,22 +1,22 @@
 "use strict";
 
 // Manages workbench windows
-export var createWindowService = (windowRegistry, apiClient, workbenchElement) => {
+export var createWindowService = (windowRegistry, apiClient) => {
     // The height in of the window title bar in pixels
     const TITLE_BAR_HEIGHT = 21;
 
     //The order of the opened windows
     let openOrder = [];
 
-    let openWindow = async id => {
+    let openWindow = async (id, workbenchElement) => {
         let window = windowRegistry.getWindow(id);
         if (window == null) {
             let windowProperties = await apiClient.getWindow(id);
-            window = windowRegistry.addWindow(windowProperties, 0);
+            window = windowRegistry.addWindow(windowProperties, workbenchElement);
         }
 
         window.arrangeIcons();
-        window.setPosition();
+        window.setPosition(workbenchElement);
 
         let menu = windowRegistry.getMenu(id);
         if (!menu)
@@ -27,7 +27,7 @@ export var createWindowService = (windowRegistry, apiClient, workbenchElement) =
         return window.open(workbenchElement, openOrder.length);
     };
 
-    let closeWindow = id => {
+    let closeWindow = (id, workbenchElement) => {
         let menu = windowRegistry.getMenu(id);
         if (!menu)
             menu = windowRegistry.getMenu(0);
@@ -49,7 +49,7 @@ export var createWindowService = (windowRegistry, apiClient, workbenchElement) =
         window.close(workbenchElement);
     };
 
-    let moveWindow = (event, selection, mouseOffset) => {
+    let moveWindow = (event, selection, mouseOffset, workbenchElement) => {
         //Calculate new window position
         let newPosX = event.clientX - mouseOffset.x;
         let newPosY = event.clientY - mouseOffset.y;

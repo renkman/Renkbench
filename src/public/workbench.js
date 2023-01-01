@@ -24,7 +24,7 @@ import { createWindowService } from "./modules/windowService.js";
 
 //The workbench main object
 (() => {
-	//The DOM-element of the workbench (<div>)
+	// The DOM-element of the workbench (<div>)
 	var element = {};
 
 	// The image path structure
@@ -149,7 +149,7 @@ import { createWindowService } from "./modules/windowService.js";
 					return false;
 
 				let id = image.dataset.id;
-				return windowService.openWindow(id);
+				return windowService.openWindow(id, element);
 			}
 			lastClickedElement=selection.parentNode;
 			
@@ -487,7 +487,7 @@ import { createWindowService } from "./modules/windowService.js";
 		if(selection.dataset.mode==="resize")
 			return resize(event, selection); // resize(event, selection);
 		else if(selection.dataset.mode==="move")
-			return windowService.moveWindow(event, selection, offset);
+			return windowService.moveWindow(event, selection, offset, element);
 
 		// Scroll button moving
 		var windowElement = getWindowElement(selection);

@@ -35,12 +35,12 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return workbench;
     };
 
-    let addWindow = windowContract => {
+    let addWindow = (windowContract, workbenchElement) => {
         let window = getWindow(windowContract.id);
         if (window)
             return;
 
-        window = createWindow(windowContract);
+        window = createWindow(windowContract, workbenchElement);
         //console.debug(window);
         let menu = createMenu(windowContract.id, windowContract.menu);
 
@@ -102,15 +102,15 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
             entry.isSelected = false;
     }
 
-    let createWindow = (windowContract) => {
-        let window = windowFactory.createWindow(windowContract.id, windowContract.window);
+    let createWindow = (windowContract, workbenchElement) => {
+        let window = windowFactory.createWindow(windowContract.id, windowContract.window, workbenchElement);
 
         //Fill the window with content
         if (typeof windowContract.content == "object") {
             if (windowContract.content.type == "file")
                 window.setDownload(windowContract.content);
             else
-                window.setContent(windowContract.content);
+                window.setContent(windowContract.content, workbenchElement);
         }
         else
             window.setIconArea();
@@ -132,6 +132,9 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     };
 
     let registerChildIcons = (childIcons, parent) => {
+        if(!childIcons)
+            return;
+        
         for (let child of childIcons) {
             let icon = createIcon(child, parent);
             registerIcon(child.id, icon, parent.id);
