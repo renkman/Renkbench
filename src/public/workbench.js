@@ -211,9 +211,7 @@ import { createWindowService } from "./modules/windowService.js";
 					selection=copyImage(selection);
 					element.appendChild(selection);
 					selection.zIndex=-1;
-					var window = registry.getWindow(oldSelectedElement.dataset.id);
-					window.isSelected = true;
-					break;
+					registry.select(oldSelectedElement.dataset.id);
 				//If the element is a window button, change button image
 				case "buttonClose":
 					changeImage(selection,"window",WINDOW+"button_close_selected.png");
@@ -321,8 +319,8 @@ import { createWindowService } from "./modules/windowService.js";
 				
 					var id=/^icon_([0-9]+)$/.exec(icon.id)[1];
 					var window = registry.getWindow(id);
-					if(!window.disk
-						|| (window.disk && parentElement.id==="workbench"))
+					if(window && (!window.disk
+						|| (window.disk && parentElement.id==="workbench")))
 					{
 						// Get position
 						var posX=parseInt(selection.style.left)-(parseInt(icon.style.width)-parseInt(selection.style.width))/2;
@@ -489,7 +487,7 @@ import { createWindowService } from "./modules/windowService.js";
 		if(selection.dataset.mode==="resize")
 			return resize(event, selection); // resize(event, selection);
 		else if(selection.dataset.mode==="move")
-			return windowService.moveWindow(event, selection);
+			return windowService.moveWindow(event, selection, offset);
 
 		// Scroll button moving
 		var windowElement = getWindowElement(selection);
@@ -544,7 +542,7 @@ import { createWindowService } from "./modules/windowService.js";
 		// Get main menu as default menu
 		let currentMenu = registry.getMenu(id);
 		if(!currentMenu)
-			registry.getMenu(0);
+			currentMenu = registry.getMenu(0);
 
 		if(oldSelectedElement.className === "icon")
 			currentMenu.enableMenu();
@@ -647,16 +645,6 @@ import { createWindowService } from "./modules/windowService.js";
 				word.children[j].style.backgroundPosition = coordinates[0] + " -" + color + "px";
 			}
 		}
-	};
-
-	var setMenuEntryColor = (menuEntry, color) => {
-		menuEntry.childNodes.forEach(word => {
-			word.childNodes.forEach(character => {
-				var position = character.style.backgroundPosition;
-				var coordinates = position.split(" ");
-				character.style.backgroundPosition = coordinates[0] + " -" + color + "px";
-			});
-		});
 	};
 	
 	var resize = (event, selection) => {

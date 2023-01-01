@@ -48,11 +48,11 @@ export var createMenuFactory = (createNode, textConverter) => {
 			return menu;
 		};
 		
-		let enableMenu = (node, enable) => {
+		let enableMenu = (node, oldSelectedElement, enable) => {
 			for(let i=0; i < node.children.length; i++)
 			{
 				let child = node.children[i];
-				enableMenu(child, enable);				
+				enableMenu(child, oldSelectedElement, enable);				
 	
 				if(!child.className.includes("dropdown-entry"))
 					continue;
@@ -60,14 +60,24 @@ export var createMenuFactory = (createNode, textConverter) => {
 				if(child.dataset.conditions === "true")
 					continue;
 
-				let isEnabled = enabled && enable && checkConditions(child.dataset.conditions);
+				let isEnabled = enabled && enable && checkConditions(child.dataset.conditions, oldSelectedElement);
 				child.className = isEnabled ? "dropdown-entry": "dropdown-entry-disabled";
 				setMenuEntryColor(child, isEnabled ? textConverter().fontColor.blueOnWhite : textConverter().fontColor.blueOnWhiteInactive);
 				child.dataset.isEnabled = isEnabled;
 			}
 		};
 
-		let checkConditions = conditionString => {
+		let setMenuEntryColor = (menuEntry, color) => {
+			menuEntry.childNodes.forEach(word => {
+				word.childNodes.forEach(character => {
+					var position = character.style.backgroundPosition;
+					var coordinates = position.split(" ");
+					character.style.backgroundPosition = coordinates[0] + " -" + color + "px";
+				});
+			});
+		};
+
+		let checkConditions = (conditionString, oldSelectedElement) => {
 			if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
 				return false;
 
@@ -100,14 +110,14 @@ export var createMenuFactory = (createNode, textConverter) => {
 			// The DOM-element of this menu
 			element : menu,
 
-			enableMenu : () => {
+			enableMenu : oldSelectedElement => {
 				enabled = true;
-				enableMenu(menu, true)
+				enableMenu(menu, oldSelectedElement, true)
 			},
 
-			disableMenu : () => {
+			disableMenu : oldSelectedElement => {
 				enabled = false;
-				enableMenu(menu, false)
+				enableMenu(menu, oldSelectedElement, false)
 			},
 
 			updateMenu : openWindowsCount => update(openWindowsCount)

@@ -49,10 +49,10 @@ export var createWindowService = (windowRegistry, apiClient, workbenchElement) =
         window.close(workbenchElement);
     };
 
-    let moveWindow = (event, selection) => {
+    let moveWindow = (event, selection, mouseOffset) => {
         //Calculate new window position
-        let newPosX = event.clientX - offset.x;
-        let newPosY = event.clientY - offset.y;
+        let newPosX = event.clientX - mouseOffset.x;
+        let newPosY = event.clientY - mouseOffset.y;
         //console.debug("x: %i, y: %i",newPosX,newPosY);
 
         //Set drag element to foreground

@@ -89,6 +89,19 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         return children.map(c => c.icon);
     }
 
+    let select = id => {
+        let entry = get(id);
+        if(entry)
+            entry.isSelected = true;
+    }
+
+
+    let deselect = id => {
+        let entry = get(id);
+        if(entry)
+            entry.isSelected = false;
+    }
+
     let createWindow = (windowContract) => {
         let window = windowFactory.createWindow(windowContract.id, windowContract.window);
 
@@ -183,6 +196,8 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         getWindow: getWindow,
         getParentWindow: getParentWindow,
         getMenu: getMenu,
-        getChildIcons: getChildIcons
+        getChildIcons: getChildIcons,
+        select: select,
+        deselect: deselect
     };
 };
