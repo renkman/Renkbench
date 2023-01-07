@@ -34,13 +34,13 @@ import { createWindowService } from "./modules/windowService.js";
 
 	let apiClient = createApiClient(httpClient);
 	
-	let windowFactory = createWindowFactory(createNode, textConverter, element);
+	let windowFactory = createWindowFactory(createNode, textConverter);
 	let menuFactory = createMenuFactory(createNode, textConverter);
 	let iconFactory = createIconFactory(createNode, textConverter, ICONS);
 
 	//The windows/icons registry	
 	var registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
-	var windowService = createWindowService(registry, apiClient, element);
+	var windowService = createWindowService(registry, apiClient);
 	
 	//The element currently selected by the user
 	var selectedElement = {};

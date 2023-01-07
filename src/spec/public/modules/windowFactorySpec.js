@@ -30,8 +30,8 @@ describe("windowFactory tests", function () {
             createNodeWrapper("div").getNode()
         ).getNode();
 
-        let factory = createWindowFactory(createNodeWrapper, textConverter, workbench);
-        let window = factory.createWindow(id, properties);
+        let factory = createWindowFactory(createNodeWrapper, textConverter);
+        let window = factory.createWindow(id, properties, workbench);
 
         expect(window).not.toBe(null);
         expect(window.id).toBe(id);

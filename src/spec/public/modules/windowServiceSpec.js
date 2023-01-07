@@ -46,8 +46,8 @@ describe("windowService tests", function () {
 
         let workbenchElement = {};
 
-        let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
-        await service.openWindow(id);
+        let service = createWindowService(windowRegistryMock, apiClientMock);
+        await service.openWindow(id, workbenchElement);
 
         expect(windowOpened).toBe(true);
         expect(positionSet).toBe(true);
@@ -65,7 +65,7 @@ describe("windowService tests", function () {
             let getWindowCalls = 0;
             let windows = [];
 
-            let addWindow = (properties, initX) => {
+            let addWindow = (properties, workbenchElement) => {
                 addWindowCalls++;
                 let window = {
                     id: properties.id,
@@ -105,8 +105,8 @@ describe("windowService tests", function () {
         let workbenchElement = {};
 
         let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
-        await service.openWindow(windowProperties.id);
-        await service.openWindow(windowProperties.id);
+        await service.openWindow(windowProperties.id, workbenchElement);
+        await service.openWindow(windowProperties.id, workbenchElement);
 
         expect(windowRegistryMock.getAddWindowCalls()).toBe(1);
         expect(windowRegistryMock.getGetWindowCalls()).toBe(2);
@@ -146,8 +146,8 @@ describe("windowService tests", function () {
 
         let workbenchElement = {};
 
-        let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
-        await service.openWindow(id);
+        let service = createWindowService(windowRegistryMock, apiClientMock);
+        await service.openWindow(id, workbenchElement);
 
         expect(windowOpened).toBe(true);
         expect(positionSet).toBe(true);
@@ -177,8 +177,8 @@ describe("windowService tests", function () {
 
         let workbenchElement = {};
 
-        let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
-        service.closeWindow(id);
+        let service = createWindowService(windowRegistryMock, apiClientMock);
+        service.closeWindow(id, workbenchElement);
 
         expect(windowClosed).toBe(true);
         expect(menuUpdated).toBe(true);
@@ -214,8 +214,8 @@ describe("windowService tests", function () {
 
         let workbenchElement = {};
 
-        let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
-        service.closeWindow(id);
+        let service = createWindowService(windowRegistryMock, apiClientMock);
+        service.closeWindow(id, workbenchElement);
 
         expect(windowClosed).toBe(true);
         expect(menuUpdated).toBe(true);

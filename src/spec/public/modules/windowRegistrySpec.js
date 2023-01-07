@@ -58,10 +58,11 @@ describe("windowRegistry tests", function () {
                     arrangeIcons: () => { }
                 };
             },
-            createWindow: (id, properties) => {
+            createWindow: (id, properties, workbenchElement) => {
                 return {
                     id: id,
                     title: properties.title,
+                    workbenchElement: workbenchElement,
                     setIconArea: () => { },
                     addIcon: icon => { },
                     getIconStartPos: () => { x: "25px" },
@@ -88,12 +89,13 @@ describe("windowRegistry tests", function () {
         const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
         registry.addWorkbench(workbenchContract, element, {});
 
-        registry.addWindow(windowContract);
+        registry.addWindow(windowContract, element);
         let window = registry.getWindow(windowContract.id);
         let menu = registry.getMenu(windowContract.id);
 
         expect(window).not.toBe(null);
         expect(window.id).toBe(windowContract.id);
+        expect(window.workbenchElement).toBe(element);
         expect(called).toBe(false);
         expect(menu).toBe(null);
     });
