@@ -100,244 +100,371 @@ describe("windowRegistry tests", function () {
         expect(menu).toBe(null);
     });
 
-    // it("windowRegistry.addWindow adds a window and gets a menu", function () {
-    //     const windowContract = {
-    //         "id": 2,
-    //         "pid": 0,
-    //         "window": {
-    //             "title": "Homecomputers"
-    //         },
-    //         "menu": ["Amiga 500", "CPC 464"],
-    //         "childIcons": []
-    //     };
+    it("windowRegistry.addWindow adds a window and gets a menu", function () {
+        const workbenchContract = {
+            "id": 0,
+            "pid": -1,
+            "window": {
+                "title": "Renkbench"
+            },
+            "childIcons": [
+                {
+                    id: 2,
+                    title: "Homecomputers",
+                    image: {
+                        file: "homecomputers.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "homecomputers_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                }
+            ]
+        };
+        
+        const windowContract = {
+            "id": 2,
+            "pid": 0,
+            "window": {
+                "title": "Homecomputers"
+            },
+            "menu": ["Amiga 500", "CPC 464"],
+            "childIcons": []
+        };
 
-    //     const parent = {
-    //         id: 0
-    //     };
+        let called = false;
+        const windowFactory = {
+            createWorkbench: (id, element) => {
+                return {
+                    id: id,
+                    element: element,
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    },
+                    arrangeIcons: () => { }
+                };
+            },
+            createWindow: (id, properties, workbenchElement) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setIconArea: () => {
+                        called = true;
+                    },
+                    addIcon: icon => { },
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    }
+                };
+            }
+        };
 
-    //     let called = false;
-    //     const windowFactory = {
-    //         createWindow: (id, properties) => {
-    //             return {
-    //                 id: id,
-    //                 title: properties.title,
-    //                 setIconArea: () => {
-    //                     called = true;
-    //                 },
-    //                 addIcon: icon => { },
-    //                 getIconStartPos: () => {
-    //                     return { x: "20px" };
-    //                 }
-    //             };
-    //         }
-    //     };
+        const menuFactory = {
+            createMenu: (items, id, openWindowsCount) => {
+                return {
+                    items: items,
+                    id: id,
+                    openWindowsCount: openWindowsCount
+                }
+            }
+        };
 
-    //     const menuFactory = {
-    //         createMenu: (items, id, openWindowsCount) => {
-    //             return {
-    //                 items: items,
-    //                 id: id,
-    //                 openWindowsCount: openWindowsCount
-    //             }
-    //         }
-    //     };
+        const iconFactory = {
+            createIcon: (iconContract, window, initX) => {
+                return {};
+            }
+        };
 
-    //     const iconFactory = {
-    //         createIcon: (iconContract, window, initX) => {
-    //             return {};
-    //         }
-    //     };
+        const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addWorkbench(workbenchContract, element, {});
 
-    //     const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
-    //     registry.addIcon({ id: windowContract.id }, parent, 12);
+        registry.addWindow(windowContract, element);
+        let menu = registry.getMenu(windowContract.id);
 
-    //     registry.addWindow(windowContract);
-    //     let menu = registry.getMenu(windowContract.id);
+        expect(menu).not.toBe(null);
+        expect(menu.items).toBe(windowContract.menu);
+        expect(called).toBe(true);
+    });
 
-    //     expect(menu).not.toBe(null);
-    //     expect(menu.items).toBe(windowContract.menu);
-    //     expect(called).toBe(true);
-    // });
+    it("windowRegistry.addWindow adds and gets a window with content", function () {
+        const workbenchContract = {
+            "id": 0,
+            "pid": -1,
+            "window": {
+                "title": "Renkbench"
+            },
+            "childIcons": [
+                {
+                    id: 4000,
+                    title: "Amiga",
+                    image: {
+                        file: "amiga.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "amiga_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                }
+            ]
+        };
+        
+        const windowContract = {
+            "id": 4000,
+            "pid": 0,
+            "window": {
+                "title": "Amiga"
+            },
+            "content": {},
+            "childIcons": []
+        };
 
-    // it("windowRegistry.addWindow adds and gets a window with content", function () {
-    //     const windowContract = {
-    //         "id": 4000,
-    //         "pid": 0,
-    //         "window": {
-    //             "title": "Amiga"
-    //         },
-    //         "content": {},
-    //         "childIcons": []
-    //     };
+        let called = false;
+        const windowFactory = {
+            createWorkbench: (id, element) => {
+                return {
+                    id: id,
+                    element: element,
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    },
+                    arrangeIcons: () => { }
+                };
+            },
+            createWindow: (id, properties, workbenchElement) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setContent: () => {
+                        called = true;
+                    },
+                    addIcon: icon => { },
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    }
+                };
+            }
+        };
 
-    //     const parent = {
-    //         id: 0
-    //     };
+        const menuFactory = {
+            createMenu: (items, id, openWindowsCount) => { }
+        };
 
-    //     let called = false;
-    //     const windowFactory = {
-    //         createWindow: (id, properties) => {
-    //             return {
-    //                 id: id,
-    //                 title: properties.title,
-    //                 setContent: () => {
-    //                     called = true;
-    //                 },
-    //                 addIcon: icon => { },
-    //                 getIconStartPos: () => {
-    //                     return { x: "20px" };
-    //                 }
-    //             };
-    //         }
-    //     };
+        const iconFactory = {
+            createIcon: (iconContract, window, initX) => {
+                return {};
+            }
+        };
 
-    //     const menuFactory = {};
-    //     const iconFactory = {
-    //         createIcon: (iconContract, window, initX) => {
-    //             return {};
-    //         }
-    //     };
+        const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addWorkbench(workbenchContract, element, {});
 
-    //     const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
-    //     registry.addIcon({ id: windowContract.id }, parent, 12);
+        registry.addWindow(windowContract, element);
+        let window = registry.getWindow(windowContract.id);
 
-    //     registry.addWindow(windowContract);
-    //     let window = registry.getWindow(windowContract.id);
+        expect(window).not.toBe(null);
+        expect(window.id).toBe(windowContract.id);
+        expect(called).toBe(true);
+    });
 
-    //     expect(window).not.toBe(null);
-    //     expect(window.id).toBe(windowContract.id);
-    //     expect(called).toBe(true);
-    // });
+    it("windowRegistry.addWindow adds and gets a window with file content", function () {
+        const workbenchContract = {
+            "id": 0,
+            "pid": -1,
+            "window": {
+                "title": "Renkbench"
+            },
+            "childIcons": [
+                {
+                    id: 3000,
+                    title: "Amiga",
+                    image: {
+                        file: "amiga.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "amiga_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                }
+            ]
+        };
 
-    // it("windowRegistry.addWindow adds and gets a window with file content", function () {
-    //     const windowContract = {
-    //         "id": 4000,
-    //         "pid": 0,
-    //         "window": {
-    //             "title": "Amiga"
-    //         },
-    //         "content": {
-    //             "type": "file"
-    //         },
-    //         "childIcons": []
-    //     };
+        const windowContract = {
+            "id": 3000,
+            "pid": 0,
+            "window": {
+                "title": "Amiga"
+            },
+            "content": {
+                "type": "file"
+            },
+            "childIcons": []
+        };
 
-    //     const parent = {
-    //         id: 0
-    //     };
+        let called = false;
+        const windowFactory = {
+            createWorkbench: (id, element) => {
+                return {
+                    id: id,
+                    element: element,
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    },
+                    arrangeIcons: () => { }
+                };
+            },
+            createWindow: (id, properties) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setDownload: () => {
+                        called = true;
+                    },
+                    addIcon: icon => { },
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    }
+                };
+            }
+        };
 
-    //     let called = false;
-    //     const windowFactory = {
-    //         createWindow: (id, properties) => {
-    //             return {
-    //                 id: id,
-    //                 title: properties.title,
-    //                 setDownload: () => {
-    //                     called = true;
-    //                 },
-    //                 addIcon: icon => { },
-    //                 getIconStartPos: () => {
-    //                     return { x: "20px" };
-    //                 }
-    //             };
-    //         }
-    //     };
+        const menuFactory = {
+            createMenu: (items, id, openWindowsCount) => { }
+        };
 
-    //     const menuFactory = {};
-    //     const iconFactory = {
-    //         createIcon: (iconContract, window, initX) => {
-    //             return {};
-    //         }
-    //     };
+        const iconFactory = {
+            createIcon: (iconContract, window, initX) => {
+                return {};
+            }
+        };
 
-    //     const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
-    //     registry.addIcon({ id: windowContract.id }, parent, 12);
+        const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addWorkbench(workbenchContract, element, {});
 
-    //     registry.addWindow(windowContract);
-    //     let window = registry.getWindow(windowContract.id);
+        registry.addWindow(windowContract, element);
+        let window = registry.getWindow(windowContract.id);
 
-    //     expect(window).not.toBe(null);
-    //     expect(window.id).toBe(windowContract.id);
-    //     expect(called).toBe(true);
-    // });
+        expect(window).not.toBe(null);
+        expect(window.id).toBe(windowContract.id);
+        expect(called).toBe(true);
+    });
 
-    // it("windowRegistry.addWindow adds and gets a window with child icons", function () {
-    //     const childIconId = 64;
-    //     const windowContract = {
-    //         "id": 2,
-    //         "pid": 0,
-    //         "window": {
-    //             "title": "Amiga"
-    //         },
-    //         "childIcons": [
-    //             {
-    //                 id: childIconId,
-    //                 title: "Workbench",
-    //                 image: {
-    //                     file: "workbench.png",
-    //                     height: 42,
-    //                     width: 42
-    //                 },
-    //                 imageSelected: {
-    //                     file: "workbench_selected.png",
-    //                     height: 42,
-    //                     width: 42
-    //                 }
-    //             }
-    //         ]
-    //     };
+    it("windowRegistry.addWindow adds and gets a window with child icons", function () {
+        const childIconId = 64;
 
-    //     const windowFactory = {
-    //         createWindow: (id, properties) => {
-    //             return {
-    //                 id: id,
-    //                 title: properties.title,
-    //                 setIconArea: () => { },
-    //                 addIcon: icon => { },
-    //                 getIconStartPos: () => {
-    //                     return { x: "20px" };
-    //                 }
-    //             };
-    //         }
-    //     };
+        const workbenchContract = {
+            "id": 0,
+            "pid": -1,
+            "window": {
+                "title": "Renkbench"
+            },
+            "childIcons": [
+                {
+                    id: 2,
+                    title: "Workbench",
+                    image: {
+                        file: "workbench.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "workbench_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                }
+            ]
+        };
 
-    //     const parent = {
-    //         id: 0
-    //     };
+        const windowContract = {
+            "id": 2,
+            "pid": 0,
+            "window": {
+                "title": "Amiga"
+            },
+            "childIcons": [
+                {
+                    id: childIconId,
+                    title: "Workbench",
+                    image: {
+                        file: "workbench.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "workbench_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                }
+            ]
+        };
 
-    //     const menuFactory = {
-    //         createMenu: (items, id, openWindowsCount) => { }
-    //     };
+        const windowFactory = {
+            createWorkbench: (id, element) => {
+                return {
+                    id: id,
+                    element: element,
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    },
+                    arrangeIcons: () => { }
+                };
+            },
+            createWindow: (id, properties) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    setIconArea: () => { },
+                    addIcon: icon => { },
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    }
+                };
+            }
+        };
 
-    //     const iconFactory = {
-    //         createIcon: (iconContract, window, initX) => {
-    //             if (iconContract.id === childIconId)
-    //                 return {
-    //                     id: iconContract.id,
-    //                     fileNames: [iconContract.image.file, iconContract.imageSelected.file],
-    //                     isDisk: window.id === 0,
-    //                     initX: initX
-    //                 };
-    //             createIcon: (iconContract, window, initX) => {
-    //                 return {};
-    //             }
-    //         }
-    //     };
+        const menuFactory = {
+            createMenu: (items, id, openWindowsCount) => { }
+        };
 
-    //     const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
-    //     registry.addIcon({ id: windowContract.id }, parent, 0);
+        const iconFactory = {
+            createIcon: (iconContract, window, initX) => {
+                if (iconContract.id === childIconId)
+                    return {
+                        id: iconContract.id,
+                        fileNames: [iconContract.image.file, iconContract.imageSelected.file],
+                        isDisk: window.id === 0,
+                        initX: initX
+                    };
+                createIcon: (iconContract, window, initX) => {
+                    return {};
+                }
+            }
+        };
 
-    //     registry.addWindow(windowContract);
-    //     let window = registry.getWindow(windowContract.id);
-    //     let childIcon = registry.getIcon(childIconId);
+        const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        registry.addWorkbench(workbenchContract, element, {});
 
-    //     expect(window).not.toBe(null);
-    //     expect(window.id).toBe(windowContract.id);
-    //     expect(childIcon.id).toBe(childIconId);
-    //     expect(childIcon.isDisk).toBe(false);
-    //     expect(childIcon.initX).toBe(20);
-    //     expect(childIcon.fileNames).toEqual(["workbench.png", "workbench_selected.png"]);
-    // });
+        registry.addWindow(windowContract, element);
+        let window = registry.getWindow(windowContract.id);
+        let childIcon = registry.getIcon(childIconId);
+
+        expect(window).not.toBe(null);
+        expect(window.id).toBe(windowContract.id);
+        expect(childIcon.id).toBe(childIconId);
+        expect(childIcon.isDisk).toBe(false);
+        expect(childIcon.initX).toBe(20);
+        expect(childIcon.fileNames).toEqual(["workbench.png", "workbench_selected.png"]);
+    });
 
     it("windowRegistry.addWorkbench adds and gets the workbench with child icons and menu", function () {
         const childIconId = 2;
