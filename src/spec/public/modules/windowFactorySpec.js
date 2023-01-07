@@ -19,14 +19,68 @@ describe("windowFactory tests", function () {
         expect(createWindowFactory).toEqual(jasmine.any(Function));
     });
 
+    it("windowFactory.createWorkbench creates the workbench", function () {
+        const id = 0;
+        const element = {
+            dataset: {},
+            style: {
+                zIndex: 0
+            }
+        };
+
+        let factory = createWindowFactory(createNodeWrapper, textConverter);
+        let workbench = factory.createWorkbench(id, element);
+
+        expect(workbench).not.toBe(null);
+        expect(workbench.element).toBe(element);
+        expect(workbench.element.style.zIndex).toBe(1);
+        expect(workbench.element.dataset.id).toBe(id);
+    });
+
+    it("workbench.addIcon adds an icon", function () {
+        const id = 0;
+        const element = {
+            dataset: {},
+            style: {
+                zIndex: 0
+            },
+            icon: {},
+            offsetHeight: 200,
+            offsetTop: 0,
+            appendChild: icon => element.icon = icon
+        };
+
+        let setIconSize = false;
+        const icon = {
+            posY: 0,
+            element: {},
+            setIconSize: () => setIconSize = true,
+            setPositionTop: (y) => icon.posY = y,
+            getWidth: () => 64,
+            getHeight: () => 32,
+        };
+
+        let factory = createWindowFactory(createNodeWrapper, textConverter);
+        let workbench = factory.createWorkbench(id, element);
+
+        workbench.addIcon(icon);
+        let iconStartPos = workbench.getIconStartPos();
+        let iconWidth = workbench.getIconWidth();
+
+        expect(workbench.element.icon).toBe(icon.element);
+        expect(iconStartPos.y).toBe("92px");
+        expect(iconStartPos.x).toBe("20px");
+        expect(iconWidth).toBe(64);
+    });
+
     it("windowFactory.createWindow creates a window", function () {
         const id = 4000;
 
-        let properties = {
+        const properties = {
             title: "Workbench"
         };
 
-        let workbench = createNodeWrapper("div").appendTo(
+        const workbench = createNodeWrapper("div").appendTo(
             createNodeWrapper("div").getNode()
         ).getNode();
 
