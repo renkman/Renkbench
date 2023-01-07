@@ -211,7 +211,8 @@ import { createWindowService } from "./modules/windowService.js";
 					selection=copyImage(selection);
 					element.appendChild(selection);
 					selection.zIndex=-1;
-					registry.select(oldSelectedElement.dataset.id);
+					// TODO: Remove whether not necessary
+					// registry.select(oldSelectedElement.dataset.id);
 				//If the element is a window button, change button image
 				case "buttonClose":
 					changeImage(selection,"window",WINDOW+"button_close_selected.png");

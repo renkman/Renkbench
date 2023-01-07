@@ -626,4 +626,86 @@ describe("windowRegistry tests", function () {
         expect(childIcons.length).toBe(2);
         expect(childIcons.map(i => i.id)).toEqual([1, 2]);
     });
+
+    it("windowRegistry.getParentWinow() gets the parent of a window", function () {
+        const workbenchContract = {
+            "id": 0,
+            "pid": -1,
+            "window": {
+                "title": "Renkbench"
+            },
+            "childIcons": [
+                {
+                    id: 2,
+                    title: "Workbench",
+                    image: {
+                        file: "workbench.png",
+                        height: 42,
+                        width: 42
+                    },
+                    imageSelected: {
+                        file: "workbench_selected.png",
+                        height: 42,
+                        width: 42
+                    }
+                }
+            ]
+        };
+
+        const windowContract = {
+            "id": 2,
+            "pid": 0,
+            "window": {
+                "title": "Amiga"
+            },
+            "childIcons": []
+        };
+
+        const windowFactory = {
+            createWorkbench: (id, element) => {
+                return {
+                    id: id,
+                    element: element,
+                    getIconStartPos: () => {
+                        return { x: "20px" };
+                    },
+                    arrangeIcons: () => { }
+                };
+            },
+            createWindow: (id, properties, workbenchElement) => {
+                return {
+                    id: id,
+                    title: properties.title,
+                    workbenchElement: workbenchElement,
+                    setIconArea: () => { },
+                    addIcon: icon => { },
+                    getIconStartPos: () => { x: "25px" },
+                    arrangeIcons: () => { }
+                };
+            }
+        };
+
+        let called = false;
+        const menuFactory = {
+            createMenu: (items, id, openWindowsCount) => {
+                if(id === 2)
+                    called = true;
+                return {};
+            }
+        };
+
+        const iconFactory = {
+            createIcon: (iconContract, window, initX) => {
+                return {};
+            }
+        };
+
+        const registry = createWindowRegistry(windowFactory, menuFactory, iconFactory);
+        let workbench = registry.addWorkbench(workbenchContract, element, {});
+
+        registry.addWindow(windowContract, element);
+        let parent = registry.getParentWindow(windowContract.id);
+
+        expect(parent).toBe(workbench);
+    });
 });
