@@ -213,6 +213,7 @@ import { createWindowService } from "./modules/windowService.js";
 					selection.zIndex=-1;
 					// TODO: Remove whether not necessary
 					// registry.select(oldSelectedElement.dataset.id);
+					break;
 				//If the element is a window button, change button image
 				case "buttonClose":
 					changeImage(selection,"window",WINDOW+"button_close_selected.png");
@@ -318,11 +319,11 @@ import { createWindowService } from "./modules/windowService.js";
 					//Set new parent element
 					var parentElement=getDropzone();
 				
-					var id=/^icon_([0-9]+)$/.exec(icon.id)[1];
-					var window = registry.getWindow(id);
-					if(window && (!window.disk
-						|| (window.disk && parentElement.id==="workbench")))
-					{
+					// var id=/^icon_([0-9]+)$/.exec(icon.id)[1];
+					// var window = registry.getWindow(id);
+					// if(window && (!window.disk
+					// 	|| (window.disk && parentElement.id==="workbench")))
+					// {
 						// Get position
 						var posX=parseInt(selection.style.left)-(parseInt(icon.style.width)-parseInt(selection.style.width))/2;
 						var posY=parseInt(selection.style.top);
@@ -337,8 +338,7 @@ import { createWindowService } from "./modules/windowService.js";
 						
 						// Select new parent node
 						parentElement.appendChild(icon);
-					}
-//console.debug("parentElement: %s, %s",parentElement.id,parentElement.className);
+					// }
 					
 					//Remove dummy
 					workbenchElement.removeChild(selection);
@@ -373,7 +373,7 @@ import { createWindowService } from "./modules/windowService.js";
 				case "buttonClose":
 					//var id=/^window_([0-9]+)$/.exec(selection.parentNode.parentNode.id)[1];
 					var id = getWindowElement(selection).dataset.id;
-					windowService.closeWindow(id);
+					windowService.closeWindow(id, element);
 					break;
 				case "scrollButtonLeft":
 				case "scrollButtonUp":
@@ -479,9 +479,9 @@ import { createWindowService } from "./modules/windowService.js";
 		&& selection.className!=="scrollButtonHorizontalSelected"
 		&& selection.className!=="scrollButtonVerticalSelected")
 			return false;
-//console.debug("Class: %s, id: %s, left: %s, top: %s",selection.className,selection.id,selection.style.left,selection.style.top);
-//console.dir(selection);
-//console.dir(event.target);		
+// console.debug("Class: %s, id: %s, left: %s, top: %s",selection.className,selection.id,selection.style.left,selection.style.top);
+// console.dir(selection);
+// console.dir(event.target);		
 		if(!event)
 			event=window.event;
 		

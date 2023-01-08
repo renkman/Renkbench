@@ -44,7 +44,7 @@ describe("windowFactory tests", function () {
             style: {
                 zIndex: 0
             },
-            icon: {},
+            icons: {},
             offsetHeight: 200,
             offsetTop: 0,
             appendChild: icon => element.icon = icon
@@ -67,10 +67,110 @@ describe("windowFactory tests", function () {
         let iconStartPos = workbench.getIconStartPos();
         let iconWidth = workbench.getIconWidth();
 
+        expect(setIconSize).toBe(true);
         expect(workbench.element.icon).toBe(icon.element);
         expect(iconStartPos.y).toBe("92px");
         expect(iconStartPos.x).toBe("20px");
         expect(iconWidth).toBe(64);
+    });
+
+    it("workbench.addIcon adds second icon into new column", function () {
+        const id = 0;
+        const element = {
+            dataset: {},
+            style: {
+                zIndex: 0
+            },
+            icons: [],
+            offsetHeight: 100,
+            offsetTop: 0,
+            appendChild: icon => element.icons.push(icon)
+        };
+
+        const icons = [{
+            posY: 0,
+            element: {},
+            setIconSize: () => {},
+            setPositionTop: function(y) { this.posY = y },
+            getWidth: () => 64,
+            getHeight: () => 32,
+        },
+        {
+            posY: 0,
+            element: {},
+            setIconSize: () => {},
+            setPositionTop: function(y) { this.posY = y },
+            getWidth: () => 80,
+            getHeight: () => 32,
+        }];
+
+        let factory = createWindowFactory(createNodeWrapper, textConverter);
+        let workbench = factory.createWorkbench(id, element);
+
+        workbench.addIcon(icons[0]);
+        workbench.addIcon(icons[1]);
+
+        let iconStartPos = workbench.getIconStartPos();
+        let iconWidth = workbench.getIconWidth();
+
+        expect(workbench.element.icons).toEqual(icons.map(i => i.element));
+        expect(iconStartPos.y).toBe("40px");
+        expect(iconStartPos.x).toBe("184px");
+        expect(iconWidth).toBe(80);
+    });
+
+    it("workbench.arrangeIcons arranges the icons on the y-axis", function () {
+        const id = 0;
+        const element = {
+            dataset: {},
+            style: {
+                zIndex: 0
+            },
+            icons: [],
+            offsetHeight: 200,
+            offsetTop: 0,
+            appendChild: icon => element.icons.push(icon)
+        };
+
+        const icons = [{
+            posY: 0,
+            element: {},
+            right: "",
+            initX: 20,
+            setIconSize: () => {},
+            setPositionRight: function(x) { this.right = x },
+            setPositionTop: function(y) { this.posY = y },
+            getWidth: () => 64,
+            getHeight: () => 32,
+        },
+        {
+            posY: 0,
+            element: {},
+            right: "",
+            initX: 20,
+            setIconSize: () => {},
+            setPositionRight: function(x) { this.right = x },
+            setPositionTop: function(y) { this.posY = y },
+            getWidth: () => 80,
+            getHeight: () => 32,
+        }];
+
+        let factory = createWindowFactory(createNodeWrapper, textConverter);
+        let workbench = factory.createWorkbench(id, element);
+
+        workbench.addIcon(icons[0]);
+        workbench.addIcon(icons[1]);
+        workbench.arrangeIcons();
+
+        let iconStartPos = workbench.getIconStartPos();
+        let iconWidth = workbench.getIconWidth();
+
+        expect(workbench.element.icons).toEqual(icons.map(i => i.element));
+        expect(iconStartPos.y).toBe("144px");
+        expect(iconStartPos.x).toBe("20px");
+        expect(iconWidth).toBe(80);
+        expect(icons[0].right).toBe("28px");
+        expect(icons[1].right).toBe("20px");
     });
 
     it("windowFactory.createWindow creates a window", function () {

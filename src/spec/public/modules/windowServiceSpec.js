@@ -32,7 +32,7 @@ describe("windowService tests", function () {
             getWindow: id => {
                 return {
                     id: id,
-                    open: (element, openWindowsCount) => windowOpened = true,
+                    open: _ => windowOpened = true,
                     arrangeIcons: () => iconsArranged = true,
                     setPosition: () => positionSet = true
                 };
@@ -69,7 +69,7 @@ describe("windowService tests", function () {
                 addWindowCalls++;
                 let window = {
                     id: properties.id,
-                    open: (element, openWindowsCount) => { },
+                    open: _ => { },
                     arrangeIcons: () => { },
                     setPosition: () => { }
                 };
@@ -124,7 +124,7 @@ describe("windowService tests", function () {
             getWindow: id => {
                 return {
                     id: id,
-                    open: (element, openWindowsCount) => windowOpened = true,
+                    open: _ => windowOpened = true,
                     arrangeIcons: () => iconsArranged = true,
                     setPosition: () => positionSet = true
                 };
@@ -165,7 +165,7 @@ describe("windowService tests", function () {
             getWindow: id => {
                 return {
                     id: id,
-                    close: element => windowClosed = true
+                    close: _ => windowClosed = true
                 };
             },
             getMenu: id => {
@@ -194,7 +194,7 @@ describe("windowService tests", function () {
             getWindow: id => {
                 return {
                     id: id,
-                    close: element => windowClosed = true
+                    close: _ => windowClosed = true
                 };
             },
             getMenu: windowId => {

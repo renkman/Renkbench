@@ -15,8 +15,8 @@ export var createWindowService = (windowRegistry, apiClient) => {
             window = windowRegistry.addWindow(windowProperties, workbenchElement);
         }
 
-        window.arrangeIcons();
         window.setPosition(workbenchElement);
+        window.arrangeIcons();
 
         let menu = windowRegistry.getMenu(id);
         if (!menu)
@@ -40,7 +40,7 @@ export var createWindowService = (windowRegistry, apiClient) => {
 
         //Delete closed window from open order.
         for (let i = 0; i < curOrder.length; i++) {
-            if (curOrder[i] != this.id)
+            if (curOrder[i] != openWindow.id)
                 newOrder.push(curOrder[i]);
         }
         openOrder = newOrder;

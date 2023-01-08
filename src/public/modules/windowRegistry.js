@@ -45,20 +45,18 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         let menu = createMenu(windowContract.id, windowContract.menu);
 
         registerWindow(windowContract.id, window, menu);
-        let icon = getIcon(windowContract.id);
-        window.addIcon(icon);
 
         registerChildIcons(windowContract.childIcons, window);
 
         // Arrange child icons and set size
         // console.debug("PID: %i",pid);
-        let parent = getWindow(window.pid);
+        let parent = getWindow(windowContract.pid);
         if (!parent)
             return;
 
-        parent.arrangeIcons();
+        parent.arrangeIcons();      
         if (windowContract.pid > 0)
-            parent.setPosition();
+            parent.setPosition(workbenchElement);
 
         return window;
     };

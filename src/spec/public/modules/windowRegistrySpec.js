@@ -252,7 +252,7 @@ describe("windowRegistry tests", function () {
         };
 
         const menuFactory = {
-            createMenu: (items, id, openWindowsCount) => { }
+            createMenu: (_, __, ___) => { }
         };
 
         const iconFactory = {

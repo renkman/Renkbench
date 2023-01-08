@@ -36,7 +36,7 @@ func seedWindows(client *mongo.Client, ctx context.Context) {
 	data := []interface{}{
 		model.Window{&id, 1, 0, model.WindowMetaInfo{"Renkbench"}, nil, &[]model.Icon{
 			model.Icon{3, "Edit", model.Image{"notepad.png", 32, 32}, model.Image{"notepad_selected.png", 32, 32}},
-			model.Icon{4, "Drawer", model.Image{"drawer.png", 31, 71}, model.Image{"drawer_selected.png", 34, 73}}}},
+			model.Icon{4, "Drawer", model.Image{"drawer.png", 71, 31}, model.Image{"drawer_selected.png", 34, 73}}}},
 		model.Window{&id, 2, 0, model.WindowMetaInfo{"Note!"}, &model.Content{getRef("Hello again!"),
 			&[]model.Article{model.Article{"Renkbench relaunch", `Next release: During 2022 I had the idea of switching the backend from Node.js to Go. Since I started my <a href="https://github.com/renkman/mongotui" target="_blank">MongoTUI MongoDB client</a> in 2020, I felt like programming more stuff in Go. So - here it is. And with this move, I replaced the static file based JSON-content with a MongoDB.<br /><br />The source code of this web app is available on my <a href="https://github.com/renkman/Renkbench" target="_blank">Github repository</a>.`}}, nil}, nil}}
 	manyResult := insertManyCollection(data, collection, client, ctx)
