@@ -14,6 +14,12 @@ export var createWindowService = (windowRegistry, apiClient) => {
             let windowProperties = await apiClient.getWindow(id);
             window = windowRegistry.addWindow(windowProperties, workbenchElement);
         }
+        else
+        {
+            workbenchElement.appendChild(window.element);
+            if(openOrder.some(id => id === window.id))
+                return;
+        }
 
         window.setPosition(workbenchElement);
         window.arrangeIcons();
@@ -24,7 +30,7 @@ export var createWindowService = (windowRegistry, apiClient) => {
         menu.updateMenu();
         openOrder.push(window.id);
 
-        return window.open(workbenchElement, openOrder.length);
+        return window.open(openOrder.length);
     };
 
     let closeWindow = (id, workbenchElement) => {
@@ -33,17 +39,9 @@ export var createWindowService = (windowRegistry, apiClient) => {
             menu = windowRegistry.getMenu(0);
         menu.updateMenu();
 
-        let newOrder = [];
-        let curOrder = openOrder;
-
-        //let id = this.element.dataset.id;
-
         //Delete closed window from open order.
-        for (let i = 0; i < curOrder.length; i++) {
-            if (curOrder[i] != openWindow.id)
-                newOrder.push(curOrder[i]);
-        }
-        openOrder = newOrder;
+        let index = openOrder.indexOf(id);
+        openOrder.splice(index, 1);
 
         let window = windowRegistry.getWindow(id);
         window.close(workbenchElement);

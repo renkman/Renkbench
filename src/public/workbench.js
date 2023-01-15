@@ -137,9 +137,9 @@ import { createWindowService } from "./modules/windowService.js";
 
 			// Determine the last two mousedown events as doubleclick, whether the
 			// timespan between them was smaller equal 500 ms
-//console.debug("Letzter Klick: %i, Jetzt: %i, Abstand: %i", lastClicked.getTime(), mouseDownTime.getTime(), span);
-//console.debug("Current selection: %s", selection.parentNode.id);
-//console.debug("Last selection: %s", lastClickedElement.id);
+// console.debug("Letzter Klick: %i, Jetzt: %i, Abstand: %i", lastClicked.getTime(), mouseDownTime.getTime(), span);
+// console.debug("Current selection: %s", selection.parentNode.id);
+// console.debug("Last selection: %s", lastClickedElement.id);
 			if(selection.parentNode === lastClickedElement && span<=500 && !selection.className.includes("Button"))
 			{
 				deselect(element)(event);
@@ -192,7 +192,7 @@ import { createWindowService } from "./modules/windowService.js";
 				var icon=changeImage(oldSelection,"icon","image");
 				icon.element.style.zIndex=1;
 			}
-		//console.debug("Class: %s",selection.className);
+// console.debug("Class: %s",selection.className);
 			var frameMode="move";
 			var className = (isChildOfClass(selection, "title") || isChildOfClass(selection, "titleInactive")) 
 				? "title" 
@@ -327,19 +327,21 @@ import { createWindowService } from "./modules/windowService.js";
 						// Get position
 						var posX=parseInt(selection.style.left)-(parseInt(icon.style.width)-parseInt(selection.style.width))/2;
 						var posY=parseInt(selection.style.top);
+
 						// Remove window x and y position for icon positioning
 						if(parentElement.className=="dropzone")
 						{
 							posX-=parentElement.parentNode.parentNode.offsetLeft;
 							posY-=parentElement.parentNode.parentNode.offsetTop;
 						}
+
 						icon.style.left=posX+"px";
 						icon.style.top=posY+"px";
-						
+
 						// Select new parent node
 						parentElement.appendChild(icon);
 					// }
-					
+
 					//Remove dummy
 					workbenchElement.removeChild(selection);
 					selection=icon;
@@ -678,12 +680,14 @@ import { createWindowService } from "./modules/windowService.js";
 		
 		//If the worbench is clicked, only deleselect the windows
 		//and then return
+//console.dir(element);
 		if(element.id==="workbench")
 			return;
 		
 		//Get the window titlebar
 		element=getWindowElement(element);
 		var id = element.dataset["id"];
+//console.dir(id);
 		if(id < 1)
 			return;
 
@@ -835,6 +839,8 @@ import { createWindowService } from "./modules/windowService.js";
 		var icon=selectedElement;
 		var posX=icon.offsetLeft+icon.offsetWidth/2;
 		var posY=icon.offsetTop+icon.offsetHeight/2;
+//console.debug("posX: %i", posX);
+//console.debug("posY: %i", posY);
 
 		// Get possible dropzone elements:
 		// The workbench and displayed windows (means zIndex >= 0)
@@ -843,6 +849,7 @@ import { createWindowService } from "./modules/windowService.js";
 			.sort((a, b) =>parseInt(b.style.zIndex) - parseInt(a.style.zIndex))
 			.filter(node => node.offsetLeft < posX && node.offsetTop < posY 
 				&& node.offsetLeft + node.offsetWidth > posX && node.offsetTop + node.offsetHeight > posY);
+//console.debug(elements);
 
 		var node = elements[0];
 		if(node.id === "workbench")

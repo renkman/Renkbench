@@ -22,16 +22,18 @@ describe("windowService tests", function () {
 
     it("windowService.openWindow opens the window with the passed id", async function () {
         const id = 500;
+        const windowElement = {};
 
         let windowOpened = false;
         let menuUpdated = false;
         let positionSet = false;
         let iconsArranged = false;
 
-        let windowRegistryMock = {
+        const windowRegistryMock = {
             getWindow: id => {
                 return {
-                    id: id,
+                    id: id,                    
+                    element: windowElement,
                     open: _ => windowOpened = true,
                     arrangeIcons: () => iconsArranged = true,
                     setPosition: () => positionSet = true
@@ -44,7 +46,10 @@ describe("windowService tests", function () {
 
         let apiClientMock = createApiClientMock(null);
 
-        let workbenchElement = {};
+        let workbenchElement = {
+            element : {},
+            appendChild : element => workbenchElement.element = element
+        };
 
         let service = createWindowService(windowRegistryMock, apiClientMock);
         await service.openWindow(id, workbenchElement);
@@ -53,9 +58,12 @@ describe("windowService tests", function () {
         expect(positionSet).toBe(true);
         expect(menuUpdated).toBe(true);
         expect(iconsArranged).toBe(true);
+        expect(workbenchElement.element).toBe(windowElement);
     });
 
     it("windowService.openWindow adds new window once", async function () {
+        const windowElement = {};
+
         let windowProperties = {
             id: 1000
         };
@@ -65,10 +73,11 @@ describe("windowService tests", function () {
             let getWindowCalls = 0;
             let windows = [];
 
-            let addWindow = (properties, workbenchElement) => {
+            let addWindow = (properties, _) => {
                 addWindowCalls++;
                 let window = {
                     id: properties.id,
+                    element: windowElement,
                     open: _ => { },
                     arrangeIcons: () => { },
                     setPosition: () => { }
@@ -102,7 +111,10 @@ describe("windowService tests", function () {
 
         let apiClientMock = createApiClientMock(windowProperties);
 
-        let workbenchElement = {};
+        let workbenchElement = {
+            element : {},
+            appendChild : element => workbenchElement.element = element
+        };
 
         let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
         await service.openWindow(windowProperties.id, workbenchElement);
@@ -110,10 +122,12 @@ describe("windowService tests", function () {
 
         expect(windowRegistryMock.getAddWindowCalls()).toBe(1);
         expect(windowRegistryMock.getGetWindowCalls()).toBe(2);
+        expect(workbenchElement.element).toBe(windowElement);
     });
 
     it("windowService.openWindow with window without menu updates the workbench menu", async function () {
         const id = 500;
+        const windowElement = {};
 
         let windowOpened = false;
         let menuUpdated = false;
@@ -126,7 +140,8 @@ describe("windowService tests", function () {
                     id: id,
                     open: _ => windowOpened = true,
                     arrangeIcons: () => iconsArranged = true,
-                    setPosition: () => positionSet = true
+                    setPosition: () => positionSet = true,
+                    element: windowElement
                 };
             },
             getMenu: windowId => {
@@ -144,7 +159,10 @@ describe("windowService tests", function () {
 
         let apiClientMock = createApiClientMock(null);
 
-        let workbenchElement = {};
+        let workbenchElement = {
+            element : {},
+            appendChild : element => workbenchElement.element = element
+        };
 
         let service = createWindowService(windowRegistryMock, apiClientMock);
         await service.openWindow(id, workbenchElement);
@@ -153,6 +171,7 @@ describe("windowService tests", function () {
         expect(positionSet).toBe(true);
         expect(menuUpdated).toBe(true);
         expect(iconsArranged).toBe(true);
+        expect(workbenchElement.element).toBe(windowElement);
     });
 
     it("windowService.closeWindow closes the window with the passed id", async function () {

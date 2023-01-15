@@ -144,6 +144,7 @@ export var createWindowFactory = (createNode, textConverter) => {
 
                 // Add icon to the dropzone
                 this.viewport.childNodes[0].appendChild(icon.element);
+                icon.setIconSize();
 
                 //Get maximum icon size
                 var sizeX = parseInt(icon.element.offsetWidth);
@@ -450,7 +451,7 @@ export var createWindowFactory = (createNode, textConverter) => {
             },
 
             open: function (openWindowsCount) {
-                this.isOpened = true;
+                this.isOpened = true;                
 
                 //Download file
                 // if (this.type == "file") {
