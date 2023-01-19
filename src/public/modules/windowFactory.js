@@ -1,9 +1,72 @@
 "use strict";
 
 // Creates workbench windows
-export var windowFactory = (createNode, textConverter, workbenchElement) => {
+export var createWindowFactory = (createNode, textConverter) => {
+    // The image path structure
+    const IMAGES = "images/";
+    const WINDOW = IMAGES + "window/";
+
+    let createWorkbench = (id, element) => {
+        element.dataset["id"] = id;
+        element.style.zIndex = 1;
+
+        const iconStartX = 20;
+        const iconStartY = 40;
+
+        let iconStartPos = { x: iconStartX + "px", y: iconStartY + "px" };
+        let maxIconWidth = 0;
+        let icons = [];
+
+        let workbench = {
+            id: id,
+            element: element,
+
+            arrangeIcons: () => {
+                for (let icon of icons) {
+                    let right = Math.floor((maxIconWidth - icon.getWidth()) / 2);
+                    icon.setPositionRight((icon.initX + right) + "px");
+                }
+            },
+
+            addIcon: icon => {
+                icons.push(icon);
+                element.appendChild(icon.element);
+
+                icon.setIconSize();
+                icon.setPositionTop(iconStartPos.y);
+
+                let width = icon.getWidth();
+                let height = icon.getHeight();
+
+                // Set workbench icon with highest width
+                if (width > maxIconWidth)
+                    maxIconWidth = width;
+
+                // Setup coordinates for next icon
+                let nextPosY = parseInt(iconStartPos.y) + height + 20;
+                let borderBottom = element.offsetTop + element.offsetHeight;
+
+                // Just put the next icon under the current one.
+                if (nextPosY + height + 10 < borderBottom) {
+                    iconStartPos.y = nextPosY + "px";
+                    return;
+                }
+
+                // Set the next icon left to the current icon column.
+                iconStartPos.x = (parseInt(iconStartPos.x) + width + 10) + "px";
+                iconStartPos.y = iconStartY + "px";
+            },
+
+            getIconStartPos: () => iconStartPos,
+
+            getIconWidth: () => maxIconWidth
+        };
+
+        return workbench;
+    };
+
     //Creates a window and its content
-    let createWindow = (id, properties) => {
+    let createWindow = (id, properties, workbenchElement) => {
 
         let window = {
             id: id,
@@ -25,6 +88,9 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
 
             // The icons contained by the window
             icons: [],
+
+            // States whether a window is opened
+            isOpened: false,
 
             // A content window does not show any icons.
             hasContent: false,
@@ -63,10 +129,10 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
             insertMode: true,
 
             //Sets the start position of the window
-            setPosition: function () {
+            setPosition: function (workbenchElement) {
                 //(icon.offsetLeft+(icon.offsetWidth-parseInt(image.style.width))/2)
-                var posX = (element.offsetWidth - this.element.offsetWidth) / 2;
-                var posY = (element.offsetHeight - this.element.offsetHeight) / 2;
+                var posX = (workbenchElement.offsetWidth - this.element.offsetWidth) / 2;
+                var posY = (workbenchElement.offsetHeight - this.element.offsetHeight) / 2;
                 this.element.style.left = posX + "px";
                 this.element.style.top = posY + "px";
             },
@@ -79,6 +145,7 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
 
                 // Add icon to the dropzone
                 this.viewport.childNodes[0].appendChild(icon.element);
+                icon.setIconSize();
 
                 //Get maximum icon size
                 var sizeX = parseInt(icon.element.offsetWidth);
@@ -91,11 +158,13 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
 
                 //Add icon
                 this.icons.push(icon);
-
             },
 
             //Arranges the child icons of the window and resizes it.
             arrangeIcons: function () {
+                if(!this.icons.length)
+                    return;
+                    
                 //Set window size
                 var height = Math.ceil(this.icons.length / 4);
 
@@ -130,7 +199,7 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
             },
 
             // Sets the content elements of a window
-            setContent: function (content) {
+            setContent: function (content, workbenchElement) {
                 //console.dir(content);
                 if (typeof content != "object")
                     return false;
@@ -157,7 +226,7 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
                     //this.element.style.width=maxWidth+"px";
                     //Reset scrollbar size
                     this.resizeScrollbars();
-                    this.setPosition();
+                    this.setPosition(workbenchElement);
                     return;
                 }
 
@@ -232,7 +301,7 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
                     //this.element.style.width=maxWidth+"px";
                     //Reset scrollbar size
                     this.resizeScrollbars();
-                    this.setPosition();
+                    this.setPosition(workbenchElement);
                 }
             },
 
@@ -382,47 +451,32 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
                 this.activeForm = this.formElements[0];
             },
 
-            open: function () {
-                registry[this.id].isOpened = true;
+            open: function (openWindowsCount) {
+                this.isOpened = true;                
 
                 //Download file
-                if (this.type == "file") {
-                    var temp = open(DATA_PATH + "/file/get/" + this.fileId, "Download");
-                    return true;
-                }
+                // if (this.type == "file") {
+                //     var temp = open(DATA_PATH + "/file/get/" + this.fileId, "Download");
+                //     return true;
+                // }
 
                 if (this.element.style.zIndex > 0)
                     return;
 
-                element.appendChild(this.element);
-                openOrder.push(this.id);
-                this.element.style.zIndex = openOrder.length + 1;
+                this.element.style.zIndex = openWindowsCount + 1;
                 this.element.style.visibility = "visible";
-
-                var menu = registry[this.id].menu ? registry[this.id].menu : registry[0].menu;
-                menu.updateMenu();
             },
 
-            close: function () {
+            appendTo: function(workbenchElement) {
+                workbenchElement.appendChild(this.element);
+            },
+
+            close: function (element) {
+                this.isOpened = false;
+
                 element.parentNode.appendChild(this.element);
                 this.element.style.zIndex = -1;
                 this.element.style.visibility = "hidden";
-
-                var newOrder = [];
-                var curOrder = openOrder;
-
-                //var id = this.element.dataset.id;
-                registry[this.id].isOpened = false;
-
-                //Delete closed window from open order.
-                for (var i = 0; i < curOrder.length; i++) {
-                    if (curOrder[i] != this.id)
-                        newOrder.push(curOrder[i]);
-                }
-                openOrder = newOrder;
-
-                var menu = registry[this.id].menu ? registry[this.id].menu : registry[0].menu;
-                menu.updateMenu();
             },
 
             enterText: function (event) {
@@ -563,14 +617,16 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
 
                 if (character.length > 0)
                     this.activeForm.removeChild(character[0]);
-            }
+            },
+
+            getIconStartPos: () => window.iconStartPos
         };
-        init(window, properties);
+        init(window, properties, workbenchElement);
 
         return window;
     };
 
-    let init = function(window, properties) {
+    let init = function (window, properties, workbenchElement) {
         // Create div element and set background source file
         window.element = createNode("div").class("window").
             id("window_" + window.id).
@@ -578,8 +634,8 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
             // Set custom css properties if there are any.								
             style(properties.css).
             tabIndex(0).
-            appendTo(workbenchElement.parentNode).
-            data({id:window.id}).getNode();
+            appendTo(workbenchElement).
+            data({ id: window.id }).getNode();
 
         // Create title bar
         /*
@@ -643,10 +699,50 @@ export var windowFactory = (createNode, textConverter, workbenchElement) => {
 
         // Add viewport
         window.viewport = createNode("div").class("viewport").appendTo(window.element).getNode();
-        //console.debug("Id: %i, minWidth: %i",this.id,this.minWidth);      
+        //console.debug("Id: %i, minWidth: %i",this.id,this.minWidth);
+    };
+
+    //Changes/switches the background image of an icon or a window/workbench
+    //button.
+    let changeImage = (element, type, image) => {
+        //console.debug(type);
+        //console.debug(image);
+        //console.dir(element);
+        // let id=0;
+        // let item={}
+        // let file="";
+
+        // switch(type)
+        // {
+        // 	case "window":
+        // 		id = getWindowElement(element).dataset["id"];
+        // 		if(id < 0)
+        // 			item=Workbench;
+        // 		else
+        // 			item=registry.getWindow(id);
+        // 		file=image;
+        // 		break;
+        // 	case "icon":
+        // 		id=getIconElement(element).id;
+        // 		element=(element.className=="icon")?element.firstChild:element;
+        // 		id=/^icon_([0-9]+)$/.exec(id)[1];
+        // 		item=registry.getIcon(id);
+        // 		file=item[image];
+        // 		break;
+        // }
+        //Get image from icon object members or via direct file path
+        element.style.backgroundImage = "url(" + image + ")";
+        // return item;
+    };
+
+    let getWindowElement = element => {
+        if (element.className === "window" || element.id === "workbench")
+            return element;
+        return getWindowElement(element.parentNode);
     };
 
     return {
+        createWorkbench: createWorkbench,
         createWindow: createWindow
     };
 };

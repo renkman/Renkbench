@@ -1,9 +1,7 @@
-name: Renkbench CI
+name: Renkbench CD
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
     branches: [ "master" ]
 
 jobs:

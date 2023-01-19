@@ -11,19 +11,20 @@
 
 "use strict";
 
-export var iconFactory = (createNode, textConverter, iconPath) => {
+export var createIconFactory = (createNode, textConverter, iconPath) => {
     //Creates an icon
-    let createIcon = (id, properties, isDisk, initX) => {
+    const createIcon = (properties, parent, initX) => {
         //Create new icon element
         let icon = {
-            //The images of this icon
+            id: properties.id,
+            //The images of icon icon
             image: iconPath + "/" + properties.image.file,
             imageSelected: iconPath + "/" + properties.imageSelected.file,
             initX: initX,
-            disk: isDisk,
+            disk: parent.id === 0,
             title: properties.title,
 
-            //The DOM-element of this icon
+            //The DOM-element of icon icon
             element: {},
 
             setIconSize: function () {
@@ -43,15 +44,23 @@ export var iconFactory = (createNode, textConverter, iconPath) => {
 
             setPositionTop: function (y) {
                 this.element.style.top = y;
+            },
+
+            getHeight: function() {
+                return this.element.offsetHeight;
+            },
+
+            getWidth: function() {
+                return this.element.offsetWidth;
             }
         };
 
-        init(id, icon, properties);
+        init(icon, properties, parent);
 
         return icon;
     };
 
-    let init = (id, icon, properties) => {
+    const init = (icon, properties, window) => {
         // Image
         let image = createNode("div").class("iconElements").style({
             backgroundImage: "url(" + icon.image + ")",
@@ -71,14 +80,16 @@ export var iconFactory = (createNode, textConverter, iconPath) => {
         //Create div element and set background source files
         icon.element = createNode("div")
             .class("icon")
-            .id("icon_" + id)
+            .id("icon_" + properties.id)
             .append(image)
             .append(textImage)
             .data({
-                id: id,
+                id: properties.id,
                 status: "closed"
             })
             .getNode();
+
+        window.addIcon(icon);
     };
 
     return {

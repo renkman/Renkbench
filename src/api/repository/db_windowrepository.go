@@ -40,15 +40,29 @@ func (windowRepository *dbWindowRepository) GetWindows(ctx context.Context) *mod
 	return windows
 }
 
-func (windowRepository *dbWindowRepository) GetWindowById(id int, ctx context.Context) *model.WindowResponse {
+func (windowRepository *dbWindowRepository) GetWindowById(id int, ctx context.Context) *model.Window {
 	cursor, err := windowRepository.getCollection().Find(ctx, bson.D{{Key: "id", Value: id}})
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
+	defer cursor.Close(ctx)
 
-	windows := windowRepository.readData(cursor, ctx)
-	return windows
+	for cursor.Next(ctx) {
+		var window model.Window
+		err = cursor.Decode(&window)
+		if err != nil {
+			log.Fatal(err)
+			return nil
+		}
+		return &window
+	}
+	err = cursor.Err()
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	return nil
 }
 
 func (windowRepository *dbWindowRepository) getCollection() *mongo.Collection {

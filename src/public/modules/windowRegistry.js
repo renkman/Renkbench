@@ -1,93 +1,123 @@
 "use strict";
 
-// let loadWindow = (url, id) => {
-//     let id = id || 0;
-//     httpClient.getJson(url + "/" + id)
-//         .then(addWindow)
-//         .catch(console.error);
-// };
-
-
 // Manages workbench windows
-export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
+export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
     let openWindowsCount = 0;
 
-    let addIcon = (id, iconContract, pid, initX) => {
-        let icon = getIcon(id);
-        if(icon)
-            return;
-        let isDisk = pid === 0;
-        icon = createIcon(id, iconContract, initX, isDisk);
-        registerIcon(id, icon, pid);
-    };
-
     let getIcon = id => {
         let entry = get(id);
-        if(entry && entry.icon)
+        if (entry && entry.icon)
             return entry.icon;
         return null;
     };
 
-    let addWindow = (windowContract, initX) => {
-        let window = getWindow(windowContract.id);
-        if(window)
+    let addWorkbench = (windowContract, element, menuContract) => {
+        let workbench = getWindow(windowContract.id);
+        if (workbench)
             return;
 
-        window = createWindow(windowContract);
+        workbench = windowFactory.createWorkbench(windowContract.id, element);
+        let menu = menuFactory.createMenu(menuContract, windowContract.id, openWindowsCount);
+
+        registerWorkbench(windowContract.id, workbench, menu);
+
+        registry.push({
+            icon: null,
+            pid: windowContract.pid,
+            window: workbench,
+            menu: menu
+        });
+
+        registerChildIcons(windowContract.childIcons, workbench);
+        workbench.arrangeIcons();
+
+        return workbench;
+    };
+
+    let addWindow = (windowContract, workbenchElement) => {
+        let window = getWindow(windowContract.id);
+        if (window)
+            return;
+
+        window = createWindow(windowContract, workbenchElement);
         //console.debug(window);
         let menu = createMenu(windowContract.id, windowContract.menu);
 
         registerWindow(windowContract.id, window, menu);
 
-        for (let child of windowContract.children) {
-            let icon = createIcon(child.id, child.icons, false, initX);
-            registerIcon(child.id, icon, windowContract.pid);
-            window.addIcon(icon);
-        }
+        registerChildIcons(windowContract.childIcons, window);
 
         // Arrange child icons and set size
         // console.debug("PID: %i",pid);
-        let parent = getWindow(window.pid);
-        if(!parent)
+        let parent = getWindow(windowContract.pid);
+        if (!parent)
             return;
 
-        parent.arrangeIcons();
+        parent.arrangeIcons();      
         if (windowContract.pid > 0)
-            parent.setPosition();
+            parent.setPosition(workbenchElement);
+
+        return window;
     };
 
     let getWindow = id => {
         let entry = get(id);
-        if(entry && entry.window)
+        if (entry && entry.window)
+            return entry.window;
+        return null;
+    };
+
+    let getParentWindow = id => {
+        let entry = getParent(id);
+        if (entry && entry.window)
             return entry.window;
         return null;
     };
 
     let getMenu = id => {
         let entry = get(id);
-        if(entry && entry.menu)
+        if (entry && entry.menu)
             return entry.menu;
         return null;
     };
 
-    let createWindow = (windowContract) => {
-        let window = windowFactory.createWindow(windowContract.id, windowContract.window);
+    let getChildIcons = parentId => {
+        let children = getChildren(parentId);
+        return children.map(c => c.icon);
+    }
+
+    let select = id => {
+        let entry = get(id);
+        if(entry)
+            entry.isSelected = true;
+    }
+
+
+    let deselect = id => {
+        let entry = get(id);
+        if(entry)
+            entry.isSelected = false;
+    }
+
+    let createWindow = (windowContract, workbenchElement) => {
+        let window = windowFactory.createWindow(windowContract.id, windowContract.window, workbenchElement);
 
         //Fill the window with content
         if (typeof windowContract.content == "object") {
             if (windowContract.content.type == "file")
                 window.setDownload(windowContract.content);
             else
-                window.setContent(windowContract.content);
+                window.setContent(windowContract.content, workbenchElement);
         }
         else
             window.setIconArea();
         return window;
     };
 
-    let createIcon = (id, iconContract, initX, isDisk) => {
-        let icon = iconFactory.createIcon(id, iconContract, isDisk, initX);
+    let createIcon = (iconContract, window) => {
+        let initX = parseInt(window.getIconStartPos().x);
+        let icon = iconFactory.createIcon(iconContract, window, initX);
         return icon;
     };
 
@@ -97,6 +127,26 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
             return null;
         let menu = menuFactory.createMenu(menuContract, id, openWindowsCount);
         return menu;
+    };
+
+    let registerChildIcons = (childIcons, parent) => {
+        if(!childIcons)
+            return;
+        
+        for (let child of childIcons) {
+            let icon = createIcon(child, parent);
+            registerIcon(child.id, icon, parent.id);
+        }
+    };
+
+    let registerWorkbench = (id, workbench, menu) => {
+        registry.push({
+            id: id,
+            icon: null,
+            pid: -1,
+            window: workbench,
+            menu: menu
+        });
     };
 
     let registerIcon = (id, icon, pid) => {
@@ -110,15 +160,13 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
             pid: pid,
             menu: null,
             isSelected: false,
-            isTrashcan: false,
-            isOpened: false
+            isTrashcan: false
         });
     };
 
     let registerWindow = (id, window, menu) => {
-        // console.debug(windowProperties);
         let entry = get(id);
-        if(!entry)
+        if (!entry)
             throw "Missing registry entry with id " + id;
 
         entry.window = window;
@@ -126,17 +174,31 @@ export var windowRegistry = (windowFactory, menuFactory, iconFactory) => {
     };
 
     let get = id => {
-        let result = registry.filter(w => w.id == id);
-        if(result.length === 1)
+        let result = registry.filter(e => e.id == id);
+        if (result.length === 1)
             return result[0];
         return null;
     };
 
+    let getParent = id => {
+        let entry = registry.filter(e => e.id == id);
+        let result = registry.filter(e => e.id == entry.pid);
+        if (result.length === 1)
+            return result[0];
+        return null;
+    }
+
+    const getChildren = parentId => registry.filter(e => e.pid == parentId);
+
     return {
-        addIcon: addIcon,
+        addWorkbench: addWorkbench,
         getIcon: getIcon,
         addWindow: addWindow,
         getWindow: getWindow,
-        getMenu: getMenu
+        getParentWindow: getParentWindow,
+        getMenu: getMenu,
+        getChildIcons: getChildIcons,
+        select: select,
+        deselect: deselect
     };
 };
