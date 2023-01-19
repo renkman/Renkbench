@@ -32,9 +32,12 @@ describe("windowService tests", function () {
         const windowRegistryMock = {
             getWindow: id => {
                 return {
-                    id: id,                    
+                    id: id,
                     element: windowElement,
                     open: _ => windowOpened = true,
+                    appendTo: function (workbenchElement) {
+                        workbenchElement.element = this.element;
+                    },
                     arrangeIcons: () => iconsArranged = true,
                     setPosition: () => positionSet = true
                 };
@@ -47,8 +50,7 @@ describe("windowService tests", function () {
         let apiClientMock = createApiClientMock(null);
 
         let workbenchElement = {
-            element : {},
-            appendChild : element => workbenchElement.element = element
+            element: {}
         };
 
         let service = createWindowService(windowRegistryMock, apiClientMock);
@@ -79,6 +81,9 @@ describe("windowService tests", function () {
                     id: properties.id,
                     element: windowElement,
                     open: _ => { },
+                    appendTo: function (workbenchElement) {
+                        workbenchElement.element = this.element;
+                    },
                     arrangeIcons: () => { },
                     setPosition: () => { }
                 };
@@ -112,8 +117,7 @@ describe("windowService tests", function () {
         let apiClientMock = createApiClientMock(windowProperties);
 
         let workbenchElement = {
-            element : {},
-            appendChild : element => workbenchElement.element = element
+            element: {}
         };
 
         let service = createWindowService(windowRegistryMock, apiClientMock, workbenchElement);
@@ -139,6 +143,9 @@ describe("windowService tests", function () {
                 return {
                     id: id,
                     open: _ => windowOpened = true,
+                    appendTo: function (workbenchElement) {
+                        workbenchElement.element = this.element;
+                    },
                     arrangeIcons: () => iconsArranged = true,
                     setPosition: () => positionSet = true,
                     element: windowElement
@@ -160,8 +167,7 @@ describe("windowService tests", function () {
         let apiClientMock = createApiClientMock(null);
 
         let workbenchElement = {
-            element : {},
-            appendChild : element => workbenchElement.element = element
+            element: {}
         };
 
         let service = createWindowService(windowRegistryMock, apiClientMock);

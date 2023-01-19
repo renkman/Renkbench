@@ -33,6 +33,7 @@ describe("windowFactory tests", function () {
 
         expect(workbench).not.toBe(null);
         expect(workbench.element).toBe(element);
+        expect(workbench.id).toBe(0);
         expect(workbench.element.style.zIndex).toBe(1);
         expect(workbench.element.dataset.id).toBe(id);
     });

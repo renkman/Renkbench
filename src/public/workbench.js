@@ -314,19 +314,19 @@ import { createWindowService } from "./modules/windowService.js";
 					break;	
 				//Move the icon to the current dummy position and delete the dummy
 				case "image":
-					var icon=oldSelectedElement;
+					let iconElement=oldSelectedElement;
 					
 					//Set new parent element
-					var parentElement=getDropzone();
+					let parentElement=getDropzone();
 				
-					// var id=/^icon_([0-9]+)$/.exec(icon.id)[1];
-					// var window = registry.getWindow(id);
-					// if(window && (!window.disk
-					// 	|| (window.disk && parentElement.id==="workbench")))
-					// {
+					var id=iconElement.dataset["id"];
+					let icon = registry.getIcon(id);
+					if(icon && (!icon.disk
+						|| (icon.disk && parentElement.id==="workbench")))
+					{
 						// Get position
-						var posX=parseInt(selection.style.left)-(parseInt(icon.style.width)-parseInt(selection.style.width))/2;
-						var posY=parseInt(selection.style.top);
+						let posX=parseInt(selection.style.left)-(parseInt(iconElement.style.width)-parseInt(selection.style.width))/2;
+						let posY=parseInt(selection.style.top);
 
 						// Remove window x and y position for icon positioning
 						if(parentElement.className=="dropzone")
@@ -335,16 +335,16 @@ import { createWindowService } from "./modules/windowService.js";
 							posY-=parentElement.parentNode.parentNode.offsetTop;
 						}
 
-						icon.style.left=posX+"px";
-						icon.style.top=posY+"px";
+						iconElement.style.left=posX+"px";
+						iconElement.style.top=posY+"px";
 
 						// Select new parent node
-						parentElement.appendChild(icon);
-					// }
+						parentElement.appendChild(iconElement);
+					}
 
 					//Remove dummy
 					workbenchElement.removeChild(selection);
-					selection=icon;
+					selection=iconElement;
 					break;
 				case "frame":
 					var windowElement=oldSelectedElement;

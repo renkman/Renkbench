@@ -16,7 +16,7 @@ export var createWindowService = (windowRegistry, apiClient) => {
         }
         else
         {
-            workbenchElement.appendChild(window.element);
+            window.appendTo(workbenchElement);
             if(openOrder.some(id => id === window.id))
                 return;
         }

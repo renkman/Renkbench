@@ -18,6 +18,7 @@ export var createWindowFactory = (createNode, textConverter) => {
         let icons = [];
 
         let workbench = {
+            id: id,
             element: element,
 
             arrangeIcons: () => {
@@ -466,6 +467,10 @@ export var createWindowFactory = (createNode, textConverter) => {
                 this.element.style.visibility = "visible";
             },
 
+            appendTo: function(workbenchElement) {
+                workbenchElement.appendChild(this.element);
+            },
+
             close: function (element) {
                 this.isOpened = false;
 
@@ -695,7 +700,6 @@ export var createWindowFactory = (createNode, textConverter) => {
         // Add viewport
         window.viewport = createNode("div").class("viewport").appendTo(window.element).getNode();
         //console.debug("Id: %i, minWidth: %i",this.id,this.minWidth);
-        // workbenchElement.appendChild(window.element);
     };
 
     //Changes/switches the background image of an icon or a window/workbench

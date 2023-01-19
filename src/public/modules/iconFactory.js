@@ -13,7 +13,7 @@
 
 export var createIconFactory = (createNode, textConverter, iconPath) => {
     //Creates an icon
-    const createIcon = (properties, window, initX) => {
+    const createIcon = (properties, parent, initX) => {
         //Create new icon element
         let icon = {
             id: properties.id,
@@ -21,7 +21,7 @@ export var createIconFactory = (createNode, textConverter, iconPath) => {
             image: iconPath + "/" + properties.image.file,
             imageSelected: iconPath + "/" + properties.imageSelected.file,
             initX: initX,
-            disk: window.id === 0,
+            disk: parent.id === 0,
             title: properties.title,
 
             //The DOM-element of icon icon
@@ -55,7 +55,7 @@ export var createIconFactory = (createNode, textConverter, iconPath) => {
             }
         };
 
-        init(icon, properties, window);
+        init(icon, properties, parent);
 
         return icon;
     };
