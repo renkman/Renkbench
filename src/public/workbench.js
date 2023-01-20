@@ -45,7 +45,6 @@ import { createWindowService } from "./modules/windowService.js";
 	//The element currently selected by the user
 	var selectedElement = {};
 	var oldSelectedElement = {};
-	var focus = {};
 	
 	//The mouse offset
 	var offset = {x:0,y:0};
@@ -529,7 +528,8 @@ import { createWindowService } from "./modules/windowService.js";
 			},
 			keyDown : event => {
 				event.preventDefault();
-				if(focus && focus.enterText)
+				let focus = registry.getSelectedWindow();
+				if(focus)
 					return focus.enterText(event);
 				return false;
 			}
@@ -675,8 +675,7 @@ import { createWindowService } from "./modules/windowService.js";
 	//Changes the selection status of the titlebar
 	var selectWindow = element =>
 	{
-		for(var i=1;i<registry.length;i++)
-			registry.getWindow(i).deselect();
+		registry.deselect();
 		
 		//If the worbench is clicked, only deleselect the windows
 		//and then return
@@ -686,13 +685,13 @@ import { createWindowService } from "./modules/windowService.js";
 		
 		//Get the window titlebar
 		element=getWindowElement(element);
-		var id = element.dataset["id"];
+		let id = element.dataset["id"];	
 //console.dir(id);
-		if(id < 1)
-			return;
+		if(id > 0)
+			registry.select(id);
 
-		var window = registry.getWindow(id);
-		window.select();
+		// let window = registry.getWindow(id);
+		// window.select();
 		//if(element.id!=="workbench")
 		//	changeImage(element.firstChild,"window",WINDOW+"titlebar_background.png");
 	};
@@ -930,20 +929,6 @@ import { createWindowService } from "./modules/windowService.js";
 		var titleNode = document.getElementById("mainTitle");
 		titleNode.style.display = "block";
 	};
-
-	var cursorDirection = {
-		up: 0,
-		right: 1,
-		down: 2,
-		left: 3	
-	};
-
-	var cursorIgnoredKeys = [
-		"Alt", "Control", "Shift", "AltGraph", "OS", "Escape",
-		"ContextMenu", "Insert", "CapsLock", "F1", 
-		"F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", 
-		"F11", "F12"
-	];
 
 	// Initialize workbench
 	init();	

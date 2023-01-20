@@ -68,6 +68,20 @@ export var createWindowFactory = (createNode, textConverter) => {
     //Creates a window and its content
     let createWindow = (id, properties, workbenchElement) => {
 
+        let cursorDirection = {
+            up: 0,
+            right: 1,
+            down: 2,
+            left: 3	
+        };
+    
+        let cursorIgnoredKeys = [
+            "Alt", "Control", "Shift", "AltGraph", "OS", "Escape",
+            "ContextMenu", "Insert", "CapsLock", "F1", 
+            "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", 
+            "F11", "F12"
+        ];
+
         let window = {
             id: id,
 
@@ -434,8 +448,8 @@ export var createWindowFactory = (createNode, textConverter) => {
                 this.titleInactive.style.display = "block";
                 this.title.style.display = "none";
 
-                if (this.formElements.length > 0 && focus === this)
-                    focus = null;
+                // if (this.formElements.length > 0 && focus === this)
+                //     focus = null;
             },
 
             select: function () {
@@ -447,7 +461,7 @@ export var createWindowFactory = (createNode, textConverter) => {
                 if (this.formElements.length === 0)
                     return;
 
-                focus = this;
+                // focus = this;
                 this.activeForm = this.formElements[0];
             },
 
@@ -480,6 +494,9 @@ export var createWindowFactory = (createNode, textConverter) => {
             },
 
             enterText: function (event) {
+                if(!this.activeForm.firstChild)
+                    return false;
+
                 event.preventDefault();
 
                 if (event.key === "Insert")

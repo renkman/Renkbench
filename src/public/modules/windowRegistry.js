@@ -54,7 +54,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         if (!parent)
             return;
 
-        parent.arrangeIcons();      
+        parent.arrangeIcons();
         if (windowContract.pid > 0)
             parent.setPosition(workbenchElement);
 
@@ -85,19 +85,29 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let getChildIcons = parentId => {
         let children = getChildren(parentId);
         return children.map(c => c.icon);
-    }
+    };
 
     let select = id => {
         let entry = get(id);
-        if(entry)
-            entry.isSelected = true;
-    }
+        if (!entry)
+            return;
+        
+        entry.isSelected = true;
+        entry.window.select();
+    };
 
+    let deselect = () => {
+        let entry = registry.find(r => r.isSelected);
+        if (!entry)
+            return;
+        
+        entry.isSelected = false;
+        entry.window.deselect();
+    };
 
-    let deselect = id => {
-        let entry = get(id);
-        if(entry)
-            entry.isSelected = false;
+    let getSelectedWindow = () => {
+        let focus = registry.find(r => r.isSelected);
+        return focus.window;
     }
 
     let createWindow = (windowContract, workbenchElement) => {
@@ -130,9 +140,9 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     };
 
     let registerChildIcons = (childIcons, parent) => {
-        if(!childIcons)
+        if (!childIcons)
             return;
-        
+
         for (let child of childIcons) {
             let icon = createIcon(child, parent);
             registerIcon(child.id, icon, parent.id);
@@ -199,6 +209,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         getMenu: getMenu,
         getChildIcons: getChildIcons,
         select: select,
-        deselect: deselect
+        deselect: deselect,
+        getSelectedWindow: getSelectedWindow
     };
 };
