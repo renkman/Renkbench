@@ -148,7 +148,8 @@ import { createWindowService } from "./modules/windowService.js";
 					return false;
 
 				let id = image.dataset.id;
-				return windowService.openWindow(id, element);
+				windowService.openWindow(id, element);
+				return true;
 			}
 			lastClickedElement=selection.parentNode;
 			
@@ -210,8 +211,7 @@ import { createWindowService } from "./modules/windowService.js";
 					selection=copyImage(selection);
 					element.appendChild(selection);
 					selection.zIndex=-1;
-					// TODO: Remove whether not necessary
-					// registry.select(oldSelectedElement.dataset.id);
+					registry.select(oldSelectedElement.dataset.id);
 					break;
 				//If the element is a window button, change button image
 				case "buttonClose":
@@ -544,13 +544,11 @@ import { createWindowService } from "./modules/windowService.js";
 		
 		// Get main menu as default menu
 		let currentMenu = registry.getMenu(id);
-		if(!currentMenu)
-			currentMenu = registry.getMenu(0);
 
 		if(oldSelectedElement.className === "icon")
-			currentMenu.enableMenu();
+			registry.enableMenu(id);
 		else
-			currentMenu.disableMenu();
+			registry.disableMenu(id);
 		
 		menu.appendChild(currentMenu.element);
 		menu.style.display = "block";
@@ -571,12 +569,12 @@ import { createWindowService } from "./modules/windowService.js";
 		return false;
 	};
 
-	var executeMenuCommand = event => {
-		var menuEntry = getParentWithClass(event.target, "dropdown-entry");
+	var executeMenuCommand = async event => {
+		let menuEntry = getParentWithClass(event.target, "dropdown-entry");
 		if(!menuEntry)
 			return;		
 
-		var command = menuEntry.dataset.command;
+		let command = menuEntry.dataset.command;
 		if(menuEntry.dataset.conditions === "true" && core[command])
 		{
 			core[command]();
@@ -586,10 +584,9 @@ import { createWindowService } from "./modules/windowService.js";
 		if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
 			return;
 
-		var id = oldSelectedElement.dataset.id;
-		var window = registry.getWindow(id);
-		if(window[command])
-			window[command]();
+		let id = oldSelectedElement.dataset.id;
+		if(windowService[command])
+			windowService[command](id, element);
 	};	
 
 	var hoverContextMenu = node => {

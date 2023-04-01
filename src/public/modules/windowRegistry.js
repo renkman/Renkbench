@@ -4,6 +4,7 @@
 export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
     let registry = [];
     let openWindowsCount = 0;
+    let defaultMenu = {};
 
     let getIcon = id => {
         let entry = get(id);
@@ -19,6 +20,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
         workbench = windowFactory.createWorkbench(windowContract.id, element);
         let menu = menuFactory.createMenu(menuContract, windowContract.id, openWindowsCount);
+        defaultMenu = menu;
 
         registerWorkbench(windowContract.id, workbench, menu);
 
@@ -79,7 +81,20 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         let entry = get(id);
         if (entry && entry.menu)
             return entry.menu;
-        return null;
+        return defaultMenu;
+    };
+
+    let enableMenu = id => {
+        let menu = getMenu(id);
+        menu.enableMenu(id, checkConditions);
+    };
+
+    let disableMenu = id => {
+        let menu = getMenu(id);
+        if (!menu)
+            return;
+
+        menu.disableMenu(id);
     };
 
     let getChildIcons = parentId => {
@@ -91,24 +106,38 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         let entry = get(id);
         if (!entry)
             return;
-        
+
         entry.isSelected = true;
-        entry.window.select();
+        if (entry.window)
+            entry.window.select();
     };
 
     let deselect = () => {
         let entry = registry.find(r => r.isSelected);
         if (!entry)
             return;
-        
+
         entry.isSelected = false;
-        entry.window.deselect();
+        if (entry.window)
+            entry.window.deselect();
     };
 
     let getSelectedWindow = () => {
         let focus = registry.find(r => r.isSelected);
         return focus.window;
-    }
+    };
+
+    let setWindowOpened = id => {
+        let record = get(id);
+        if (record)
+            record.isOpened = true;
+    };
+
+    let setWindowClosed = id => {
+        let record = get(id);
+        if (record)
+            record.isOpened = false;
+    };
 
     let createWindow = (windowContract, workbenchElement) => {
         let window = windowFactory.createWindow(windowContract.id, windowContract.window, workbenchElement);
@@ -170,6 +199,7 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
             pid: pid,
             menu: null,
             isSelected: false,
+            isOpened: false,
             isTrashcan: false
         });
     };
@@ -181,6 +211,19 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
 
         entry.window = window;
         entry.menu = menu;
+    };
+
+    let checkConditions = (conditionString, id) => {
+        if (!id)
+            return false;
+
+        let record = get(id);
+        let conditions = JSON.parse(conditionString);
+        return conditions.every(condition => {
+            if (condition.operand === "greaterThan")
+                return record[condition.property] > condition.value;
+            return record[condition.property] === condition.value;
+        });
     };
 
     let get = id => {
@@ -210,6 +253,10 @@ export var createWindowRegistry = (windowFactory, menuFactory, iconFactory) => {
         getChildIcons: getChildIcons,
         select: select,
         deselect: deselect,
-        getSelectedWindow: getSelectedWindow
+        getSelectedWindow: getSelectedWindow,
+        enableMenu: enableMenu,
+        disableMenu: disableMenu,
+        setWindowOpened: setWindowOpened,
+        setWindowClosed: setWindowClosed
     };
 };

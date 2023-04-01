@@ -18,7 +18,7 @@ export var createWindowService = (windowRegistry, apiClient) => {
         {
             window.appendTo(workbenchElement);
             if(openOrder.some(id => id === window.id))
-                return;
+                return window;
         }
 
         window.setPosition(workbenchElement);
@@ -27,24 +27,28 @@ export var createWindowService = (windowRegistry, apiClient) => {
         let menu = windowRegistry.getMenu(id);
         if (!menu)
             menu = windowRegistry.getMenu(0);
-        menu.updateMenu();
+        windowRegistry.enableMenu(id);
+        windowRegistry.setWindowOpened(id);
+        menu.updateMenu(openOrder.length, id);        
         openOrder.push(window.id);
-
-        return window.open(openOrder.length);
+        window.open(openOrder.length);
+        return window;
     };
 
     let closeWindow = (id, workbenchElement) => {
-        let menu = windowRegistry.getMenu(id);
-        if (!menu)
-            menu = windowRegistry.getMenu(0);
-        menu.updateMenu();
-
         //Delete closed window from open order.
         let index = openOrder.indexOf(id);
         openOrder.splice(index, 1);
 
+        let menu = windowRegistry.getMenu(id);
+        if (!menu)
+            menu = windowRegistry.getMenu(0);
+        menu.updateMenu(openOrder.length, id);
+        windowRegistry.setWindowClosed(id);
+
         let window = windowRegistry.getWindow(id);
         window.close(workbenchElement);
+        return window;
     };
 
     let moveWindow = (event, selection, mouseOffset, workbenchElement) => {

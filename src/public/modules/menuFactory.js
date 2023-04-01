@@ -45,14 +45,15 @@ export var createMenuFactory = (createNode, textConverter) => {
 						.getNode();
 				}
 			}
+
 			return menu;
 		};
 		
-		let enableMenu = (node, oldSelectedElement, enable) => {
+		let enableMenu = (node, id, enable, checkConditions) => {
 			for(let i=0; i < node.children.length; i++)
 			{
 				let child = node.children[i];
-				enableMenu(child, oldSelectedElement, enable);				
+				enableMenu(child, id, enable, checkConditions);				
 	
 				if(!child.className.includes("dropdown-entry"))
 					continue;
@@ -60,7 +61,7 @@ export var createMenuFactory = (createNode, textConverter) => {
 				if(child.dataset.conditions === "true")
 					continue;
 
-				let isEnabled = enabled && enable && checkConditions(child.dataset.conditions, oldSelectedElement);
+				let isEnabled = enabled && enable && checkConditions(child.dataset.conditions, id);
 				child.className = isEnabled ? "dropdown-entry": "dropdown-entry-disabled";
 				setMenuEntryColor(child, isEnabled ? textConverter().fontColor.blueOnWhite : textConverter().fontColor.blueOnWhiteInactive);
 				child.dataset.isEnabled = isEnabled;
@@ -77,27 +78,26 @@ export var createMenuFactory = (createNode, textConverter) => {
 			});
 		};
 
-		let checkConditions = (conditionString, oldSelectedElement) => {
-			if(!oldSelectedElement || !oldSelectedElement.dataset || !oldSelectedElement.dataset.id)
-				return false;
+		// let checkConditions = (conditionString, id) => {
+		// 	if(!id)
+		// 		return false;
 
-			let selectedId = oldSelectedElement.dataset.id;
-			let record = registry[selectedId];
-			let conditions = JSON.parse(conditionString);
-			return conditions.every(condition => {
-				if(condition.operand === "greaterThan")
-					return record[condition.property] > condition.value;
-				return record[condition.property] === condition.value;
-			});
-		};
+		// 	let record = registry[id];
+		// 	let conditions = JSON.parse(conditionString);
+		// 	return conditions.every(condition => {
+		// 		if(condition.operand === "greaterThan")
+		// 			return record[condition.property] > condition.value;
+		// 		return record[condition.property] === condition.value;
+		// 	});
+		// };
 		
 		let update = (openWindowsCount) => {		
 			menu.childNodes.forEach(node => {
 				node.childNodes[1].style.zIndex = openWindowsCount + 2;
 			});
 
-			if(enabled)
-				enableMenu(menu, true);
+			// if(enabled)
+			// 	enableMenu(menu, id, true, checkConditions);
 		};
 		
 		let enabled = false;
@@ -110,14 +110,14 @@ export var createMenuFactory = (createNode, textConverter) => {
 			// The DOM-element of this menu
 			element : menu,
 
-			enableMenu : oldSelectedElement => {
+			enableMenu : (id, checkConditions) => {
 				enabled = true;
-				enableMenu(menu, oldSelectedElement, true)
+				enableMenu(menu, id, true, checkConditions)
 			},
 
-			disableMenu : oldSelectedElement => {
+			disableMenu : id => {
 				enabled = false;
-				enableMenu(menu, oldSelectedElement, false)
+				enableMenu(menu, id, false)
 			},
 
 			updateMenu : openWindowsCount => update(openWindowsCount)

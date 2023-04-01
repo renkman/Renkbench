@@ -234,4 +234,41 @@ describe("menuFactory tests", function () {
         expect(menu.disableMenu).toEqual(jasmine.any(Function));
         expect(menu.updateMenu).toEqual(jasmine.any(Function));
     });
+
+    it("enableMenu enables the menu for the passed id", function () {
+        let menuItems = {
+            menu: [
+                {
+                    name: "Amiga",
+                    entries: [
+                        {
+                            name: "Amiga 500",
+                            command: "play",
+                            conditions: [{ property: "isSelected", value: true }]
+                        },
+                        {
+                            name: "Amiga 1000",
+                            command: "work",
+                            conditions: "true"
+                        }
+                    ]
+                },
+                {
+                    name: "8 bit",
+                    entries: [
+                        {
+                            name: "VIC 20",
+                            command: "load",
+                            conditions: "true"
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        let factory = createMenuFactory(domTreeMock, textConverter);
+        let menu = factory.createMenu(menuItems, 1, 3);
+        
+        menu.enableMenu(0);        
+    });
 });

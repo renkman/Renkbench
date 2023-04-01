@@ -67,8 +67,8 @@ func seedMenu(client *mongo.Client, ctx context.Context) {
 
 	data := []interface{}{
 		model.Menu{"Renkbench", []model.MenuEntry{
-			model.MenuEntry{"Open", "open", `[ {"property" : "isSelected", "value" : true } ]`},
-			model.MenuEntry{"Close", "close", `[ {"property" : "isSelected", "value" : true }, {"property" : "isOpened", "value" : true } ]`},
+			model.MenuEntry{"Open", "openWindow", `[ {"property" : "isSelected", "value" : true } ]`},
+			model.MenuEntry{"Close", "closeWindow", `[ {"property" : "isSelected", "value" : true }, {"property" : "isOpened", "value" : true } ]`},
 			model.MenuEntry{"Duplicate", "duplicate", `[ {"property" : "isSelected", "value" : true } ]`},
 			model.MenuEntry{"Rename", "rename", `[ {"property" : "isSelected", "value" : true } ]`},
 			model.MenuEntry{"Info", "info", `[ {"property" : "isSelected", "value" : true } ]`},
