@@ -3,6 +3,7 @@ name: Renkbench CD
 on:
   push:
     branches: [ "master" ]
+  workflow_dispatch:    
 
 jobs:
 
