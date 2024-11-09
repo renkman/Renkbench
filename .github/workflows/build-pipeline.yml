@@ -15,13 +15,13 @@ jobs:
     - name: API unit tests
       run: |
         cd src
-        docker-compose -f docker/docker-compose.yml up test-backend
+        docker compose -f docker/docker-compose.yml up test-backend
         docker cp test-backend:/src/api/coverage.out ./
 
     - name: Frontend unit tests
       run: |
         cd src
-        docker-compose -f docker/docker-compose.yml up test-frontend
+        docker compose -f docker/docker-compose.yml up test-frontend
         docker cp docker_test-frontend_1:/src/coverage/ ./
 
     - name: Upload coverage to Codecov
@@ -32,17 +32,17 @@ jobs:
     - name: Docker cleanup
       run: |
         cd src
-        docker-compose -f docker/docker-compose.yml down
+        docker compose -f docker/docker-compose.yml down
 
     - name: Build the API
       run: |
         cd src
-        docker-compose -f docker/docker-compose.yml build app
+        docker compose -f docker/docker-compose.yml build app
 
     - name: Build the db init
       run: |
         cd src
-        docker-compose -f docker/docker-compose.yml build init
+        docker compose -f docker/docker-compose.yml build init
 
     - name: Push docker images to Docker Hub
       run: |
